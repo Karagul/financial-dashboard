@@ -1,9 +1,7 @@
 library(shiny)
-library(shinythemes)
 library(ggplot2)
 library(googleVis)
 library(googlesheets)
-
 
 # Define UI for application that plots features of movies 
 ui <- fluidPage(theme = shinytheme("sandstone"),
@@ -23,16 +21,24 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
                       
                       selectInput(inputId = "Growth Rate",
                                   label = "Percentage Growth:",
-                                  choices = c("blah", "dfsg")
-                                  )
+                                  choices = c("Exponential: 10%/Month", "Exponential: 20%/Month",
+                                              "Exponential: 25%/Month","Exponential: 40%/Month", 
+                                              "Exponential: 50%/Month","Exponential: 75%/Month",
+                                              "Exponential: 100%/Month","Exponential: 150%/Month")
+                                  ),
+                      radioButtons(inputId = "Options",
+                                   choices = c("Color","Year", "Type","Visualization"),
+                                   label = "Other Options")
                     ),
                        # Outputs
                       mainPanel(
                          tabsetPanel(type = "tab",
-                                     tabPanel("Revenue over time", plotOutput(outputId = "Bar_graph")),
-                                     tabPanel("Labor Cost over time", plotOutput(outputId ="line_graph"))
-                                      
-                          
+                                     tabPanel("Profit", plotOutput(outputId = "Bar_graph")),
+                                     tabPanel("Runway", plotOutput(outputId ="line_graph")),
+                                     tabPanel("Revenue"),
+                                     tabPanel("Labor Cost"),
+                                     tabPanel("Partner Pay"),
+                                     tabPanel("Other")
                         )
                      )
                   )
@@ -40,7 +46,7 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
               tabPanel("Partners"),
               navbarMenu("More",
                          tabPanel("Spreadsheet",
-                                  shiny::dataTableOutput(outputId = "data")
+                                  dataTableOutput(outputId = "data")
                          ),
                          tabPanel("About")
               )
@@ -66,7 +72,7 @@ server <- function(input, output) {
   
   output$data <- renderDataTable({
     datatable(data = gs_MRT,
-              options = list(pageLength = 10, lengthMenu = c(10, 25, 40)), 
+              options = list(pageLength = 20, lengthMenu = c(10, 25, 40)), 
               rownames = FALSE)
   })
   
