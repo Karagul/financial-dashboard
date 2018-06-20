@@ -2,6 +2,7 @@ library(shiny)
 library(ggplot2)
 library(googleVis)
 library(googlesheets)
+library(DT)
 
 # Define UI for application that plots features of movies 
 ui <- fluidPage(theme = shinytheme("sandstone"),
@@ -71,7 +72,7 @@ server <- function(input, output) {
   })
   
   output$data <- renderDataTable({
-    datatable(data = gs_MRT,
+    DT::datatable(data = gs_MRT,
               options = list(pageLength = 20, lengthMenu = c(10, 25, 40)), 
               rownames = FALSE)
   })
