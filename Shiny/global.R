@@ -1,3 +1,8 @@
 library(shiny)
-data <- readRDS("healthexp.Rds")
-data$Region <- as.factor(data$Region)
+source("Server.R")
+source("UI.R")
+source("global.R")
+
+
+# Run the app ----
+shinyApp(ui = ui, server = server)
