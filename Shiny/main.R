@@ -1,140 +1,71 @@
 library(shiny)
 library(ggplot2)
-library(stringr)
-library(dplyr)
-library(DT)
-library(tools)
-library(googlesheets)
-#source(gs_MRT)
-load(url("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies.Rdata"))
 
-# Define UI for application that plots features of movies
-ui <- fluidPage(
+# Define UI for application that plots features of movies 
+ui <- fluidPage(theme = shinytheme("sandstone"),
+                
+           # App title
+ titlePanel("Invisible Model 3.0", windowTitle = "TheMoodel3.0"),
   
-  #title of page
-  titlePanel("Invisible Model 3.0", windowTitle = "Model3.0"),
-  
-  # Sidebar layout with a input and output definitions
+  # Sidebar layout with a input and output definitions 
   sidebarLayout(
     
-    # Inputs
     sidebarPanel(
-      
-      h3("Plotting"),      # Third level header: Plotting
-      
-      # Select variable for y-axis 
-      selectInput(inputId = "y", 
-                  label = "Y-axis:",
-                  choices = c("IMDB rating" = "imdb_rating", 
-                              "IMDB number of votes" = "imdb_num_votes", 
-                              "Critics Score" = "critics_score", 
-                              "Audience Score" = "audience_score", 
-                              "Runtime" = "runtime"), 
-                  selected = "audience_score"),
-      
-      # Select variable for x-axis 
-      selectInput(inputId = "x", 
-                  label = "X-axis:",
-                  choices = c("IMDB rating" = "imdb_rating", 
-                              "IMDB number of votes" = "imdb_num_votes", 
-                              "Critics Score" = "critics_score", 
-                              "Audience Score" = "audience_score", 
-                              "Runtime" = "runtime"), 
-                  selected = "critics_score"),
-      
-      # Enter text for plot title
-      textInput(inputId = "plot_title", 
-                label = "Plot title", 
-                placeholder = "Enter text to be used as plot title"),
-      
-      hr(),            # Horizontal line for visual separation
-      
-      h3("Subsetting"),               # Third level header: Subsetting
-      
-      # Select which types of movies to plot
-      checkboxGroupInput(inputId = "selected_type",
-                         label = "Select movie type(s):",
-                         choices = c("Documentary", "Feature Film", "TV Movie"),
-                         selected = "Feature Film"),
-      
-      hr(),               # Horizontal line for visual separation
-      
-      # Show data table
-      checkboxInput(inputId = "show_data",
-                    label = "Show data table",
-                    value = TRUE)
-      
+    # Select variable for y-axis 
+    selectInput(inputId = "y", 
+                label = "Y-axis:",
+                choices = c("Revenue"), 
+                selected = "Revenue"),
+    
+    # Select variable for x-axis 
+    selectInput(inputId = "x", 
+                label = "X-axis:",
+                choices = c("Month"), 
+                selected = "Month"),
+    sliderInput(inputId = "Month",
+                label = "Number of months:",
+                min = 1,
+                max = nrow(gs_MRT),
+                value = c(3,nrow(gs_MRT) - 5))
+
     ),
     
-    # Output:
+    # Outputs
     mainPanel(
-      
-      h3("Scatterplot"),    # Third level header: Scatterplot
-      plotOutput(outputId = "scatterplot"),
-      br(),               # Single line break for a little bit of visual separation
-      
-      h5(textOutput("description")),
-      # Fifth level header: Description
-      
-      #conditional for data panel
-      conditionalPanel("input.show_data == true", h3("Data table")),
-      
-      DT::dataTableOutput(outputId = "moviestable")
+      tabsetPanel(type = "tab",
+                  tabPanel("Scatterplot", plotOutput(outputId = "scatterplot")),
+                  tabPanel("Data", dataTableOutput(outputId ="data")),
+                  tabPanel("Histogram", plotOutput(outputId ="histogram"))
+                  
+      )
     )
   )
 )
 
-################################################################################
-################################################################################
-##################################server########################################
-################################################################################
-################################################################################
-
 # Define server function required to create the scatterplot
-server <- function(input, output, session) {
+server <- function(input, output) {
   
-  # Create a subset of data filtering for selected title types
-  movies_selected <- reactive({
-    req(input$selected_type) # ensure availablity of value before proceeding
-    filter(movies, title_type %in% input$selected_type)
-  })
-  
-  # x and y as reactive expressions
-  x <- reactive({ toTitleCase(str_replace_all(input$x, "_", " ")) })
-  y <- reactive({ toTitleCase(str_replace_all(input$y, "_", " ")) })
-  
-  # Create scatterplot object the plotOutput function is expecting 
+  # Create scatterplot object the plotOutput function is expecting
   output$scatterplot <- renderPlot({
-    ggplot(data = movies_selected(), aes_string(x = input$x, y = input$y)) +
-      geom_point() +
-      labs(x = x(),
-           y = y(),
-           color = toTitleCase(str_replace_all(input$z, "_", " ")),
-           title = toTitleCase(input$plot_title))
+    ggplot(data = gs_MRT, aes_string(x = input$x, y = input$y)) +
+      geom_point()
   })
   
-  # Create description of plot
-  output$description <- renderText({
-    paste("The plot above shows the relationship between",
-          x(),
-          "and",
-          y(),
-          "for",
-          nrow(movies_selected()),
-          "movies.")
+  output$data <- renderDataTable({
+    datatable(data = gs_MRT,
+              options = list(pageLength = 10, lengthMenu = c(10, 25, 40)), 
+              rownames = FALSE)
   })
   
-  # Print data table if checked
-  output$moviestable <- DT::renderDataTable(
-    if(input$show_data){
-      DT::datatable(data = movies_selected()[, 1:6], 
-                    options = list(pageLength = 10), 
-                    rownames = FALSE)
-    }
-  )
-  
+  output$histogram <- renderPlot({
+    x <- gs_MRT$Revenue
+    x <- gsub(",", "", x)# remove comma
+    x <- gsub("$", "", x)# remove dollar
+    x <- as.numeric(x)
+    hist(x, breaks = 20, col = "red")
+  })
 }
 
-# Create Shiny app object
-shinyApp(ui = ui, server = server)
 
+# Create a Shiny app object
+shinyApp(ui = ui, server = server)
