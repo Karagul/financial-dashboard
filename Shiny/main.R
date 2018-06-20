@@ -1,49 +1,66 @@
 library(shiny)
 library(ggplot2)
+library(googleVis)
+library(googlesheets)
 
 # Define UI for application that plots features of movies 
 ui <- fluidPage(theme = shinytheme("sandstone"),
                 
-           # App title
- titlePanel("Invisible Model 3.0", windowTitle = "TheMoodel3.0"),
-  
-  # Sidebar layout with a input and output definitions 
-  sidebarLayout(
-    
-    sidebarPanel(
-    # Select variable for y-axis 
-    selectInput(inputId = "y", 
-                label = "Y-axis:",
-                choices = c("Revenue"), 
-                selected = "Revenue"),
-    
-    # Select variable for x-axis 
-    selectInput(inputId = "x", 
-                label = "X-axis:",
-                choices = c("Month"), 
-                selected = "Month"),
-    sliderInput(inputId = "Month",
-                label = "Number of months:",
-                min = 1,
-                max = nrow(gs_MRT),
-                value = c(3,nrow(gs_MRT) - 5))
-
-    ),
-    
-    # Outputs
-    mainPanel(
-      tabsetPanel(type = "tab",
-                  tabPanel("Scatterplot", plotOutput(outputId = "scatterplot")),
-                  tabPanel("Data", dataTableOutput(outputId ="data")),
-                  tabPanel("Histogram", plotOutput(outputId ="histogram"))
-                  
-      )
-    )
-  )
+ #top bar
+   navbarPage("Invisible",
+              tabPanel("Investors",
+                  titlePanel("Invisible Model 3.0", windowTitle = "TheMoodel3.0"), # App title
+                    sidebarLayout( # Sidebar layout with a input and output definitions
+                      sidebarPanel(
+                        
+                        
+                      # Select variable for y-axis 
+                     selectInput(inputId = "y", 
+                                  label = "Y-axis:",
+                                  choices = c("Revenue"), 
+                                  selected = "Revenue"
+                                 ),
+                      
+                      # Select variable for x-axis 
+                      selectInput(inputId = "x", 
+                                  label = "X-axis:",
+                                  choices = c("Month"), 
+                                  selected = "Month"
+                                  ),
+                      sliderInput(inputId = "Month",
+                                  label = "Number of months:",
+                                  min = 1,
+                                  max = nrow(gs_MRT),
+                                  value = c(3,nrow(gs_MRT) - 5))
+                      ),
+                      
+                      # Outputs
+                      mainPanel(
+                        tabsetPanel(type = "tab",
+                                    #tabPanel("Scatterplot", htmlOutput("view")),
+                                    tabPanel("Scatterplot", plotOutput(outputId = "scatterplot")),
+                                    tabPanel("Histogram", plotOutput(outputId ="histogram"))
+                                    
+                        
+                       )
+                     )
+                  )
+                ),
+            tabPanel("Partners"),
+            navbarMenu("More",
+                       tabPanel("Spreadsheet",
+                                dataTableOutput(outputId = "data")
+                       ),
+                       tabPanel("About")
+            )
+   )
 )
+
 
 # Define server function required to create the scatterplot
 server <- function(input, output) {
+  
+
   
   # Create scatterplot object the plotOutput function is expecting
   output$scatterplot <- renderPlot({
