@@ -1,4 +1,5 @@
 library(shiny)
+library(shinythemes)
 library(ggplot2)
 library(googleVis)
 library(googlesheets)
@@ -39,7 +40,7 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
               tabPanel("Partners"),
               navbarMenu("More",
                          tabPanel("Spreadsheet",
-                                  dataTableOutput(outputId = "data")
+                                  shiny::dataTableOutput(outputId = "data")
                          ),
                          tabPanel("About")
               )
