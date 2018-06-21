@@ -3,6 +3,7 @@ library(ggplot2)
 library(googleVis)
 library(googlesheets)
 library(DT)
+library(shinythemes)
 
 # Define UI for application that plots features of movies 
 ui <- fluidPage(theme = shinytheme("sandstone"),
@@ -15,6 +16,7 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
                     sidebarPanel(
                       sliderInput(inputId = "Month",
                                   label = "Number of months:",
+                                  step = 1,
                                   min = 1,
                                   max = nrow(gs_MRT),
                                   value = c(3,nrow(gs_MRT) - 5)
