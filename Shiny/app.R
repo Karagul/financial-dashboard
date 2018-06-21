@@ -24,6 +24,7 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
                                   value = c(3,nrow(gs_MRT) - 5),
                                   animate = TRUE
                                   ),
+                      hr(),
                       
                       selectInput(inputId = "Growth Rate",
                                   label = "Percentage Growth:",
@@ -32,6 +33,7 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
                                               "Exponential: 5%/mo","Exponential: 15%/mo",
                                               "Exponential: 20%/mo","Exponential: 30%/mo")
                                   ),
+                      hr(),
                       checkboxGroupInput(inputId = "Options",
                                          label = "Other Options:",
                                          choices = c("Inlcude Agent Guarantee of 30 hrs/mo",
@@ -44,9 +46,9 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
                          tabsetPanel(type = "tab",
                                      tabPanel("Profit", plotOutput(outputId = "Bar_graph")),
                                      tabPanel("Runway", plotOutput(outputId ="line_graph")),
-                                     tabPanel("Revenue"),
-                                     tabPanel("Labor Cost"),
-                                     tabPanel("Partner Pay"),
+                                     tabPanel("Revenue"),#htmlOutput("table")),
+                                     tabPanel("Labor Cost", htmlOutput("gchart")),
+                                     tabPanel("Partner Pay", htmlOutput("gline")),
                                      tabPanel("Other")
                         )
                      )
@@ -64,6 +66,7 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
                                        value = c(3,nrow(gs_MRT) - 5),
                                        animate = TRUE
                            ),
+                           hr(),
                            
                            selectInput(inputId = "Growth Rate",
                                        label = "Percentage Growth:",
@@ -72,6 +75,7 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
                                                    "Exponential: 5%/mo","Exponential: 15%/mo",
                                                    "Exponential: 20%/mo","Exponential: 30%/mo")
                            ),
+                           hr(),
                            checkboxGroupInput(inputId = "Options",
                                               label = "Other Options:",
                                               choices = c("Inlcude Agent Guarantee of 30 hrs/mo",
@@ -79,6 +83,7 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
                                                           "Inlcude Varience in Projetions"),
                                               selected = c("Type"))
                          ),
+                         
                          # Outputs
                          mainPanel(
                            tabsetPanel(type = "tab",
@@ -94,7 +99,7 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
               ),
               navbarMenu("More",
                          tabPanel("Spreadsheet",
-                                  dataTableOutput(outputId = "data")
+                                  htmlOutput("table")#dataTableOutput(outputId = "data")
                          ),
                          tabPanel("About")
               )
@@ -109,7 +114,7 @@ server <- function(input, output) {
   ###################################INVESTOR PAGE#############################################
   # Create scatterplot object the plotOutput function is expecting
   output$Bar_graph <- renderPlot({
-    ggplot(data = gs_MRT, aes(x = Comissions, y = Revenue)) +
+    ggplot(data = gs_MRT, aes(x = Month, y = Revenue)) +
       geom_bar(stat = "identity")
   })
   
@@ -117,7 +122,15 @@ server <- function(input, output) {
     ggplot(data = gs_MRT, aes(x = Month, y = Comissions)) +
       geom_bar(stat = "identity")
   })
-  
+
+
+  output$gchart <-renderGvis({
+    gvisBarChart(gs_MRT)
+  })
+
+  output$gline <- renderGvis({
+    gvisLineChart(gs_MRT)
+  })
 
   
 ######################################PARTNER PAGE################################################
@@ -132,11 +145,16 @@ server <- function(input, output) {
   })
   
 #########################################MORE PAGE###############################################
-  output$data <- renderDataTable({
-    DT::datatable(data = gs_MRT,
-                  options = list(pageLength = 20, lengthMenu = c(10, 25, 40)), 
-                  rownames = FALSE)
-  })
+
+  #old data frame way#
+  #  output$data <- renderDataTable({
+#    DT::datatable(data = gs_MRT,
+#                  options = list(pageLength = 20, lengthMenu = c(10, 25, 40)), 
+#                  rownames = FALSE)
+#  })
+    output$table <-renderGvis({
+      gvisTable(gs_MRT)
+    })
   
 }
 
