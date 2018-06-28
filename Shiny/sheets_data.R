@@ -20,5 +20,12 @@ df=data.frame(Month = gs_MRT[,1],
 #Agent_Labor_Cost = Agent_Labor_cost_numeric[1:nrow(gs_MRT)])
 
 
+tabPanel("Client Growth",
+         fluidPage(
+           fluidRow(
+             column(6, htmlOutput("num_client")), 
+             column(6, htmlOutput("rev_client"))),
+           fluidRow( htmlOutput("client")))),
+
 
 

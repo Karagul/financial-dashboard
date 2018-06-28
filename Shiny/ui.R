@@ -46,7 +46,7 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
                                                 step = 1,
                                                 min = 1,
                                                 max = 36,
-                                                value=c(3,31),
+                                                value=c(4,12),
                                                 animate = TRUE
                                     ),
 
@@ -81,7 +81,7 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
                                     checkboxGroupInput(inputId = "Options",
                                                        label = "Other Options:(*UNDER CONSTRUCTION)",
                                                        choices = c("Include Agent Guarantee of 30 hrs/mo",
-                                                                   "Monty Carlo Simulation", 
+                                                                   "Monty Carlo Simulation",
                                                                    "Include Varience in Projetions"),
                                                        selected = c("Type")),
                                     h6("* Cost multiplier refers to the percentage that Business Development Costs, 
@@ -99,7 +99,8 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
                                     tabsetPanel(type = "tab",
                                                 tabPanel("Profit", htmlOutput("profit"), htmlOutput("gross")),
                                                 tabPanel("Runway", htmlOutput("runway"), htmlOutput("profRev")),
-                                                tabPanel("Revenue", htmlOutput("gchart")),
+                                                tabPanel("Growth",htmlOutput("num_client"), htmlOutput("rev_client")),      
+                                                tabPanel("Churn", htmlOutput("client")),
                                                 tabPanel("Workforce", htmlOutput("Lcost"), htmlOutput("workForce")),
                                                 tabPanel("Partner Pay", htmlOutput("combo"), htmlOutput("linechart")),
                                                 tabPanel("Overhead", htmlOutput("overhead"), htmlOutput("econScale")),
@@ -150,18 +151,28 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
                                           step = 1,
                                           min = 1,
                                           max = 36,
-                                          value=c(3,16),
+                                          value=c(4,12),
                                           animate = TRUE
                               ),
                               
                               #second slide bar for cost multiplying
-                                sliderTextInput(
-                                  inputId = "part_mCost",
-                                  label = "Costs Multiplier:(*UNDER COSNTRUCTION)",
-                                  grid = TRUE,
-                                  choices = c("Revenue/4", "Revenue/3", "Revenue/2", "Revenue"),
-                                  selected = "Revenue/4" 
-                                ),
+                              sliderTextInput(
+                                inputId = "part_mCost",
+                                label = "Costs Multiplier:(*UNDER CONSTRUCTION)",
+                                grid = TRUE,
+                                choices = c("10%", "20%","30%","40%","50%","60%","70%","80%","90%","100%",
+                                            "110%","125%","150%","200%"),
+                                selected = "30%" 
+                              ),
+                              
+                              sliderTextInput(
+                                inputId = "part_churn",
+                                label = "Monthly Churn(*UNDER CONSTRUCTION)",
+                                grid = TRUE,
+                                choices = c("1%","2%","3%","4%","5%","6%","7%","8%","9%","10%",
+                                            "11%","12%","13%","14%","15%","16%","17%","18%","19%","20%"),
+                                selected = "17%" 
+                              ),
                               
                               #input for precentage growth
                               selectInput(inputId = "Growth Rate",
@@ -193,11 +204,13 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
                             # main panel outputs
                             mainPanel(
                               tabsetPanel(type = "tab",
-                                          tabPanel("Profit", htmlOutput("part_profit")),
-                                          tabPanel("Runway", htmlOutput("part_runway")),
-                                          tabPanel("Revenue", htmlOutput("part_gchart")),
-                                          tabPanel("Labor Cost", htmlOutput("part_Lcost")),
-                                          tabPanel("Partner Pay", htmlOutput("part_combo")),
+                                          tabPanel("Profit", htmlOutput("part_profit"), htmlOutput("part_gross")),
+                                          tabPanel("Runway", htmlOutput("part_runway"), htmlOutput("part_profRev")),
+                                          tabPanel("Growth",htmlOutput("part_num_client"), htmlOutput("part_rev_client")),      
+                                          tabPanel("Churn", htmlOutput("part_client")),
+                                          tabPanel("Workforce", htmlOutput("part_Lcost"), htmlOutput("part_workForce")),
+                                          tabPanel("Partner Pay", htmlOutput("part_combo"),htmlOutput("part_linechart")),
+                                          tabPanel("Overhead", htmlOutput("part_overhead"), htmlOutput("part_econScale")),
                                           tabPanel("Other", 
                                                    fluidPage(
                                                      fluidRow(
