@@ -3,6 +3,7 @@ library(googleVis)
 library(googlesheets)
 library(shinythemes)
 library(shinyWidgets)
+curr_date <-format(Sys.Date(), "%b '%y")
 
 #This is for the color of slide bar.
 mycss <- ".irs-bar,
@@ -17,11 +18,11 @@ border-color: #36454f;
 ui <- fluidPage(theme = shinytheme("sandstone"),
          #top bar
          navbarPage("Invisible Technologies",
-              tabPanel("Investors",
-                 titlePanel("The Model", windowTitle = "TheMoodel3.0"), # App title
-                    sidebarLayout(position = "right", # Sidebar layout with a input and output definitions
+              tabPanel("General",  #general page
+                 titlePanel(paste0("The Model: ",curr_date), windowTitle = "TheMoodel3.0"), # App title
+                    sidebarLayout(position = "right", # Sidebar is on right side
                         sidebarPanel(
-                              #this the code to change color of the slide bars
+                              #this the code to change color of the slide bars(HTML)
                               tags$head(tags$style(HTML('.js-irs-0 .irs-single, .js-irs-0 .irs-bar- edge, .js-irs-0 .irs-bar {
                                                       background: #36454f;
                                                       border-top: 1px solid #36454f ;
@@ -39,56 +40,103 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
                                     #             timeFormat="%b %Y",
                                     #             animate = TRUE
                                     #             ),
-                                    
-                                    #first slide bar for months
+                              
+                                    #first slider bar for months
                                     sliderInput(inputId = "moSlider",
                                                 label = "Month Range:",
+                                                step = 1,
+                                                min = 1,
+                                                max = 72,
+                                                value=c(5,24),
+                                                animate = TRUE
+                                    ),
+                                    #slider for Client Growth
+                                    sliderTextInput(
+                                      inputId = "growslide",
+                                      label = "Client Growth:(UNDER CONSTRUCTION)",
+                                      grid = TRUE,
+                                      choices = c("5%", "10%","15%","20%","25%","30%","35%","40%","45%","50%",
+                                                  "55%","60%","65%","70%", "75%", "80%", "85%", "90%","95%", "100%"),
+                                      selected = "50%" 
+                                    ),
+                                    
+                                    #slider for Cost Multiplier
+                                    sliderTextInput(
+                                      inputId = "mCost",
+                                      label = "Costs Multiplier:(UNDER CONSTRUCTION)",
+                                      grid = TRUE,
+                                      choices = c("10%", "20%","30%","40%","50%","60%","70%","80%","90%","100%",
+                                                  "110%","125%","150%","200%"),
+                                      selected = "30%" 
+                                    ),
+                                    hr(style="border-color: black;"),
+                              
+                                    #slider for Churn
+                                    sliderTextInput(
+                                      inputId = "churn",
+                                      label = "Monthly Churn:(UNDER CONSTRUCTION)",
+                                      grid = TRUE,
+                                      choices = c("1%","2%","3%","4%","5%","6%","7%","8%","9%","10%","11%","12%","13%","14%","15%","16%",
+                                                  "17%","18%","19%","20%","21%", "22%", "23%", "24%","25%","26%","27%","28%","29%","30%",
+                                                  "31%","32%","33%","34%","35%","36%","37%","38%","39%","40%"),
+                                      selected = "29%" 
+                                    ),
+                              
+                                    
+                                    #slider for Cost Multiplier
+                                    sliderTextInput(
+                                      inputId = "Gross Margins",
+                                      label = "Gross Margins:(UNDER CONSTRUCTION)",
+                                      grid = TRUE,
+                                      choices = c("10%", "20%","30%","40%","50%","60%","70%","80%","90%","100%",
+                                                  "110%","125%","150%","200%"),
+                                      selected = "30%" 
+                                    ),
+                              
+                                    sliderInput(inputId = "cacslide",
+                                                label = "CAC Slider:(UNDER CONSTRUCTION)",
+                                                step = 1,
+                                                min = 1,
+                                                max = 72,
+                                                value=c(5,24),
+                                                animate = TRUE
+                                    ),
+                                    
+                                    sliderInput(inputId = "ltvslide",
+                                                label = "LTV Slider:(UNDER CONSTRUCTION)",
                                                 step = 1,
                                                 min = 1,
                                                 max = 36,
                                                 value=c(4,12),
                                                 animate = TRUE
                                     ),
-
-                                    sliderTextInput(
-                                      inputId = "mCost",
-                                      label = "Costs Multiplier:(*UNDER CONSTRUCTION)",
-                                      grid = TRUE,
-                                      choices = c("10%", "20%","30%","40%","50%","60%","70%","80%","90%","100%",
-                                                  "110%","125%","150%","200%"),
-                                      selected = "30%" 
-                                    ),
-                                    
-                                    sliderTextInput(
-                                      inputId = "churn",
-                                      label = "Monthly Churn(*UNDER CONSTRUCTION)",
-                                      grid = TRUE,
-                                      choices = c("1%","2%","3%","4%","5%","6%","7%","8%","9%","10%",
-                                                  "11%","12%","13%","14%","15%","16%","17%","18%","19%","20%"),
-                                      selected = "17%" 
-                                    ),
-                                    #input for precentage growth
-                                    selectInput(inputId = "Growth Rate",
-                                                label = "Percentage Growth:(*UNDER CONSTRUCTION)",
-                                                choices = c("Flat", "Linear: 5k/mo",
-                                                            "Linear: 10k/mo","Linear: 20k/mo", 
-                                                            "Exponential: 5%/mo","Exponential: 15%/mo",
-                                                            "Exponential: 20%/mo","Exponential: 30%/mo")
+                                    sliderInput(inputId = "partnerbonus",
+                                                label = "Partner Bonuses:(UNDER CONSTRUCTION)",
+                                                step = 1,
+                                                min = 1,
+                                                max = 36,
+                                                value=c(4,12),
+                                                animate = TRUE
                                     ),
                                     hr(),
-                                    
+                              
+                                    checkboxGroupInput(inputId = "growthbox",
+                                                       label = "Growth Options:(UNDER CONSTRUCTION)",
+                                                       choices = c("Linear",
+                                                                   "Exponential"),
+                                                       selected = c("Type")),
                                     #check box for random options
                                     checkboxGroupInput(inputId = "Options",
-                                                       label = "Other Options:(*UNDER CONSTRUCTION)",
+                                                       label = "Other Options:(UNDER CONSTRUCTION)",
                                                        choices = c("Include Agent Guarantee of 30 hrs/mo",
-                                                                   "Monty Carlo Simulation",
+                                                                   "Monte Carlo Simulation",
                                                                    "Include Varience in Projetions"),
                                                        selected = c("Type")),
                                     h6("* Cost multiplier refers to the percentage that Business Development Costs, 
                                        Subscription Costs, R&D Costs, 
                                        and Sales/Marketing Costs increase at relative to revenue."),
-                                #reload data clicker
-                                  
+                                
+                                    #reload data clicker
                                     actionButton(inputId = "reload", label = "Reload data"),
                                     textOutput('clics')
                                     ),
@@ -115,16 +163,18 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
                                   )
                               )
                     ),
+                 #this is the table at the bottom of the investor page. 
                  fluidRow(
                    column(12,
                           htmlOutput("main_table")
                    )
                  )
             ),
-           ###########################Partners######################################################
-           tabPanel("Partners",
-                    titlePanel("The Model 3.0(UNDER CONSTRUCTION)", windowTitle = "TheMoodel3.0"), # App title
-                          sidebarLayout(position = "right", # Sidebar layout with a input and output definitions
+##################################################Partner page########################################################################
+
+              tabPanel("Costs",
+                    titlePanel("The Model", windowTitle = "TheMoodel3.0"), # App title
+                          sidebarLayout(position = "right", # Sidebar is set to right side
                             sidebarPanel(
                               #this the code to change color of the slide bars
                               tags$head(tags$style(HTML('.js-irs-0 .irs-single, .js-irs-0 .irs-bar- edge, .js-irs-0 .irs-bar {
@@ -145,9 +195,57 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
                               #             animate = TRUE
                               #             ),
                               
-                              #first slide bar for months
+                              #first slider bar for months
                               sliderInput(inputId = "part_moSlider",
                                           label = "Month Range:",
+                                          step = 1,
+                                          min = 1,
+                                          max = 72,
+                                          value=c(5,24),
+                                          animate = TRUE
+                              ),
+                              #slider for Client Growth
+                              sliderTextInput(
+                                inputId = "part_growslide",
+                                label = "Client Growth:(UNDER CONSTRUCTION)",
+                                grid = TRUE,
+                                choices = c("5%", "10%","15%","20%","25%","30%","35%","40%","45%","50%",
+                                            "55%","60%","65%","70%", "75%", "80%", "85%", "90%","95%", "100%"),
+                                selected = "50%" 
+                              ),
+                              
+                              #slider for Cost Multiplier
+                              sliderTextInput(
+                                inputId = "part_mCost",
+                                label = "Costs Multiplier:(UNDER CONSTRUCTION)",
+                                grid = TRUE,
+                                choices = c("10%", "20%","30%","40%","50%","60%","70%","80%","90%","100%",
+                                            "110%","125%","150%","200%"),
+                                selected = "30%" 
+                              ),
+                              #slider for Churn
+                              sliderTextInput(
+                                inputId = "part_churn",
+                                label = "Monthly Churn:(UNDER CONSTRUCTION)",
+                                grid = TRUE,
+                                choices = c("1%","2%","3%","4%","5%","6%","7%","8%","9%","10%","11%","12%","13%","14%","15%","16%",
+                                            "17%","18%","19%","20%","21%", "22%", "23%", "24%","25%","26%","27%","28%","29%","30%",
+                                            "31%","32%","33%","34%","35%","36%","37%","38%","39%","40%"),
+                                selected = "29%" 
+                              ),
+                              
+                              #slider for Cost Multiplier
+                              sliderTextInput(
+                                inputId = "part_gross_margins",
+                                label = "Gross Margins:(UNDER CONSTRUCTION)",
+                                grid = TRUE,
+                                choices = c("10%", "20%","30%","40%","50%","60%","70%","80%","90%","100%",
+                                            "110%","125%","150%","200%"),
+                                selected = "30%" 
+                              ),
+                              
+                              sliderInput(inputId = "part_cacslide",
+                                          label = "CAC Slider:(UNDER CONSTRUCTION)",
                                           step = 1,
                                           min = 1,
                                           max = 36,
@@ -155,53 +253,47 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
                                           animate = TRUE
                               ),
                               
-                              #second slide bar for cost multiplying
-                              sliderTextInput(
-                                inputId = "part_mCost",
-                                label = "Costs Multiplier:(*UNDER CONSTRUCTION)",
-                                grid = TRUE,
-                                choices = c("10%", "20%","30%","40%","50%","60%","70%","80%","90%","100%",
-                                            "110%","125%","150%","200%"),
-                                selected = "30%" 
+                              sliderInput(inputId = "part_ltvslide",
+                                          label = "LTV Slider:(UNDER CONSTRUCTION)",
+                                          step = 1,
+                                          min = 1,
+                                          max = 36,
+                                          value=c(4,12),
+                                          animate = TRUE
                               ),
-                              
-                              sliderTextInput(
-                                inputId = "part_churn",
-                                label = "Monthly Churn(*UNDER CONSTRUCTION)",
-                                grid = TRUE,
-                                choices = c("1%","2%","3%","4%","5%","6%","7%","8%","9%","10%",
-                                            "11%","12%","13%","14%","15%","16%","17%","18%","19%","20%"),
-                                selected = "17%" 
-                              ),
-                              
-                              #input for precentage growth
-                              selectInput(inputId = "Growth Rate",
-                                          label = "Percentage Growth:",
-                                          choices = c("Flat", "Linear: 5k/mo",
-                                                      "Linear: 10k/mo","Linear: 20k/mo", 
-                                                      "Exponential: 5%/mo","Exponential: 15%/mo",
-                                                      "Exponential: 20%/mo","Exponential: 30%/mo")
+                              sliderInput(inputId = "part_partnerbonus",
+                                          label = "Partner Bonuses:(UNDER CONSTRUCTION)",
+                                          step = 1,
+                                          min = 1,
+                                          max = 36,
+                                          value=c(4,12),
+                                          animate = TRUE
                               ),
                               hr(),
                               
+                              checkboxGroupInput(inputId = "part_growthbox",
+                                                 label = "Growth Options:(UNDER CONSTRUCTION)",
+                                                 choices = c("Linear",
+                                                             "Exponential"),
+                                                 selected = c("Type")),
                               #check box for random options
-                              checkboxGroupInput(inputId = "Options",
-                                                 label = "Other Options:",
+                              checkboxGroupInput(inputId = "part_Options",
+                                                 label = "Other Options:(UNDER CONSTRUCTION)",
                                                  choices = c("Include Agent Guarantee of 30 hrs/mo",
-                                                             "Monty Carlo Simulation", 
+                                                             "Monte Carlo Simulation",
                                                              "Include Varience in Projetions"),
                                                  selected = c("Type")),
                               h6("* Cost multiplier refers to the percentage that Business Development Costs, 
-                                 Fixed Costs, Research and Development Costs, Labor Costs, 
+                                 Subscription Costs, R&D Costs, 
                                  and Sales/Marketing Costs increase at relative to revenue."),
-                              #reload data clicker
                               
+                              #reload data clicker
                               actionButton(inputId = "part_reload", label = "Reload data"),
                               textOutput('part_clics')
                               ),
                             
                             
-                            # main panel outputs
+                            # main panel outputs for partners
                             mainPanel(
                               tabsetPanel(type = "tab",
                                           tabPanel("Profit", htmlOutput("part_profit"), htmlOutput("part_gross")),
@@ -224,16 +316,20 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
                                           )
                                         )
                                   ),
+                    #bottom of the partner page data table
                     fluidRow(
                       column(12,
                              htmlOutput("part_main_table")
                       )
                     )
            ),
+
+            # more page that had spreadsheet and demo dropdowns
            navbarMenu("More",
-                      tabPanel("Spreadsheet",
-                               htmlOutput("table")
+                      tabPanel("Further Customization",
+                               dataTableOutput('table')
                       ),
+                      #youtube video in demo dropdown 
                       tabPanel("demo",
                                HTML('<iframe width="1000" height="600" 
                                     src="https://www.youtube.com/embed/tX1gtG--OGE" 

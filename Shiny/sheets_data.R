@@ -1,31 +1,163 @@
-gs_auth
-gs_ls() # not neccessary
-gs_mock_runway_title <- gs_title("Mock Runway Table")
-gs_MRT <- gs_read(gs_mock_runway_title, ws=1)
+#We try not to use "return" in any of the functions
 
 
-operators_numeric = as.numeric(gsub("[\\$,]", "", gs_MRT$Operators))
-RRR_numeric = as.numeric(gsub("[\\$,]", "", gs_MRT$RRRs))
-sentries_numeric = as.numeric(gsub("[\\$,]", "", gs_MRT$Sentries))
-strategists_numeric = as.numeric(gsub("[\\$,]", "", gs_MRT$Strategists))
-specialists_numeric = as.numeric(gsub("[\\$,]", "", gs_MRT$Specialists))
-Agent_Labor_cost_numeric = as.numeric(gsub("[\\$,]", "", gs_MRT$`Agent Labor Costs`))
+Client_growth_fn <- function(percent,dframe,index){
+  
+}
+####################NESTED REVENUE FUCNTIONS#########################################
 
-df=data.frame(Month = gs_MRT[,1], 
-              Operator_Labor_cost = operators_numeric[1:nrow(gs_MRT)],
-              #RRR_Labor_Cost = RRR_numeric[1:nrow(gs_MRT)],
-              Sentry_Labor_Cost = sentries_numeric[1:nrow(gs_MRT)])#,
-#Strategists_Labor_Cost = strategists_numeric[1:nrow(gs_MRT)],
-#Specialists_Labor_Cost = specialists_numeric[1:nrow(gs_MRT)],
-#Agent_Labor_Cost = Agent_Labor_cost_numeric[1:nrow(gs_MRT)])
+Revenue_fn <- function(dollars, dframe,index){
+  dframe$Revenue[index] <- Enterprise_revenue_fn(dollars, dframe,index) + 
+    Small_business_revenue(dollars,dframe,index) + 
+    Personal_revenue_fn(dollars,dframe,index)
+}
+
+######Enterprise############
+Enterprise_revenue_fn <- function(dollars,dframe,index){
+  dframe$`Enterprise revenue`[index] <- Total_enterprise_monthly_operator_fees_fn(dollars,dframe,index) + 
+    Total_enterprise_monthly_assistant_fees_fn(dollars,dframe,index) + 
+    Total_enterprise_monthly_strategist_specialist_fees(dollars,dframe,index)
+}
+
+#########
+Total_enterprise_monthly_operator_fees_fn <- function(dollars,dframe,index){
+  dframe$`Total enterprise monthly operator fees`[index] = 0.8 * dframe$`Operator hrly rate`[index]
+}
 
 
-tabPanel("Client Growth",
-         fluidPage(
-           fluidRow(
-             column(6, htmlOutput("num_client")), 
-             column(6, htmlOutput("rev_client"))),
-           fluidRow( htmlOutput("client")))),
+#######
+Total_enterprise_monthly_assistant_fees_fn<- function(dollars,dframe,index){
+  dframe$`Total enterprise monthly assistant fees`[index] = Enterprise_monthly_assistant_hrs_fn(dollars,dframe,index) * 
+    dframe$`Assistant hrly rate`[index]
+  }
+
+Enterprise_monthly_assistant_hrs_fn <- funcion(dollars,dframe,index){
+  dframe$`Enterprise monthly assistant hrs` = Enterprise_clients_fn(dollars,dframe,index) * 
+    dframe$`Average enterprise monthly operator hrs`[index]
+}
+
+
+#####
+Total_enterprise_monthly_strategist_specialist_fees_fn <- function(dollars,dframe,index){
+  dframe$`Total enterprise monthly strategist specialist fees`[index] <- 
+    Enterprise_monthly_strategist_specialist_hrs_fn(dollars,dframe,index) * dframe$`Strategist specialist hrly rate`[index]
+}
+
+Enterprise_monthly_strategist_specialist_hrs_fn <- function(dollars,dframe,index){
+  dframe$`Enterprise monthly strategist specialist hrs`[index] <- Enterprise_clients_fn(dollars,dframe,index) * 
+    dframe$`Average enterprise monthly strategist specialist hrs`[index]
+}
+
+Enterprise_clients_fn <- function(dollars,dframe,index){
+  dframe$`Enterprise clients`[index] <- dframe$`% Enterprise client`[index] * Total_clients_fn(dollars,dframe,index)
+}
+
+Total_client_fn <- function(dollars,dframe,index){
+  dframe$`Total clients`[index] <- (dframe$`Total clients`[index-1]) / 
+    (1 + dframe$`Churn percentage weighted by number of clients`[index] - dframe$`Client growth percentage`[index])
+}
+
+
+######Small Buisness#######
+
+Small_business_revenue <- function(dollars,dframe,index){
+  dframe$`Small business revenue` = Total_small_business_monthly_operator_fees_fn(dollars,dframe,index) + 
+    Total_small_business_monthly_assistant_fees_fn(dollars,dframe,index) + 
+    Total_small_business_monthly_strategist_specialist_fees_fn(dollars,dframe,index)
+}
+
+#######
+Total_small_business_monthly_operator_fees_fn <- fucntion(dollars,dframe,index){
+  dframe$`Total small business monthly operator fees`[index] = Small_business_monthly_operator_hrs_fn(dollars,dframe,index) * 
+    dframe$`Operator hrly rate`[index]
+}
+
+Small_business_monthly_operator_hrs_fn <- function(dollars,dframe,index){
+  dframe$`Small business monthly operator hrs`[index] = Small_business_clients_fn(dollars,dframe,index) * 
+    dframe$`Average small business monthly operator hrs`[index]
+}
+
+########
+Total_small_business_monthly_assistant_fees_fn <- function(dollars, dframe, index){
+  dframe$`Total small business monthly assistant fees`[index] = Small_business_monthly_assistant_hrs_fn(dollars,dframe,index) * 
+    dframe$`Assistant hrly rate`[index]
+}
+
+Small_business_monthly_assistant_hrs_fn <- function(dollars,dframe,index){
+  dframe$`Small business monthly assistant hrs`[index] = Small_business_clients_fn(dollars,dframe,index) * 
+    dframe$`Average small business monthly assistant hrs`[index]
+}
+
+######
+Total_small_business_monthly_strategist_specialist_fees_fn <- function(dollars,dframe,index){
+  dframe$`Total small business monthly strategist specialist fees`[index] = 
+    Small_business_monthly_strategist_specialist_hrs_fn(dollars,dframe,index) * dframe$`Strategist specialist hrly rate`[index]
+}
+
+Small_business_monthly_strategist_specialist_hrs_fn <- function(dolalrs,dframe,index){
+  dframe$`Small business monthly strategist specialist hrs`[index] = Small_business_clients_fn(dollars,dframe,index) * 
+    dframe$`Average small business monthly strategist specialist hrs`[index]
+}
+
+Small_business_clients_fn <- function(dollars,dframe,index){
+  dframe$`Small business clients`[index] = dframe$`% Small business clients`[index] * Total_clients_fn(dollars,dframe,index)
+}
+
+########Personal Revenue########
+
+Personal_revenue_fn <-function(dollars,dframe,index){
+  dframe$`Personal revenue` <- Total_personal_monthly_operator_fees_fn(dollars,dframe,index) + 
+    Total_personal_monthly_assistant_fees_fn(dollars,dframe,index) + 
+    Total_personal_monthly_strategist_specialist_fees_fn(dollars,dframe,index)
+}
+
+
+########
+Total_personal_monthly_operator_fees_fn <- function(dollars,dframe,index){
+  dframe$`Total personal monthly operator fees`[index] <- Personal_monthly_operator_hrs_fn(dollars,dframe,index) * 
+    dframe$`Operator hrly rate`[index]
+}
+
+
+Personal_monthly_operator_hrs_fn <- function(dollars,dframe,index){
+  dframe$`Personal monthly operator hrs`[index] <- dframe$`Average personal monthly operator hrs`[index] * 
+    Personal_clients_fn(dollars,dframe,index)
+}
+
+########
+Total_personal_monthly_assistant_fees_fn <- function(dollars,dframe,index){
+  dframe$`Total personal monthly assistant fees`[index] <- Personal_monthly_assistant_hrs_fn(dollars,dframe,index) * 
+    dframe$`Assistant hrly rate`[index]
+}
+
+Personal_monthly_assistant_hrs_fn <- function(dollars,dframe,index){
+  dframe$`Personal monthly assistant hrs`[index] <- dframe$`Average personal monthly assistant hours`[index] * 
+    Personal_clients_fn(dollars,dframe,index)
+}
+
+#######
+Total_personal_monthly_strategist_specialist_fees_fn <- function(dollars,dframe,index){
+  dframe$`Total personal monthly strategist specialist fees`[index] <- Personal_monthly_strategist_specialist_hrs_fn(dollars,dframe,index) * 
+    dframe$`Strategist and specialist hrly rate`[index]
+}
+
+Personal_monthly_strategist_specialist_hrs_fn <- function(dollars,dframe,index){
+  dframe$`Personal_monthly_strategist_specialist_hrs`[index] <- dframe$`Average personal monthly specialist strategist hrs`[index] * 
+    Personal_clients_fn(dollars,dframe,index)
+}
+
+Personal_clients_fn <-function(dollars,dframe,index){
+  dframe$`Personal clients`[index] <- Percent_personal_clients_fn(dollars,dframe,index) * Total_clients_fn(dollars,dframe,index)
+}
+
+Percent_personal_clients_fn <- function(dollars,dframe,index){
+  dframe$`Percent personal clients`[index] <- 1 - dframe$`Percent enterprise clients`[index] - 
+    dframe$`Percent small business clients`[index]
+}
+
+
+
+
 
 
 

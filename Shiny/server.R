@@ -3,6 +3,8 @@ library(googleVis)
 library(googlesheets)
 library(shinythemes)
 library(shinyWidgets)
+library(DT)
+source('sheets_data.R')
 
 #####date slider
 # monthStart <- function(x) ({
@@ -11,8 +13,10 @@ library(shinyWidgets)
 #   as.Date(x)
 # })
 
+curr_date <- format(Sys.Date(), "%b '%y")
+
 # Define server function required to create the scatterplot
-server <- function(input, output, session) {
+server <- function(input, output) {
   
   ##date slider
   # sliderMonth <- reactiveValues()
@@ -21,53 +25,148 @@ server <- function(input, output, session) {
   #   sliderMonth$Month <- as.character(monthStart(full.date))
   # })
   
+  #reload data button. This creates MRT$data which is the data frame with the main data we use from google speadsheets. 
+  MRT <- reactiveValues()
+  live <- reactiveValues()
+  observeEvent(input$reload, {
+    MRT$data <- gs_read( gs_key("1KdOJJ9rj3eWUKA4F6mX-MIEQKe5XJAMeJf4aZvQ1m8A"), ws = "Frozen Shiny Sheet")
+    live$data <- MRT$data
+  }, ignoreNULL=FALSE)
+  output$clics <- renderText(input$reload)
   ###################################INVESTOR PAGE#############################################
   #bottoom page table
   output$main_table <-renderGvis({
     gvisTable(MRT$data[,c(1:26,31:33,35:37,42,44,47:50,61)])
   })
-  #reload data button#
-  MRT <- reactiveValues()
-  observeEvent(input$reload, {
-    MRT$data <- gs_read( gs_key("1ZtE7i3lJCNaCBiU26mYFLEOL9ZqLE8bNyLeh1woCuck"), ws = "Monthly Shiny and Data Studio Launch Pad") 
+  
+  #Effects the slider for the client growth slider
+  
+  observeEvent(input$growslide, {
+    i <- 1
+      while(i <= nrow(MRT$data)){
+        if(MRT$data$Month[i] == curr_date){
+          row_after_curr_mon<-i+1
+          while(row_after_curr_mon <= nrow(MRT$data)){
+            if(input$growslide == "5%"){
+              live$data <- MRT$data
+              live$data[row_after_curr_mon,"Client Growth"] <-.05
+            }
+            else if(input$growslide == "10%"){
+              live$data <- MRT$data
+            }
+            else if(input$growslide == "15%"){
+              live$data <- MRT$data
+            }
+            else if(input$growslide == "20%"){
+              live$data <- MRT$data
+            }
+            else if(input$growslide == "25%"){
+              live$data <- MRT$data
+            }
+            else if(input$growslide == "30%"){
+              live$data <- MRT$data
+            }
+            else if(input$growslide == "35%"){
+              live$data <- MRT$data
+            }
+            else if(input$growslide == "40%"){
+              live$data <- MRT$data
+            }
+            else if(input$growslide == "45%"){
+              live$data <- MRT$data
+            }
+            else if(input$growslide == "50%"){
+              live$data <- MRT$data
+            }
+            else if(input$growslide == "55%"){
+              live$data <- MRT$data
+            }
+            else if(input$growslide == "60%"){
+              live$data <- MRT$data
+            }
+            else if(input$growslide == "65%"){
+              live$data <- MRT$data
+            }
+            else if(input$growslide == "70%"){
+              live$data <- MRT$data
+            }
+            else if(input$growslide == "75%"){
+              live$data <- MRT$data
+            }
+            else if(input$growslide == "80%"){
+              live$data <- MRT$data
+            }
+            else if(input$growslide == "85%"){
+              live$data <- MRT$data
+            }
+            else if(input$growslide == "90%"){
+              live$data <- MRT$data
+            }
+            else if(input$growslide == "95%"){
+              live$data <- MRT$data
+            }
+            else if(input$growslide == "100%"){
+              live$data <- MRT$data
+            }
+            row_after_curr_mon = row_after_curr_mon + 1
+          }
+        }
+        i = i + 1
+    }
   }, ignoreNULL=FALSE)
-  output$clics <- renderText(input$reload)
   
-  #slider for costs multiplier
-  # observeEvent(input$mCost, {
-  # if(input$mCost == "Revenue/3"){
-  #   MRT$data[,"Subscription Costs"] <- 4/3 * MRT$data[,"Subscription Costs"]
-  #   MRT$data[,"R&D Costs"] <- 4/3 * MRT$data[,"R&D Costs"]
-  #   MRT$data[,"BD Costs"] <- 4/3 * MRT$data[,"BD Costs"]
-  #   MRT$data[,"Discretionary Spending"] <- 4/3 * MRT$data[,"Discretionary Spending"]
-  # }
-  # else if(input$mCost == "Revenue/2"){
-  #   MRT$data[,"Subscription Costs"] <- 2 * MRT$data[,"Subscription Costs"]
-  #   MRT$data[,"R&D Costs"] <- 2 * MRT$data[,"R&D Costs"]
-  #   MRT$data[,"BD Costs"] <- 2 * MRT$data[,"BD Costs"]
-  #   MRT$data[,"Discretionary Spending"] <- 2 * MRT$data[,"Discretionary Spending"]
-  # }
-  # else if(input$mCost == "Revenue"){
-  #   MRT$data[,"Subscription Costs"] <- 4 * MRT$data[,"Subscription Costs"]
-  #   MRT$data[,"R&D Costs"] <- 4 * MRT$data[,"R&D Costs"]
-  #   MRT$data[,"BD Costs"] <- 4 * MRT$data[,"BD Costs"]
-  #   MRT$data[,"Discretionary Spending"] <- 4 * MRT$data[,"Discretionary Spending"]
-  # }
-  # else{
-  #   MRT$data[,"Subscription Costs"] <-  MRT$data[,"Subscription Costs"]
-  #   MRT$data[,"R&D Costs"] <-  MRT$data[,"R&D Costs"]
-  #   MRT$data[,"BD Costs"] <-  MRT$data[,"BD Costs"]
-  #   MRT$data[,"Discretionary Spending"] <-  MRT$data[,"Discretionary Spending"]
-  # }
-  # }, ignoreNULL=FALSE)
-  
+  #effects the slider for the cost multiplier slider
+  observeEvent(input$mCost, {
+    if(input$growslide == "10%"){
+      live$data = MRT$data
+    }
+    else if(input$growslide == "20%"){
+      live$data <- MRT$data
+    }
+    else if(input$growslide == "30%"){
+      live$data <- MRT$data
+    }
+    else if(input$growslide == "40%"){
+      live$data <- MRT$data
+    }
+    else if(input$growslide == "50%"){
+      live$data <- MRT$data
+    }
+    else if(input$growslide == "60%"){
+      live$data <- MRT$data
+    }
+    else if(input$growslide == "70%"){
+      live$data <- MRT$data
+    }
+    else if(input$growslide == "80%"){
+      live$data <- MRT$data
+    }
+    else if(input$growslide == "90%"){
+      live$data <- MRT$data
+    }
+    else if(input$growslide == "100%"){
+      live$data <- MRT$data
+    }
+    else if(input$growslide == "110%"){
+      live$data <- MRT$data
+    }
+    else if(input$growslide == "125%"){
+      live$data <- MRT$data
+    }
+    else if(input$growslide == "150%"){
+      live$data <- MRT$data
+    }
+    else if(input$growslide == "200%"){
+      live$data <- MRT$data
+    }
+  }, ignoreNULL=FALSE)
+
   #####################################Profit Page####################################################################################
+  #profit visual
   output$profit <- renderGvis({
-    gross_profit_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Gross Profit`))
-    net_profit_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Net Profit`))
-    df=data.frame(Month = MRT$data[input$moSlider[1]:input$moSlider[2],1], 
-                  Gross_Profit = gross_profit_numeric[input$moSlider[1]:input$moSlider[2]],
-                  Net_Profit = net_profit_numeric[input$moSlider[1]:input$moSlider[2]])
+    df=data.frame(Month = live$data[input$moSlider[1]:input$moSlider[2],"Month"], 
+                  Gross_Profit = live$data$`Gross profit`[input$moSlider[1]:input$moSlider[2]],
+                  Net_Profit = live$data$`Net profit`[input$moSlider[1]:input$moSlider[2]])
     gvisColumnChart(df, xvar = "Month", 
                     yvar = c("Gross_Profit", "Net_Profit"),
                     options=list(bar="{groupWidth:'70%'}", width = "800", height = "400",
@@ -75,59 +174,47 @@ server <- function(input, output, session) {
                                  hAxis="{title:'Months'}", title = "Profit",
                                  series = "[{color:'8497e5'}, {color:'b8e986'}]"))
   })
-  #gross/ net margins
+  #gross/ net margins visual
   output$gross <-renderGvis({
-    revenue_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$Revenue))
-    gross_margins_numeric = as.numeric(gsub("[\\%,]", "", MRT$data$`Gross Margins`))
-    net_margins_numeric = as.numeric(gsub("[\\%,]", "", MRT$data$`Net Margins`))
-    df=data.frame(Revenue = revenue_numeric[input$moSlider[1]:input$moSlider[2]],
-                  Gross_Margins= gross_margins_numeric[input$moSlider[1]:input$moSlider[2]],
-                  Net_Margins= net_margins_numeric[input$moSlider[1]:input$moSlider[2]])
+    df=data.frame(Revenue = live$data$Revenue[input$moSlider[1]:input$moSlider[2]],
+                  Gross_Margins= live$data$`Gross margins`[input$moSlider[1]:input$moSlider[2]],
+                  Net_Margins= live$data$`Net margins`[input$moSlider[1]:input$moSlider[2]])
     gvisLineChart(df, options=list(pointSize = 6, width = 800, height = 400, vAxis="{title:'Profit Margins'}",
                                    hAxis="{title:'Revenue'}", series = "[{color:'8497e5'}, {color:'b8e986'}]", 
                                    title = "Margins(%)"))
   })
   
   ################################Runway page########################################################################################
+  #runway visual
   output$runway <- renderGvis({
-    cash_in_bank_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Cash in Bank`))
-    net_profit_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Net Profit`))
-    funds_raised_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Cumulative Fundraising`))
     df=data.frame(Month= MRT$data[input$moSlider[1]:input$moSlider[2],"Month"], 
-                  Cash_in_Bank= cash_in_bank_numeric[input$moSlider[1]:input$moSlider[2]],
-                  Net_Profit = net_profit_numeric[input$moSlider[1]:input$moSlider[2]],
-                  Funds_Raised = funds_raised_numeric[input$moSlider[1]:input$moSlider[2]])
+                  Cash_in_Bank= live$data$`Cash in bank`[input$moSlider[1]:input$moSlider[2]],
+                  Net_Profit = live$data$`Net profit`[input$moSlider[1]:input$moSlider[2]],
+                  Funds_Raised = live$data$`Cumulative funds raised`[input$moSlider[1]:input$moSlider[2]])
     gvisLineChart(df, options=list(pointSize=6,width = 800, height = 400,vAxis="{title:'Dollars($)'}",
                                    hAxis="{title:'Months'}", title = "Runway", 
                                    series = "[{color:'8497e5'}, {color:'b8e986'}, {color:'grey'}]"))
   })
   
-  #Profit and Revenue
+  #Profit and Revenue visual
   output$profRev <-renderGvis({
-    gross_profit_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Gross Profit`))
-    net_profit_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Net Profit`))
-    revenue_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$Revenue))
-    overhead_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$Overhead))
-    df=data.frame(Revenue= gross_profit_numeric[input$moSlider[1]:input$moSlider[2]],
-                  Overhead= overhead_numeric[input$moSlider[1]:input$moSlider[2]],
-                  Gross_Profit= gross_profit_numeric[input$moSlider[1]:input$moSlider[2]],
-                  Net_Profit= net_profit_numeric[input$moSlider[1]:input$moSlider[2]])
+    df=data.frame(Revenue= live$data$Revenue[input$moSlider[1]:input$moSlider[2]],
+                  Overhead= live$data$Overhead[input$moSlider[1]:input$moSlider[2]],
+                  Gross_Profit= live$data$`Gross profit`[input$moSlider[1]:input$moSlider[2]],
+                  Net_Profit= live$data$`Net profit`[input$moSlider[1]:input$moSlider[2]])
     gvisLineChart(df, options=list(pointSize = 6, width = 800, height = 400, vAxis="{title:'Profit'}",
                                    hAxis="{title:'Revenue'}", series = "[{color:'8497e5'}, {color:'b8e986'}, {color:'grey'}]", 
                                    title = "Profit/Revenue"))
   })
   
   ###########################Growth Page##############################################################################################
+  #client growth and revenue visual
   output$num_client <- renderGvis({
-    revenue_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$Revenue))
-    ent_client_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Enterprise Clients`))
-    small_buis_cli_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Small Business Clients`))
-    personal_clients_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Personal Clients`))
-    df=data.frame(Month = MRT$data[input$moSlider[1]:input$moSlider[2],"Month"], 
-                  Revenue = revenue_numeric[input$moSlider[1]:input$moSlider[2]],
-                  Enterprise_Clients = ent_client_numeric[input$moSlider[1]:input$moSlider[2]],
-                  Small_Business_Clients = small_buis_cli_numeric[input$moSlider[1]:input$moSlider[2]],
-                  Personal_Clients = personal_clients_numeric[input$moSlider[1]:input$moSlider[2]])
+    df=data.frame(Month = live$data[input$moSlider[1]:input$moSlider[2],"Month"], 
+                  Revenue = live$data$Revenue[input$moSlider[1]:input$moSlider[2]],
+                  Enterprise_Clients = live$data$`Enterprise clients`[input$moSlider[1]:input$moSlider[2]],
+                  Small_Business_Clients = live$data$`Small business clients`[input$moSlider[1]:input$moSlider[2]],
+                  Personal_Clients = live$data$`Personal clients`[input$moSlider[1]:input$moSlider[2]])
     gvisComboChart(df, xvar="Month",
                    yvar=c("Personal_Clients", "Revenue", "Small_Business_Clients", 
                           "Enterprise_Clients"),
@@ -139,17 +226,13 @@ server <- function(input, output, session) {
                                 vAxes="[{title:'Number of Clients'}, {title:'Revenue'}]",  isStacked = TRUE,
                                 width = 800, height = 400, title = "Client Growth and Revenue", hAxis="{title:'Months'}"))
 })
-  
+  #revenue from clients visual
   output$rev_client <- renderGvis({
-    revenue_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$Revenue))
-    ent_rev_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Enterprise Revenue`))
-    small_buis_rev_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Small Business Revenue`))
-    personal_rev_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Personal Revenue`))
-    df=data.frame(Month = MRT$data[input$moSlider[1]:input$moSlider[2],"Month"], 
-                  Revenue = revenue_numeric[input$moSlider[1]:input$moSlider[2]],
-                  Enterprise_Clients_Revenue = ent_rev_numeric[input$moSlider[1]:input$moSlider[2]],
-                  Small_Business_Clients_Revenue = small_buis_rev_numeric[input$moSlider[1]:input$moSlider[2]],
-                  Personal_Clients_Revenue = personal_rev_numeric[input$moSlider[1]:input$moSlider[2]])
+    df=data.frame(Month = live$data[input$moSlider[1]:input$moSlider[2],"Month"], 
+                  Revenue = live$data$Revenue[input$moSlider[1]:input$moSlider[2]],
+                  Enterprise_Clients_Revenue = live$data$`Enterprise revenue`[input$moSlider[1]:input$moSlider[2]],
+                  Small_Business_Clients_Revenue = live$data$`Small business revenue`[input$moSlider[1]:input$moSlider[2]],
+                  Personal_Clients_Revenue = live$data$`Personal revenue`[input$moSlider[1]:input$moSlider[2]])
     gvisComboChart(df, xvar="Month",
                    yvar=c("Personal_Clients_Revenue", "Revenue", "Small_Business_Clients_Revenue", 
                           "Enterprise_Clients_Revenue"),
@@ -163,42 +246,25 @@ server <- function(input, output, session) {
   })
   
   #######################################churn page#################################################################################
-  
+  #churn vs client growth visual
   output$client <-renderGvis({
-    churn_numeric = as.numeric(gsub("[\\%,]", "", MRT$data$Churn))
-    client_growth_numeric = as.numeric(gsub("[\\%,]", "", MRT$data$`Client Growth Percentage`))
-    df=data.frame(Month = MRT$data[input$moSlider[1]:input$moSlider[2],"Month"], 
-                  Churn = churn_numeric[input$moSlider[1]:input$moSlider[2]],
-                  Client_Growth_Percentage = client_growth_numeric[input$moSlider[1]:input$moSlider[2]])
+    df=data.frame(Month = live$data[input$moSlider[1]:input$moSlider[2],"Month"], 
+                  Churn = live$data$`Churn percentage weighted by number of clients`[input$moSlider[1]:input$moSlider[2]],
+                  Client_Growth = live$data$`Client growth percentage`[input$moSlider[1]:input$moSlider[2]])
     gvisLineChart(df, options=list(pointSize = 4, width = 800, height = 400, vAxis="{title:'Percent'}",
                                    hAxis="{title:'Months'}", title = "Churn Vs Client Growth", 
                                    series = "[{color:'8497e5'}, {color: 'b8e986'}]"))
   })
   
-  # output$cltv_cac <-renderGvis({
-  #   cltv_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$CLTV))
-  #   cac_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$CAC))
-  #   df=data.frame(Month = MRT$data[input$moSlider[1]:input$moSlider[2],"Month"], 
-  #                 CLTV = cltv_numeric[input$moSlider[1]:input$moSlider[2]],
-  #                 CAC = cac_numeric[input$moSlider[1]:input$moSlider[2]])
-  #   gvisColumnChart(df, options=list( width = 800, height = 400, vAxis="{title:'Dollars($)'}",
-  #                                    hAxis="{title:'Months'}", title = "Client Growth", 
-  #                                    series = "[{color:'8497e5'}, {color: 'b8e986'}]"))
-  # })
-  
   
   ############################Workforce Page##########################################################################################
   
-  #work Force
+  #Revenue per head visual
   output$workForce <-renderGvis({
-    revenue_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$Revenue))
-    head_count_numeric = as.numeric(gsub("[\\%,]", "", MRT$data$`Company Head Count`))
-    revperhead_numeric = as.numeric(gsub("[\\%,]", "", MRT$data$`Revenue per Head`))
-    partner_numeric = as.numeric(gsub("[\\%,]", "", MRT$data$Partners))
-    df=data.frame(Revenue= revenue_numeric[input$moSlider[1]:input$moSlider[2]],
-                  Company_Head_Count= head_count_numeric[input$moSlider[1]:input$moSlider[2]],
-                  Revenue_per_Head= revperhead_numeric[input$moSlider[1]:input$moSlider[2]],
-                  Partners= partner_numeric[input$moSlider[1]:input$moSlider[2]])
+    df=data.frame(Revenue= live$data$Revenue[input$moSlider[1]:input$moSlider[2]],
+                  Company_Head_Count= live$data$`Company head count`[input$moSlider[1]:input$moSlider[2]],
+                  Revenue_per_Employee= live$data$`Revenue per head`[input$moSlider[1]:input$moSlider[2]],
+                  Partners= live$data$`Number of partners`[input$moSlider[1]:input$moSlider[2]])
     gvisLineChart(df, options=list(pointSize = 6, width = 800, height = 400, vAxis="{title:'Head Count'}",
                                    hAxis="{title:'Revenue'}", 
                                     series = "[{type:'line', 
@@ -210,25 +276,19 @@ server <- function(input, output, session) {
                                    vAxes="[{title:'Company Head Count'}, {title:'Revenue per Head'}]"))
   })
   
+  #Labor costs Visual
+  ############################################################
   output$Lcost <- renderGvis({
-    Agent_Labor_cost_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Agent Labor Cost`))
-    operators_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$Operators))
-    RRR_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$RRRs))
-    sentries_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$Sentries))
-    strategists_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$Strategists))
-    specialists_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$Specialists))
-    df=data.frame(Month = MRT$data[input$moSlider[1]:input$moSlider[2],"Month"], 
-                  Agent_Labor_Cost = Agent_Labor_cost_numeric[input$moSlider[1]:input$moSlider[2]],
-                  Operator_Labor_cost = operators_numeric[input$moSlider[1]:input$moSlider[2]],
-                  RRR_Labor_Cost = RRR_numeric[input$moSlider[1]:input$moSlider[2]],
-                  Sentry_Labor_Cost = sentries_numeric[input$moSlider[1]:input$moSlider[2]],
-                  Strategists_Labor_Cost = strategists_numeric[input$moSlider[1]:input$moSlider[2]],
-                  Specialists_Labor_Cost = specialists_numeric[input$moSlider[1]:input$moSlider[2]]
-                  
+    df=data.frame(Month = live$data[input$moSlider[1]:input$moSlider[2],"Month"], 
+                  Actual_Labor_Cost = live$data$`Actual Labor Cost`[input$moSlider[1]:input$moSlider[2]],
+                  Expected_Operator_Labor_cost = live$data$`Expected Operator Labor Costs`[input$moSlider[1]:input$moSlider[2]],
+                  Expected_RRR_Labor_Cost = live$data$`Expected RRR Labor Costs for Assistants`[input$moSlider[1]:input$moSlider[2]],
+                  Expected_Specialist_and_Strategist_Labor_Costs = 
+                    live$data$`Expected Specialist and Strategist Labor Costs`[input$moSlider[1]:input$moSlider[2]]
     )
     gvisComboChart(df, xvar="Month",
-                   yvar=c("Operator_Labor_cost", "Agent_Labor_Cost", "RRR_Labor_Cost", 
-                          "Sentry_Labor_Cost", "Strategists_Labor_Cost", "Specialists_Labor_Cost"),
+                   yvar=c("Expected_Operator_Labor_cost", "Actual_Labor_Cost", "Expected_RRR_Labor_Cost", 
+                          "Expected_Specialist_and_Strategist_Labor_Costs"),
                    options=list(pointSize = 3, seriesType="line",
                                 series="[{type:'line', 
                                 targetAxisIndex:0,
@@ -236,20 +296,18 @@ server <- function(input, output, session) {
                                 {type:'bars', 
                                 targetAxisIndex:1,
                                 color:'8497e5'},
-                                {color:'grey'}, {color:'black'}, 
-                                {color:'orange'},{color:'blue'}]",
-                                vAxes="[{title:'Labor_Costs'}, {title:'Agent_Labor_Cost'}]", 
+                                {color:'grey'}, {color:'black'}]",
+                                vAxes="[{title:'Expected_Operator_Labor_cost'}, {title:'Actual_Labor_Cost'}]", 
                                 width = 800, height = 400, title = "Labor Costs", hAxis="{title:'Months'}"))
 })
   
   
   ############################Partner pay########################################################################################
+  #partner pay visual
   output$combo <- renderGvis({
-    partner_pay_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Partner Pay`))
-    gross_profits_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Gross Profit`))
-    df=data.frame(Month = MRT$data[input$moSlider[1]:input$moSlider[2],"Month"], 
-                  Partner_Pay = partner_pay_numeric[input$moSlider[1]:input$moSlider[2]],
-                  Gross_Profits = gross_profits_numeric[input$moSlider[1]:input$moSlider[2]])
+    df=data.frame(Month = live$data[input$moSlider[1]:input$moSlider[2],"Month"], 
+                  Partner_Pay = live$data$`Partner Pay`[input$moSlider[1]:input$moSlider[2]],
+                  Gross_Profits = live$data$`Gross Profit`[input$moSlider[1]:input$moSlider[2]])
     gvisComboChart(df, xvar = "Month", 
                    yvar = c("Partner_Pay", "Gross_Profits"),
                    options=list(seriesType="bars",
@@ -259,95 +317,82 @@ server <- function(input, output, session) {
                                 hAxis="{title:'Months'}", title = "Partner Pay"))
   })
   
+  #partner pay comapred to revenue visual
   output$linechart <- renderGvis({
-    partner_pay_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Partner Pay`))
-    gross_profits_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Gross Profit`))
-    net_profit_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Net Profit`))
-    revenue_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$Revenue))
-    df=data.frame(Revenue = revenue_numeric[input$moSlider[1]:input$moSlider[2]], 
-                  Partner_Pay = partner_pay_numeric[input$moSlider[1]:input$moSlider[2]],
-                  Gross_Profits = gross_profits_numeric[input$moSlider[1]:input$moSlider[2]],
-                  Net_Profit = net_profit_numeric[input$moSlider[1]:input$moSlider[2]])
+    df=data.frame(Revenue = live$data$Revenue[input$moSlider[1]:input$moSlider[2]], 
+                  Partner_Pay = live$data$`Partner Pay`[input$moSlider[1]:input$moSlider[2]],
+                  Gross_Profits = live$data$`Gross Profit`[input$moSlider[1]:input$moSlider[2]],
+                  Net_Profit = live$data$`Net Profit`[input$moSlider[1]:input$moSlider[2]])
     gvisLineChart(df, options=list(pointSize = 4, width = 800, height = 400, vAxis="{title:'Dollars($)'}",
                                    hAxis="{title:'Revenue'}", series = "[{color:'8497e5'}, {color:'b8e986'}, 
                                    {color:'grey'}, {color:'Black'}, {color:'Red'}]", title = "Partner Pay Compared to Revenue"))
   })
   
   ########################################Overhead Page##############################################################################
-
+  #overhead visual
   output$overhead <-renderGvis({
-    overhead_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$Overhead))
-    RDcost_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`R&D Costs`))
-    BDcost_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`BD Costs`))
-    subsCost_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Subscription Costs`))
-    Disc_spend_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Discretionary Spending`))
-    partner_pay_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Partner Pay`))
-    partner_bonuses_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Partner Bonuses`))
-    df=data.frame(Month = MRT$data[input$moSlider[1]:input$moSlider[2],"Month"],
-                  Total_Overhead = overhead_numeric[input$moSlider[1]:input$moSlider[2]],
-                  BD_Costs= BDcost_numeric[input$moSlider[1]:input$moSlider[2]],
-                  Subscription_Costs= subsCost_numeric[input$moSlider[1]:input$moSlider[2]],
-                  Discretionary_Spending= Disc_spend_numeric[input$moSlider[1]:input$moSlider[2]],
-                  Partner_Pay= partner_pay_numeric[input$moSlider[1]:input$moSlider[2]],
-                  Partner_Bonuses= partner_bonuses_numeric[input$moSlider[1]:input$moSlider[2]])
+    df=data.frame(Month = live$data[input$moSlider[1]:input$moSlider[2],"Month"],
+                  Total_Overhead = live$data$Overhead[input$moSlider[1]:input$moSlider[2]],
+                  BD_Costs = live$data$`BD Costs`[input$moSlider[1]:input$moSlider[2]],
+                  RD_Costs = live$data$`R&D Costs`[input$moSlider[1]:input$moSlider[2]],
+                  Subscription_Costs = live$data$`Subscription Costs`[input$moSlider[1]:input$moSlider[2]],
+                  Discretionary_Spending = live$data$`Discretionary Spending`[input$moSlider[1]:input$moSlider[2]],
+                  Partner_Pay = live$data$`Partner Pay`[input$moSlider[1]:input$moSlider[2]],
+                  Partner_Bonuses = live$data$`Partner Bonuses`[input$moSlider[1]:input$moSlider[2]])
     gvisLineChart(df, options=list(pointSize = 2, width = 800, height = 400, vAxis="{title:'Dollars($)'}",
                                    hAxis="{title:'Months'}", series = "[{color:'8497e5'}, {color:'b8e986'}, 
                                    {color:'grey'}, {color:'Red'}]", title = "Overhead"))
   })
   
-  #Ecoomies of Scale
+  #Ecoomies of Scale visual
   output$econScale <-renderGvis({
-    revenue_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$Revenue))
-    overhead_opex_numeric = as.numeric(gsub("[\\%,]", "", MRT$data$`Overhead/Opex %`))
-    df=data.frame(Revenue = revenue_numeric[input$moSlider[1]:input$moSlider[2]],
-                  `Overhead/Opex %`= overhead_opex_numeric[input$moSlider[1]:input$moSlider[2]])
+    df=data.frame(Revenue = live$data$Revenue[input$moSlider[1]:input$moSlider[2]],
+                  `Overhead/Opex %`= live$data$`Overhead to Opex`[input$moSlider[1]:input$moSlider[2]])
     gvisLineChart(df, options=list(pointSize = 4, width = 800, height = 400, vAxis="{title:'Overhead/Opex %'}",
                                    hAxis="{title:'Revenue'}", series = "[{color: '8497e5'}]", title = "Economies of Scale"))
   })
   
   
   #######################################other################################################################################
+  #gross margins visual
   output$viz1 <-renderGvis({
-    Gross_Margins = as.numeric(gsub("[\\%,]", "", MRT$data$`Gross Margins`))
-    df=data.frame(Month= MRT$data[input$moSlider[1]:input$moSlider[2],"Month"], 
-                  Gross_Margins= Gross_Margins[input$moSlider[1]:input$moSlider[2]])
+    df=data.frame(Month= live$data[input$moSlider[1]:input$moSlider[2],"Month"], 
+                  Gross_Margins= live$data$`Gross Margins`[input$moSlider[1]:input$moSlider[2]])
     gvisLineChart(df, options=list(pointSize = 2, width = 400, height = 200, vAxis="{title:'Perecent of Dollars($)'}",
                                    hAxis="{title:'Months'}", series = "[{color: 'b8e986'}]", title = "Gross Margins"))
   })
+  #amount of partners visual
   output$viz2 <-renderGvis({
-    partner = as.numeric(gsub("[\\%,]", "", MRT$data$Partners))
-    df=data.frame(Month = MRT$data[input$moSlider[1]:input$moSlider[2],"Month"], 
-                  Partner = partner[input$moSlider[1]:input$moSlider[2]])
+    df=data.frame(Month = live$data[input$moSlider[1]:input$moSlider[2],"Month"], 
+                  Partner = live$data$Partners[input$moSlider[1]:input$moSlider[2]])
     gvisLineChart(df, options=list(pointSize = 2, width = 400, height = 200, vAxis="{title:'# of Partners'}",
                                    hAxis="{title:'Months'}", series = "[{color: 'b8e986'}]", title = "Amount of Partners"))
   })
-  
+  #partner bonuses visual
   output$viz3 <-renderGvis({
-    part_bonus = as.numeric(gsub("[\\$,]", "", MRT$data$`Partner Bonuses`))
-    df=data.frame(Month = MRT$data[input$moSlider[1]:input$moSlider[2],"Month"], 
-                  Partner_Bonuses = part_bonus[input$moSlider[1]:input$moSlider[2]])
+    df=data.frame(Month = live$data[input$moSlider[1]:input$moSlider[2],"Month"], 
+                  Partner_Bonuses = live$data$`Partner Bonuses`[input$moSlider[1]:input$moSlider[2]])
     gvisLineChart(df, options=list(pointSize = 2, width = 400, height = 200, vAxis="{title:'Dollars($)'}",
                                    hAxis="{title:'Months'}", series = "[{color: 'b8e986'}]", title = "Partner Bonues"))
   })
+  #comissons visual
   output$viz4 <-renderGvis({
-    comissions = as.numeric(gsub("[\\$,]", "", MRT$data$Comissions))
-    df=data.frame(Month= MRT$data[input$moSlider[1]:input$moSlider[2],"Month"], 
-                  Comissions = comissions[input$moSlider[1]:input$moSlider[2]])
+    df=data.frame(Month= live$data[input$moSlider[1]:input$moSlider[2],"Month"], 
+                  Comissions = live$data$Comissions[input$moSlider[1]:input$moSlider[2]])
     gvisLineChart(df, options=list(pointSize = 2, width = 400, height = 200, vAxis="{title:'Dollars($)'}",
                                    hAxis="{title:'Months'}", series = "[{color: 'b8e986'}]", title = "Comissions"))
   })
-  
+  #total fixed costs visual
   output$viz5 <-renderGvis({
-    total_fixed_cost = as.numeric(gsub("[\\$,]", "", MRT$data$`Subscription Costs`))
-    df=data.frame(Month = MRT$data[input$moSlider[1]:input$moSlider[2],"Month"], 
-                  Subscription_Costs= total_fixed_cost[input$moSlider[1]:input$moSlider[2]])
+    df=data.frame(Month = live$data[input$moSlider[1]:input$moSlider[2],"Month"], 
+                  Subscription_Costs = live$data$`Subscription Costs`[input$moSlider[1]:input$moSlider[2]])
     gvisLineChart(df, options=list(pointSize = 2, width = 400, height = 200, vAxis="{title:'Dollars($)'}",
-                                   hAxis="{title:'Months'}", series = "[{color: 'b8e986'}]", title = "Total Fixed Costs"))
+                                   hAxis="{title:'Months'}", series = "[{color: 'b8e986'}]", title = "Subscription Costs"))
   })
+  #R&D costs Visual
   output$viz6 <-renderGvis({
-    RDCost = as.numeric(gsub("[\\$,]", "", MRT$data$`R&D Costs`))
-    df=data.frame(Month = MRT$data[input$moSlider[1]:input$moSlider[2],"Month"], 
-                  RD_Costs = RDCost[input$moSlider[1]:input$moSlider[2]])
+    df=data.frame(Month = live$data[input$moSlider[1]:input$moSlider[2],"Month"], 
+                  RD_Costs = live$data$`R&D Costs`[input$moSlider[1]:input$moSlider[2]])
     gvisLineChart(df, options=list(pointSize = 2, width = 400, height = 200, vAxis="{title:'Dollars($)'}",
                                    hAxis="{title:'Months'}", series = "[{color: 'b8e986'}]", title = "R&D Costs"))
   })
@@ -358,46 +403,123 @@ server <- function(input, output, session) {
     gvisTable(MRT$data[,c(1:26,31:33,35:37,42,44,47:50,61)])
   })
   
-  #reload data button#
-  MRT <- reactiveValues()
-  observeEvent(input$part_reload, {
-    MRT$data <- gs_read( gs_key("1ZtE7i3lJCNaCBiU26mYFLEOL9ZqLE8bNyLeh1woCuck"), ws = "Monthly Shiny and Data Studio Launch Pad")
-  }, ignoreNULL=FALSE)
-  output$part_clics <- renderText(input$part_reload)
+  #Effects the slider for the client growth slider
   
-  # observeEvent(input$part_mCost, {
-  #   if(input$mCost == "Revenue/3"){
-  #     MRT$data[,"Subscription Costs"] <- 4/3 * MRT$data[,"Subscription Costs"]
-  #     MRT$data[,"R&D Costs"] <- 4/3 * MRT$data[,"R&D Costs"]
-  #     MRT$data[,"BD Costs"] <- 4/3 * MRT$data[,"BD Costs"]
-  #     MRT$data[,"Discretionary Spending"] <- 4/3 * MRT$data[,"Discretionary Spending"]
-  #   }
-  #   else if(input$mCost == "Revenue/2"){
-  #     MRT$data[,"Subscription Costs"] <- 2 * MRT$data[,"Subscription Costs"]
-  #     MRT$data[,"R&D Costs"] <- 2 * MRT$data[,"R&D Costs"]
-  #     MRT$data[,"BD Costs"] <- 2 * MRT$data[,"BD Costs"]
-  #     MRT$data[,"Discretionary Spending"] <- 2 * MRT$data[,"Discretionary Spending"]
-  #   }
-  #   else if(input$mCost == "Revenue"){
-  #     MRT$data[,"Subscription Costs"] <- 4 * MRT$data[,"Subscription Costs"]
-  #     MRT$data[,"R&D Costs"] <- 4 * MRT$data[,"R&D Costs"]
-  #     MRT$data[,"BD Costs"] <- 4 * MRT$data[,"BD Costs"]
-  #     MRT$data[,"Discretionary Spending"] <- 4 * MRT$data[,"Discretionary Spending"]
-  #   }
-  #   else{
-  #     MRT$data[,"Subscription Costs"] <-  MRT$data[,"Subscription Costs"]
-  #     MRT$data[,"R&D Costs"] <-  MRT$data[,"R&D Costs"]
-  #     MRT$data[,"BD Costs"] <-  MRT$data[,"BD Costs"]
-  #     MRT$data[,"Discretionary Spending"] <-  MRT$data[,"Discretionary Spending"]
-  #   }
-  # })
+  observeEvent(input$part_growslide, {
+    if(input$growslide == "5%"){
+      live$data = MRT$data
+    }
+    else if(input$part_growslide == "10%"){
+      live$data <- MRT$data
+    }
+    else if(input$part_growslide == "15%"){
+      live$data <- MRT$data
+    }
+    else if(input$part_growslide == "20%"){
+      live$data <- MRT$data
+    }
+    else if(input$part_growslide == "25%"){
+      live$data <- MRT$data
+    }
+    else if(input$part_growslide == "30%"){
+      live$data <- MRT$data
+    }
+    else if(input$part_growslide == "35%"){
+      live$data <- MRT$data
+    }
+    else if(input$part_growslide == "40%"){
+      live$data <- MRT$data
+    }
+    else if(input$part_growslide == "45%"){
+      live$data <- MRT$data
+    }
+    else if(input$part_growslide == "50%"){
+      live$data <- MRT$data
+    }
+    else if(input$part_growslide == "55%"){
+      live$data <- MRT$data
+    }
+    else if(input$part_growslide == "60%"){
+      live$data <- MRT$data
+    }
+    else if(input$part_growslide == "65%"){
+      live$data <- MRT$data
+    }
+    else if(input$part_growslide == "70%"){
+      live$data <- MRT$data
+    }
+    else if(input$part_growslide == "75%"){
+      live$data <- MRT$data
+    }
+    else if(input$part_growslide == "80%"){
+      live$data <- MRT$data
+    }
+    else if(input$part_growslide == "85%"){
+      live$data <- MRT$data
+    }
+    else if(input$part_growslide == "90%"){
+      live$data <- MRT$data
+    }
+    else if(input$part_growslide == "95%"){
+      live$data <- MRT$data
+    }
+    else if(input$part_growslide == "100%"){
+      live$data <- MRT$data
+    }
+  }, ignoreNULL=FALSE)
+  
+  #effects the slider for the cost multiplier slider
+  observeEvent(input$part_mCost, {
+    if(input$growslide == "10%"){
+      live$data = MRT$data
+    }
+    else if(input$part_growslide == "20%"){
+      live$data <- MRT$data
+    }
+    else if(input$part_growslide == "30%"){
+      live$data <- MRT$data
+    }
+    else if(input$part_growslide == "40%"){
+      live$data <- MRT$data
+    }
+    else if(input$part_growslide == "50%"){
+      live$data <- MRT$data
+    }
+    else if(input$part_growslide == "60%"){
+      live$data <- MRT$data
+    }
+    else if(input$vgrowslide == "70%"){
+      live$data <- MRT$data
+    }
+    else if(input$part_growslide == "80%"){
+      live$data <- MRT$data
+    }
+    else if(input$part_growslide == "90%"){
+      live$data <- MRT$data
+    }
+    else if(input$part_growslide == "100%"){
+      live$data <- MRT$data
+    }
+    else if(input$part_growslide == "110%"){
+      live$data <- MRT$data
+    }
+    else if(input$part_growslide == "125%"){
+      live$data <- MRT$data
+    }
+    else if(input$part_growslide == "150%"){
+      live$data <- MRT$data
+    }
+    else if(input$part_growslide == "200%"){
+      live$data <- MRT$data
+    }
+  }, ignoreNULL=FALSE)
+  
   #####################################Profit Page#####################################################################################
+  #profit visual
   output$part_profit <- renderGvis({
-    gross_profit_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Gross Profit`))
-    net_profit_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Net Profit`))
-    df=data.frame(Month = MRT$data[input$part_moSlider[1]:input$part_moSlider[2],1], 
-                  Gross_Profit = gross_profit_numeric[input$part_moSlider[1]:input$part_moSlider[2]],
-                  Net_Profit = net_profit_numeric[input$part_moSlider[1]:input$part_moSlider[2]])
+    df=data.frame(Month = live$data[input$part_moSlider[1]:input$part_moSlider[2],1], 
+                  Gross_Profit = live$data$`Gross Profit`[input$part_moSlider[1]:input$part_moSlider[2]],
+                  Net_Profit = live$data$`Net Profit`[input$part_moSlider[1]:input$part_moSlider[2]])
     gvisColumnChart(df, xvar = "Month", 
                     yvar = c("Gross_Profit", "Net_Profit"),
                     options=list(bar="{groupWidth:'70%'}", width = "800", height = "400",
@@ -405,59 +527,47 @@ server <- function(input, output, session) {
                                  hAxis="{title:'Months'}", title = "Profit",
                                  series = "[{color:'8497e5'}, {color:'b8e986'}]"))
   })
-  #gross/ net margins
+  #gross/ net margins visual
   output$part_gross <-renderGvis({
-    revenue_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$Revenue))
-    gross_margins_numeric = as.numeric(gsub("[\\%,]", "", MRT$data$`Gross Margins`))
-    net_margins_numeric = as.numeric(gsub("[\\%,]", "", MRT$data$`Net Margins`))
-    df=data.frame(Revenue = revenue_numeric[input$part_moSlider[1]:input$part_moSlider[2]],
-                  Gross_Margins= gross_margins_numeric[input$part_moSlider[1]:input$part_moSlider[2]],
-                  Net_Margins= net_margins_numeric[input$part_moSlider[1]:input$part_moSlider[2]])
+    df=data.frame(Revenue = live$data$Revenue[input$part_moSlider[1]:input$part_moSlider[2]],
+                  Gross_Margins= live$data$`Gross Margins`[input$part_moSlider[1]:input$part_moSlider[2]],
+                  Net_Margins= live$data$`Net Margins`[input$part_moSlider[1]:input$part_moSlider[2]])
     gvisLineChart(df, options=list(pointSize = 6, width = 800, height = 400, vAxis="{title:'Profit Margins'}",
                                    hAxis="{title:'Revenue'}", series = "[{color:'8497e5'}, {color:'b8e986'}]", 
                                    title = "Margins(%)"))
   })
   
   ################################Runway page########################################################################################
+  #runway visual
   output$part_runway <- renderGvis({
-    cash_in_bank_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Cash in Bank`))
-    net_profit_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Net Profit`))
-    funds_raised_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Cumulative Fundraising`))
-    df=data.frame(Month= MRT$data[input$part_moSlider[1]:input$part_moSlider[2],"Month"], 
-                  Cash_in_Bank= cash_in_bank_numeric[input$part_moSlider[1]:input$part_moSlider[2]],
-                  Net_Profit = net_profit_numeric[input$part_moSlider[1]:input$part_moSlider[2]],
-                  Funds_Raised = funds_raised_numeric[input$part_moSlider[1]:input$part_moSlider[2]])
+    df=data.frame(Month= live$data[input$part_moSlider[1]:input$part_moSlider[2],"Month"], 
+                  Cash_in_Bank= live$data$`Cash in Bank`[input$part_moSlider[1]:input$part_moSlider[2]],
+                  Net_Profit = live$data$`Net Profit`[input$part_moSlider[1]:input$part_moSlider[2]],
+                  Funds_Raised = live$data$`Cumulative Fundraising`[input$part_moSlider[1]:input$part_moSlider[2]])
     gvisLineChart(df, options=list(pointSize=6,width = 800, height = 400,vAxis="{title:'Dollars($)'}",
                                    hAxis="{title:'Months'}", title = "Runway", 
                                    series = "[{color:'8497e5'}, {color:'b8e986'}, {color:'grey'}]"))
   })
   
-  #Profit and Revenue
+  #Profit and Revenue visual
   output$part_profRev <-renderGvis({
-    gross_profit_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Gross Profit`))
-    net_profit_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Net Profit`))
-    revenue_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$Revenue))
-    overhead_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$Overhead))
-    df=data.frame(Revenue= gross_profit_numeric[input$part_moSlider[1]:input$part_moSlider[2]],
-                  Overhead= overhead_numeric[input$part_moSlider[1]:input$part_moSlider[2]],
-                  Gross_Profit= gross_profit_numeric[input$part_moSlider[1]:input$part_moSlider[2]],
-                  Net_Profit= net_profit_numeric[input$part_moSlider[1]:input$part_moSlider[2]])
+    df=data.frame(Revenue = live$data$Revenue[input$part_moSlider[1]:input$part_moSlider[2]],
+                  Overhead = live$data$Overhead[input$part_moSlider[1]:input$part_moSlider[2]],
+                  Gross_Profit = live$data$`Gross Profit`[input$part_moSlider[1]:input$part_moSlider[2]],
+                  Net_Profit = live$data$`Net Profit`[input$part_moSlider[1]:input$part_moSlider[2]])
     gvisLineChart(df, options=list(pointSize = 6, width = 800, height = 400, vAxis="{title:'Profit'}",
                                    hAxis="{title:'Revenue'}", series = "[{color:'8497e5'}, {color:'b8e986'}, {color:'grey'}]", 
                                    title = "Profit/Revenue"))
   })
   
   ###########################Growth Page########################################################################################
+  #client growth and revenue
   output$part_num_client <- renderGvis({
-    revenue_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$Revenue))
-    ent_client_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Enterprise Clients`))
-    small_buis_cli_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Small Business Clients`))
-    personal_clients_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Personal Clients`))
-    df=data.frame(Month = MRT$data[input$part_moSlider[1]:input$part_moSlider[2],"Month"], 
-                  Revenue = revenue_numeric[input$part_moSlider[1]:input$part_moSlider[2]],
-                  Enterprise_Clients = ent_client_numeric[input$part_moSlider[1]:input$part_moSlider[2]],
-                  Small_Business_Clients = small_buis_cli_numeric[input$part_moSlider[1]:input$part_moSlider[2]],
-                  Personal_Clients = personal_clients_numeric[input$part_moSlider[1]:input$part_moSlider[2]])
+    df=data.frame(Month = live$data[input$part_moSlider[1]:input$part_moSlider[2],"Month"], 
+                  Revenue = live$data$Revenue[input$part_moSlider[1]:input$part_moSlider[2]],
+                  Enterprise_Clients = live$data$`Enterprise Clients`[input$part_moSlider[1]:input$part_moSlider[2]],
+                  Small_Business_Clients = live$data$`Small Business Clients`[input$part_moSlider[1]:input$part_moSlider[2]],
+                  Personal_Clients = live$data$`Personal Clients`[input$part_moSlider[1]:input$part_moSlider[2]])
     gvisComboChart(df, xvar="Month",
                    yvar=c("Personal_Clients", "Revenue", "Small_Business_Clients", 
                           "Enterprise_Clients"),
@@ -470,17 +580,13 @@ server <- function(input, output, session) {
                                 width = 800, height = 400, title = "Client Growth and Revenue", hAxis="{title:'Months'}"))
   })
   
-  
+  #revenue from clients visual
   output$part_rev_client <- renderGvis({
-    revenue_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$Revenue))
-    ent_rev_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Enterprise Revenue`))
-    small_buis_rev_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Small Business Revenue`))
-    personal_rev_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Personal Revenue`))
-    df=data.frame(Month = MRT$data[input$part_moSlider[1]:input$part_moSlider[2],"Month"], 
-                  Revenue = revenue_numeric[input$part_moSlider[1]:input$part_moSlider[2]],
-                  Enterprise_Clients_Revenue = ent_rev_numeric[input$part_moSlider[1]:input$part_moSlider[2]],
-                  Small_Business_Clients_Revenue = small_buis_rev_numeric[input$part_moSlider[1]:input$part_moSlider[2]],
-                  Personal_Clients_Revenue = personal_rev_numeric[input$part_moSlider[1]:input$part_moSlider[2]])
+    df=data.frame(Month = live$data[input$part_moSlider[1]:input$part_moSlider[2],"Month"], 
+                  Revenue = live$data$Revenue[input$part_moSlider[1]:input$part_moSlider[2]],
+                  Enterprise_Clients_Revenue = live$data$`Enterprise Revenue`[input$part_moSlider[1]:input$part_moSlider[2]],
+                  Small_Business_Clients_Revenue = live$data$`Small Business Revenue`[input$part_moSlider[1]:input$part_moSlider[2]],
+                  Personal_Clients_Revenue = live$data$`Personal Revenue`[input$part_moSlider[1]:input$part_moSlider[2]])
     gvisComboChart(df, xvar="Month",
                    yvar=c("Personal_Clients_Revenue", "Revenue", "Small_Business_Clients_Revenue", 
                           "Enterprise_Clients_Revenue"),
@@ -494,30 +600,24 @@ server <- function(input, output, session) {
   })
   ##########################################Churn page##################################################################################
   
-  
+  #churn vs client growth visual
   output$part_client <-renderGvis({
-    churn_numeric = as.numeric(gsub("[\\%,]", "", MRT$data$Churn))
-    client_growth_numeric = as.numeric(gsub("[\\%,]", "", MRT$data$`Client Growth Percentage`))
-    df=data.frame(Month = MRT$data[input$part_moSlider[1]:input$part_moSlider[2],"Month"], 
-                  Churn = churn_numeric[input$part_moSlider[1]:input$part_moSlider[2]],
-                  Client_Growth_Percentage = client_growth_numeric[input$part_moSlider[1]:input$part_moSlider[2]])
+    df=data.frame(Month = live$data[input$part_moSlider[1]:input$part_moSlider[2],"Month"], 
+                  Churn = live$data$Churn[input$part_moSlider[1]:input$part_moSlider[2]],
+                  Client_Growth = live$data$`Client Growth`[input$part_moSlider[1]:input$part_moSlider[2]])
     gvisLineChart(df, options=list(pointSize = 4, width = 800, height = 400, vAxis="{title:'Percent'}",
-                                   hAxis="{title:'Months'}", title = "Client Growth", 
+                                   hAxis="{title:'Months'}", title = "Churn Vs Client Growth", 
                                    series = "[{color:'8497e5'}, {color: 'b8e986'}]"))
   })
   
   ############################Workforce Page##########################################################################################
   
-  #work Force
+  #Revenue per head visual
   output$part_workForce <-renderGvis({
-    revenue_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$Revenue))
-    head_count_numeric = as.numeric(gsub("[\\%,]", "", MRT$data$`Company Head Count`))
-    revperhead_numeric = as.numeric(gsub("[\\%,]", "", MRT$data$`Revenue per Head`))
-    partner_numeric = as.numeric(gsub("[\\%,]", "", MRT$data$Partners))
-    df=data.frame(Revenue= revenue_numeric[input$part_moSlider[1]:input$part_moSlider[2]],
-                  Company_Head_Count= head_count_numeric[input$part_moSlider[1]:input$part_moSlider[2]],
-                  Revenue_per_Head= revperhead_numeric[input$part_moSlider[1]:input$part_moSlider[2]],
-                  Partners= partner_numeric[input$part_moSlider[1]:input$part_moSlider[2]])
+    df=data.frame(Revenue = live$data$Revenue[input$part_moSlider[1]:input$part_moSlider[2]],
+                  Company_Head_Count = live$data$`Company Head Count`[input$part_moSlider[1]:input$part_moSlider[2]],
+                  Revenue_per_Head= live$data$`Revenue Per Employee`[input$part_moSlider[1]:input$part_moSlider[2]],
+                  Partners= live$data$Partners[input$part_moSlider[1]:input$part_moSlider[2]])
     gvisLineChart(df, options=list(pointSize = 6, width = 800, height = 400, vAxis="{title:'Head Count'}",
                                    hAxis="{title:'Revenue'}", 
                                    series = "[{type:'line', 
@@ -528,26 +628,18 @@ server <- function(input, output, session) {
                                    color:'8497e5'}]", title = "Revenue per Head",
                                    vAxes="[{title:'Company Head Count'}, {title:'Revenue per Head'}]"))
 })
-  
+  #Labor Costs visuals
   output$part_Lcost <- renderGvis({
-    Agent_Labor_cost_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Agent Labor Cost`))
-    operators_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$Operators))
-    RRR_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$RRRs))
-    sentries_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$Sentries))
-    strategists_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$Strategists))
-    specialists_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$Specialists))
-    df=data.frame(Month = MRT$data[input$part_moSlider[1]:input$part_moSlider[2],"Month"], 
-                  Agent_Labor_Cost = Agent_Labor_cost_numeric[input$part_moSlider[1]:input$part_moSlider[2]],
-                  Operator_Labor_cost = operators_numeric[input$part_moSlider[1]:input$part_moSlider[2]],
-                  RRR_Labor_Cost = RRR_numeric[input$part_moSlider[1]:input$part_moSlider[2]],
-                  Sentry_Labor_Cost = sentries_numeric[input$part_moSlider[1]:input$part_moSlider[2]],
-                  Strategists_Labor_Cost = strategists_numeric[input$part_moSlider[1]:input$part_moSlider[2]],
-                  Specialists_Labor_Cost = specialists_numeric[input$part_moSlider[1]:input$part_moSlider[2]]
-                  
+    df=data.frame(Month = live$data[input$moSlider[1]:input$moSlider[2],"Month"], 
+                  Actual_Labor_Cost = live$data$`Actual Labor Cost`[input$moSlider[1]:input$moSlider[2]],
+                  Expected_Operator_Labor_cost = live$data$`Expected Operator Labor Costs`[input$moSlider[1]:input$moSlider[2]],
+                  Expected_RRR_Labor_Cost = live$data$`Expected RRR Labor Costs for Assistants`[input$moSlider[1]:input$moSlider[2]],
+                  Expected_Specialist_and_Strategist_Labor_Costs = 
+                    live$data$`Expected Specialist and Strategist Labor Costs`[input$moSlider[1]:input$moSlider[2]]
     )
     gvisComboChart(df, xvar="Month",
-                   yvar=c("Operator_Labor_cost", "Agent_Labor_Cost", "RRR_Labor_Cost", 
-                          "Sentry_Labor_Cost", "Strategists_Labor_Cost", "Specialists_Labor_Cost"),
+                   yvar=c("Expected_Operator_Labor_cost", "Actual_Labor_Cost", "Expected_RRR_Labor_Cost", 
+                          "Expected_Specialist_and_Strategist_Labor_Costs"),
                    options=list(pointSize = 3, seriesType="line",
                                 series="[{type:'line', 
                                 targetAxisIndex:0,
@@ -555,20 +647,18 @@ server <- function(input, output, session) {
                                 {type:'bars', 
                                 targetAxisIndex:1,
                                 color:'8497e5'},
-                                {color:'grey'}, {color:'black'}, 
-                                {color:'orange'},{color:'blue'}]",
-                                vAxes="[{title:'Labor_Costs'}, {title:'Agent_Labor_Cost'}]", 
+                                {color:'grey'}, {color:'black'}]",
+                                vAxes="[{title:'Expected_Operator_Labor_cost'}, {title:'Actual_Labor_Cost'}]", 
                                 width = 800, height = 400, title = "Labor Costs", hAxis="{title:'Months'}"))
-    })
+})
   
   
   ############################Partner pay########################################################################################
+  #partner pay visual
   output$part_combo <- renderGvis({
-    partner_pay_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Partner Pay`))
-    gross_profits_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Gross Profit`))
-    df=data.frame(Month = MRT$data[input$part_moSlider[1]:input$part_moSlider[2],"Month"], 
-                  Partner_Pay = partner_pay_numeric[input$part_moSlider[1]:input$part_moSlider[2]],
-                  Gross_Profits = gross_profits_numeric[input$part_moSlider[1]:input$part_moSlider[2]])
+    df=data.frame(Month = live$data[input$part_moSlider[1]:input$part_moSlider[2],"Month"], 
+                  Partner_Pay = live$data$`Partner Pay`[input$part_moSlider[1]:input$part_moSlider[2]],
+                  Gross_Profits = live$data$`Gross Profit`[input$part_moSlider[1]:input$part_moSlider[2]])
     gvisComboChart(df, xvar = "Month", 
                    yvar = c("Partner_Pay", "Gross_Profits"),
                    options=list(seriesType="bars",
@@ -578,109 +668,92 @@ server <- function(input, output, session) {
                                 hAxis="{title:'Months'}", title = "Partner Pay"))
   })
   
+  #partner pay compared to Revenue visual
   output$part_linechart <- renderGvis({
-    partner_pay_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Partner Pay`))
-    gross_profits_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Gross Profit`))
-    net_profit_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Net Profit`))
-    revenue_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$Revenue))
-    df=data.frame(Revenue = revenue_numeric[input$part_moSlider[1]:input$part_moSlider[2]], 
-                  Partner_Pay = partner_pay_numeric[input$part_moSlider[1]:input$part_moSlider[2]],
-                  Gross_Profits = gross_profits_numeric[input$part_moSlider[1]:input$part_moSlider[2]],
-                  Net_Profit = net_profit_numeric[input$part_moSlider[1]:input$part_moSlider[2]])
+    df=data.frame(Revenue = live$data$Revenue[input$part_moSlider[1]:input$part_moSlider[2]], 
+                  Partner_Pay = live$data$`Partner Pay`[input$part_moSlider[1]:input$part_moSlider[2]],
+                  Gross_Profits = live$data$`Gross Profit`[input$part_moSlider[1]:input$part_moSlider[2]],
+                  Net_Profit = live$data$`Net Profit`[input$part_moSlider[1]:input$part_moSlider[2]])
     gvisLineChart(df, options=list(pointSize = 4, width = 800, height = 400, vAxis="{title:'Dollars($)'}",
                                    hAxis="{title:'Revenue'}", series = "[{color:'8497e5'}, {color:'b8e986'}, 
                                    {color:'grey'}, {color:'Black'}, {color:'Red'}]", title = "Partner Pay Compared to Revenue"))
   })
   
   ########################################Overhead Page##############################################################################
-  
+  #overhead visual
   output$part_overhead <-renderGvis({
-    overhead_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$Overhead))
-    RDcost_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`R&D Costs`))
-    BDcost_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`BD Costs`))
-    subsCost_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Subscription Costs`))
-    Disc_spend_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Discretionary Spending`))
-    partner_pay_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Partner Pay`))
-    partner_bonuses_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$`Partner Bonuses`))
-    df=data.frame(Month = MRT$data[input$part_moSlider[1]:input$part_moSlider[2],"Month"],
-                  Total_Overhead = overhead_numeric[input$part_moSlider[1]:input$part_moSlider[2]],
-                  BD_Costs= BDcost_numeric[input$part_moSlider[1]:input$part_moSlider[2]],
-                  Subscription_Costs= subsCost_numeric[input$part_moSlider[1]:input$part_moSlider[2]],
-                  Discretionary_Spending= Disc_spend_numeric[input$part_moSlider[1]:input$part_moSlider[2]],
-                  Partner_Pay= partner_pay_numeric[input$part_moSlider[1]:input$part_moSlider[2]],
-                  Partner_Bonuses= partner_bonuses_numeric[input$part_moSlider[1]:input$part_moSlider[2]])
+    df=data.frame(Month = live$data[input$part_moSlider[1]:input$part_moSlider[2],"Month"],
+                  Total_Overhead = live$data$Overhead[input$part_moSlider[1]:input$part_moSlider[2]],
+                  BD_Costs= live$data$`BD Costs`[input$part_moSlider[1]:input$part_moSlider[2]],
+                  RD_Costs= live$data$`R&D Costs`[input$part_moSlider[1]:input$part_moSlider[2]],
+                  Subscription_Costs= live$data$`Subscription Costs`[input$part_moSlider[1]:input$part_moSlider[2]],
+                  Discretionary_Spending= live$data$`Discretionary Spending`[input$part_moSlider[1]:input$part_moSlider[2]],
+                  Partner_Pay= live$data$`Partner Pay`[input$part_moSlider[1]:input$part_moSlider[2]],
+                  Partner_Bonuses= live$data$`Partner Bonuses`[input$part_moSlider[1]:input$part_moSlider[2]])
     gvisLineChart(df, options=list(pointSize = 2, width = 800, height = 400, vAxis="{title:'Dollars($)'}",
                                    hAxis="{title:'Months'}", series = "[{color:'8497e5'}, {color:'b8e986'}, 
                                    {color:'grey'}, {color:'Red'}]", title = "Overhead"))
   })
   
-  #Ecoomies of Scale
+  #Ecoomies of Scale visual
   output$part_econScale <-renderGvis({
-    revenue_numeric = as.numeric(gsub("[\\$,]", "", MRT$data$Revenue))
-    overhead_opex_numeric = as.numeric(gsub("[\\%,]", "", MRT$data$`Overhead/Opex %`))
-    df=data.frame(Revenue = revenue_numeric[input$part_moSlider[1]:input$part_moSlider[2]],
-                  `Overhead/Opex %`= overhead_opex_numeric[input$part_moSlider[1]:input$part_moSlider[2]])
+    df=data.frame(Revenue = live$data$Revenue[input$part_moSlider[1]:input$part_moSlider[2]],
+                  `Overhead/Opex %`= live$data$`Overhead to Opex`[input$part_moSlider[1]:input$part_moSlider[2]])
     gvisLineChart(df, options=list(pointSize = 4, width = 800, height = 400, vAxis="{title:'Overhead/Opex %'}",
                                    hAxis="{title:'Revenue'}", series = "[{color: '8497e5'}]", title = "Economies of Scale"))
   })
   
   #######################################other################################################################################
+  #gross margins visual
   output$part_viz1 <-renderGvis({
-    Gross_Margins = as.numeric(gsub("[\\%,]", "", MRT$data$`Gross Margins`))
-    df=data.frame(Month= MRT$data[input$part_moSlider[1]:input$part_moSlider[2],"Month"], 
-                  Gross_Margins= Gross_Margins[input$part_moSlider[1]:input$part_moSlider[2]])
+    df=data.frame(Month= live$data[input$part_moSlider[1]:input$part_moSlider[2],"Month"], 
+                  Gross_Margins= live$data$`Gross Margins`[input$part_moSlider[1]:input$part_moSlider[2]])
     gvisLineChart(df, options=list(pointSize = 2, width = 400, height = 200, vAxis="{title:'Perecent of Dollars($)'}",
                                    hAxis="{title:'Months'}", series = "[{color: 'b8e986'}]", title = "Gross Margins"))
   })
+  #amunt of partners visuals
   output$part_viz2 <-renderGvis({
-    partner = as.numeric(gsub("[\\%,]", "", MRT$data$Partners))
-    df=data.frame(Month = MRT$data[input$part_moSlider[1]:input$part_moSlider[2],"Month"], 
-                  Partner = partner[input$part_moSlider[1]:input$part_moSlider[2]])
+    df=data.frame(Month = live$data[input$part_moSlider[1]:input$part_moSlider[2],"Month"], 
+                  Partner = live$data$Partners[input$part_moSlider[1]:input$part_moSlider[2]])
     gvisLineChart(df, options=list(pointSize = 2, width = 400, height = 200, vAxis="{title:'# of Partners'}",
                                    hAxis="{title:'Months'}", series = "[{color: 'b8e986'}]", title = "Amount of Partners"))
   })
-  
+  #partner bonuses visual
   output$part_viz3 <-renderGvis({
-    part_bonus = as.numeric(gsub("[\\$,]", "", MRT$data$`Partner Bonuses`))
-    df=data.frame(Month = MRT$data[input$part_moSlider[1]:input$part_moSlider[2],"Month"], 
-                  Partner_Bonuses = part_bonus[input$part_moSlider[1]:input$part_moSlider[2]])
+    df=data.frame(Month = live$data[input$part_moSlider[1]:input$part_moSlider[2],"Month"], 
+                  Partner_Bonuses = live$data$`Partner Bonuses`[input$part_moSlider[1]:input$part_moSlider[2]])
     gvisLineChart(df, options=list(pointSize = 2, width = 400, height = 200, vAxis="{title:'Dollars($)'}",
                                    hAxis="{title:'Months'}", series = "[{color: 'b8e986'}]", title = "Partner Bonues"))
   })
+  #commissions visuals 
   output$part_viz4 <-renderGvis({
-    comissions = as.numeric(gsub("[\\$,]", "", MRT$data$Comissions))
-    df=data.frame(Month= MRT$data[input$part_moSlider[1]:input$part_moSlider[2],"Month"], 
-                  Comissions = comissions[input$part_moSlider[1]:input$part_moSlider[2]])
+    df=data.frame(Month= live$data[input$part_moSlider[1]:input$part_moSlider[2],"Month"], 
+                  Comissions = live$data$Comissions[input$part_moSlider[1]:input$part_moSlider[2]])
     gvisLineChart(df, options=list(pointSize = 2, width = 400, height = 200, vAxis="{title:'Dollars($)'}",
                                    hAxis="{title:'Months'}", series = "[{color: 'b8e986'}]", title = "Comissions"))
   })
-  
+  #total fixed costs visuals
   output$part_viz5 <-renderGvis({
-    total_fixed_cost = as.numeric(gsub("[\\$,]", "", MRT$data$`Subscription Costs`))
-    df=data.frame(Month = MRT$data[input$part_moSlider[1]:input$part_moSlider[2],"Month"], 
-                  Subscription_Costs= total_fixed_cost[input$part_moSlider[1]:input$part_moSlider[2]])
+    df=data.frame(Month = live$data[input$part_moSlider[1]:input$part_moSlider[2],"Month"], 
+                  Subscription_Costs= live$data$`Subscription Costs`[input$part_moSlider[1]:input$part_moSlider[2]])
     gvisLineChart(df, options=list(pointSize = 2, width = 400, height = 200, vAxis="{title:'Dollars($)'}",
-                                   hAxis="{title:'Months'}", series = "[{color: 'b8e986'}]", title = "Total Fixed Costs"))
+                                   hAxis="{title:'Months'}", series = "[{color: 'b8e986'}]", title = "Subscription Costs"))
   })
+  #R&D Costs visuals
   output$part_viz6 <-renderGvis({
-    RDCost = as.numeric(gsub("[\\$,]", "", MRT$data$`R&D Costs`))
-    df=data.frame(Month = MRT$data[input$part_moSlider[1]:input$part_moSlider[2],"Month"], 
-                  RD_Costs = RDCost[input$part_moSlider[1]:input$part_moSlider[2]])
+    df=data.frame(Month = live$data[input$part_moSlider[1]:input$part_moSlider[2],"Month"], 
+                  RD_Costs = live$data$`R&D Costs`[input$part_moSlider[1]:input$part_moSlider[2]])
     gvisLineChart(df, options=list(pointSize = 2, width = 400, height = 200, vAxis="{title:'Dollars($)'}",
                                    hAxis="{title:'Months'}", series = "[{color: 'b8e986'}]", title = "R&D Costs"))
   })
   
   #########################################MORE PAGE###############################################
   
-  #old data frame way#
-  #  output$data <- renderDataTable({
-  #    DT::datatable(data = gs_MRT,
-  #                  options = list(pageLength = 20, lengthMenu = c(10, 25, 40)), 
-  #                  rownames = FALSE)
-  #  })
   #######################################spreadsheet##############################################
-  output$table <-renderGvis({
-    gvisTable(MRT$data[,c(1:26,31:33,35:37,42,44,47:50,61)])
-  })
+  
+  output$table <- renderDataTable({
+    datatable(MRT$data[, c("Client Growth", "Cost Multiplier", "Churn", "CAC", "CLTV", "Partner Bonuses")], 
+              editable = TRUE, options = list(pageLength = nrow(MRT$data)))
+    })
 
   }
