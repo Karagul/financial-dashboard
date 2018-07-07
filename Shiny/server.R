@@ -4,26 +4,14 @@ library(googlesheets)
 library(shinythemes)
 library(shinyWidgets)
 library(DT)
-source('sheets_data.R')
 
-#####date slider
-# monthStart <- function(x) ({
-#   x <- as.POSIXlt(x)
-#   x$mday <- 1
-#   as.Date(x)
-# })
 
 curr_date <- format(Sys.Date(), "%b '%y")
 
 # Define server function required to create the scatterplot
 server <- function(input, output) {
+  source('sheets_data.R', local = TRUE)
   
-  ##date slider
-  # sliderMonth <- reactiveValues()
-  # observe({
-  #   full.date <- as.POSIXct(input$moSlider_date, tz="GMT")
-  #   sliderMonth$Month <- as.character(monthStart(full.date))
-  # })
   
   #reload data button. This creates MRT$data which is the data frame with the main data we use from google speadsheets. 
   MRT <- reactiveValues()
@@ -36,7 +24,7 @@ server <- function(input, output) {
   ###################################INVESTOR PAGE#############################################
   #bottoom page table
   output$main_table <-renderGvis({
-    gvisTable(MRT$data[,c(1:26,31:33,35:37,42,44,47:50,61)])
+    gvisTable(live$data)
   })
   
   #Effects the slider for the client growth slider
@@ -47,66 +35,92 @@ server <- function(input, output) {
         if(MRT$data$Month[i] == curr_date){
           row_after_curr_mon<-i+1
           while(row_after_curr_mon <= nrow(MRT$data)){
-            if(input$growslide == "5%"){
+            if(input$growslide == "Custom"){
               live$data <- MRT$data
-              live$data[row_after_curr_mon,"Client Growth"] <-.05
+            }
+            else if(input$growslide == "5%"){
+              live$data$`Client growth percentage`[row_after_curr_mon] <- .5
+              Revenue_fn(row_after_curr_mon)
+              Revenue_percent_change_fn(row_after_curr_mon)
             }
             else if(input$growslide == "10%"){
-              live$data <- MRT$data
+              live$data$`Client growth percentage`[row_after_curr_mon] <- .10
+              Revenue_fn(row_after_curr_mon)
+              Revenue_percent_change_fn(row_after_curr_mon)
             }
             else if(input$growslide == "15%"){
-              live$data <- MRT$data
+              live$data$`Client growth percentage`[row_after_curr_mon] <- .15
+              Revenue_fn(row_after_curr_mon)
+              Revenue_percent_change_fn(row_after_curr_mon)
             }
             else if(input$growslide == "20%"){
-              live$data <- MRT$data
+              live$data$`Client growth percentage`[row_after_curr_mon] <- .20
+              Revenue_fn(row_after_curr_mon)
+              Revenue_percent_change_fn(row_after_curr_mon)
             }
             else if(input$growslide == "25%"){
-              live$data <- MRT$data
+              live$data$`Client growth percentage`[row_after_curr_mon] <- .25
+              Revenue_fn(row_after_curr_mon)
             }
             else if(input$growslide == "30%"){
-              live$data <- MRT$data
+              live$data$`Client growth percentage`[row_after_curr_mon] <- .30
+              Revenue_fn(row_after_curr_mon)
             }
             else if(input$growslide == "35%"){
-              live$data <- MRT$data
+              live$data$`Client growth percentage`[row_after_curr_mon] <- .35
+              Revenue_fn(row_after_curr_mon)
             }
             else if(input$growslide == "40%"){
-              live$data <- MRT$data
+              live$data$`Client growth percentage`[row_after_curr_mon] <- .40
+              Revenue_fn(row_after_curr_mon)
             }
             else if(input$growslide == "45%"){
-              live$data <- MRT$data
+              live$data$`Client growth percentage`[row_after_curr_mon] <- .45
+              Revenue_fn(row_after_curr_mon)
             }
             else if(input$growslide == "50%"){
-              live$data <- MRT$data
+              live$data$`Client growth percentage`[row_after_curr_mon] <- .50
+              Revenue_fn(row_after_curr_mon)
             }
             else if(input$growslide == "55%"){
-              live$data <- MRT$data
+              live$data$`Client growth percentage`[row_after_curr_mon] <- .55
+              Revenue_fn(row_after_curr_mon)
             }
             else if(input$growslide == "60%"){
-              live$data <- MRT$data
+              live$data$`Client growth percentage`[row_after_curr_mon] <- .60
+              Revenue_fn(row_after_curr_mon)
             }
             else if(input$growslide == "65%"){
-              live$data <- MRT$data
+              live$data$`Client growth percentage`[row_after_curr_mon] <- .65
+              Revenue_fn(row_after_curr_mon)
             }
             else if(input$growslide == "70%"){
-              live$data <- MRT$data
+              live$data$`Client growth percentage`[row_after_curr_mon] <- .70
+              Revenue_fn(row_after_curr_mon)
             }
             else if(input$growslide == "75%"){
-              live$data <- MRT$data
+              live$data$`Client growth percentage`[row_after_curr_mon] <- .75
+              Revenue_fn(row_after_curr_mon)
             }
             else if(input$growslide == "80%"){
-              live$data <- MRT$data
+              live$data$`Client growth percentage`[row_after_curr_mon] <- .80
+              Revenue_fn(row_after_curr_mon)
             }
             else if(input$growslide == "85%"){
-              live$data <- MRT$data
+              live$data$`Client growth percentage`[row_after_curr_mon] <- .85
+              Revenue_fn(row_after_curr_mon)
             }
             else if(input$growslide == "90%"){
-              live$data <- MRT$data
+              live$data$`Client growth percentage`[row_after_curr_mon] <- .90
+              Revenue_fn(row_after_curr_mon)
             }
             else if(input$growslide == "95%"){
-              live$data <- MRT$data
+              live$data$`Client growth percentage`[row_after_curr_mon] <- .95
+              Revenue_fn(row_after_curr_mon)
             }
             else if(input$growslide == "100%"){
-              live$data <- MRT$data
+              live$data$`Client growth percentage`[row_after_curr_mon] <- 1
+              Revenue_fn(row_after_curr_mon)
             }
             row_after_curr_mon = row_after_curr_mon + 1
           }
@@ -114,7 +128,8 @@ server <- function(input, output) {
         i = i + 1
     }
   }, ignoreNULL=FALSE)
-  
+
+
   #effects the slider for the cost multiplier slider
   observeEvent(input$mCost, {
     if(input$growslide == "10%"){
@@ -277,14 +292,13 @@ server <- function(input, output) {
   })
   
   #Labor costs Visual
-  ############################################################
   output$Lcost <- renderGvis({
     df=data.frame(Month = live$data[input$moSlider[1]:input$moSlider[2],"Month"], 
-                  Actual_Labor_Cost = live$data$`Actual Labor Cost`[input$moSlider[1]:input$moSlider[2]],
-                  Expected_Operator_Labor_cost = live$data$`Expected Operator Labor Costs`[input$moSlider[1]:input$moSlider[2]],
-                  Expected_RRR_Labor_Cost = live$data$`Expected RRR Labor Costs for Assistants`[input$moSlider[1]:input$moSlider[2]],
+                  Actual_Labor_Cost = live$data$`Actual labor costs`[input$moSlider[1]:input$moSlider[2]],
+                  Expected_Operator_Labor_cost = live$data$`Expected operator labor costs`[input$moSlider[1]:input$moSlider[2]],
+                  Expected_RRR_Labor_Cost = live$data$`Expected RRR labor costs for assistants`[input$moSlider[1]:input$moSlider[2]],
                   Expected_Specialist_and_Strategist_Labor_Costs = 
-                    live$data$`Expected Specialist and Strategist Labor Costs`[input$moSlider[1]:input$moSlider[2]]
+                    live$data$`Expected specialist and strategist labor costs`[input$moSlider[1]:input$moSlider[2]]
     )
     gvisComboChart(df, xvar="Month",
                    yvar=c("Expected_Operator_Labor_cost", "Actual_Labor_Cost", "Expected_RRR_Labor_Cost", 
@@ -306,8 +320,8 @@ server <- function(input, output) {
   #partner pay visual
   output$combo <- renderGvis({
     df=data.frame(Month = live$data[input$moSlider[1]:input$moSlider[2],"Month"], 
-                  Partner_Pay = live$data$`Partner Pay`[input$moSlider[1]:input$moSlider[2]],
-                  Gross_Profits = live$data$`Gross Profit`[input$moSlider[1]:input$moSlider[2]])
+                  Partner_Pay = live$data$`Total partner pay`[input$moSlider[1]:input$moSlider[2]],
+                  Gross_Profits = live$data$`Gross profit`[input$moSlider[1]:input$moSlider[2]])
     gvisComboChart(df, xvar = "Month", 
                    yvar = c("Partner_Pay", "Gross_Profits"),
                    options=list(seriesType="bars",
@@ -320,9 +334,9 @@ server <- function(input, output) {
   #partner pay comapred to revenue visual
   output$linechart <- renderGvis({
     df=data.frame(Revenue = live$data$Revenue[input$moSlider[1]:input$moSlider[2]], 
-                  Partner_Pay = live$data$`Partner Pay`[input$moSlider[1]:input$moSlider[2]],
-                  Gross_Profits = live$data$`Gross Profit`[input$moSlider[1]:input$moSlider[2]],
-                  Net_Profit = live$data$`Net Profit`[input$moSlider[1]:input$moSlider[2]])
+                  Partner_Pay = live$data$`Total partner pay`[input$moSlider[1]:input$moSlider[2]],
+                  Gross_Profits = live$data$`Gross profit`[input$moSlider[1]:input$moSlider[2]],
+                  Net_Profit = live$data$`Net profit`[input$moSlider[1]:input$moSlider[2]])
     gvisLineChart(df, options=list(pointSize = 4, width = 800, height = 400, vAxis="{title:'Dollars($)'}",
                                    hAxis="{title:'Revenue'}", series = "[{color:'8497e5'}, {color:'b8e986'}, 
                                    {color:'grey'}, {color:'Black'}, {color:'Red'}]", title = "Partner Pay Compared to Revenue"))
@@ -333,12 +347,12 @@ server <- function(input, output) {
   output$overhead <-renderGvis({
     df=data.frame(Month = live$data[input$moSlider[1]:input$moSlider[2],"Month"],
                   Total_Overhead = live$data$Overhead[input$moSlider[1]:input$moSlider[2]],
-                  BD_Costs = live$data$`BD Costs`[input$moSlider[1]:input$moSlider[2]],
-                  RD_Costs = live$data$`R&D Costs`[input$moSlider[1]:input$moSlider[2]],
-                  Subscription_Costs = live$data$`Subscription Costs`[input$moSlider[1]:input$moSlider[2]],
-                  Discretionary_Spending = live$data$`Discretionary Spending`[input$moSlider[1]:input$moSlider[2]],
-                  Partner_Pay = live$data$`Partner Pay`[input$moSlider[1]:input$moSlider[2]],
-                  Partner_Bonuses = live$data$`Partner Bonuses`[input$moSlider[1]:input$moSlider[2]])
+                  BD_Costs = live$data$`BD costs`[input$moSlider[1]:input$moSlider[2]],
+                  RD_Costs = live$data$`Total R and D costs`[input$moSlider[1]:input$moSlider[2]],
+                  Subscription_Costs = live$data$`Subscription costs`[input$moSlider[1]:input$moSlider[2]],
+                  Discretionary_Spending = live$data$`Discretionary spending`[input$moSlider[1]:input$moSlider[2]],
+                  Partner_Pay = live$data$`Total partner pay`[input$moSlider[1]:input$moSlider[2]],
+                  Partner_Bonuses = live$data$`Partner bonuses`[input$moSlider[1]:input$moSlider[2]])
     gvisLineChart(df, options=list(pointSize = 2, width = 800, height = 400, vAxis="{title:'Dollars($)'}",
                                    hAxis="{title:'Months'}", series = "[{color:'8497e5'}, {color:'b8e986'}, 
                                    {color:'grey'}, {color:'Red'}]", title = "Overhead"))
@@ -347,7 +361,7 @@ server <- function(input, output) {
   #Ecoomies of Scale visual
   output$econScale <-renderGvis({
     df=data.frame(Revenue = live$data$Revenue[input$moSlider[1]:input$moSlider[2]],
-                  `Overhead/Opex %`= live$data$`Overhead to Opex`[input$moSlider[1]:input$moSlider[2]])
+                  `Overhead/Opex %`= live$data$`Overhead to opex`[input$moSlider[1]:input$moSlider[2]])
     gvisLineChart(df, options=list(pointSize = 4, width = 800, height = 400, vAxis="{title:'Overhead/Opex %'}",
                                    hAxis="{title:'Revenue'}", series = "[{color: '8497e5'}]", title = "Economies of Scale"))
   })
@@ -357,42 +371,42 @@ server <- function(input, output) {
   #gross margins visual
   output$viz1 <-renderGvis({
     df=data.frame(Month= live$data[input$moSlider[1]:input$moSlider[2],"Month"], 
-                  Gross_Margins= live$data$`Gross Margins`[input$moSlider[1]:input$moSlider[2]])
+                  Gross_Margins= live$data$`Gross margins`[input$moSlider[1]:input$moSlider[2]])
     gvisLineChart(df, options=list(pointSize = 2, width = 400, height = 200, vAxis="{title:'Perecent of Dollars($)'}",
                                    hAxis="{title:'Months'}", series = "[{color: 'b8e986'}]", title = "Gross Margins"))
   })
   #amount of partners visual
   output$viz2 <-renderGvis({
     df=data.frame(Month = live$data[input$moSlider[1]:input$moSlider[2],"Month"], 
-                  Partner = live$data$Partners[input$moSlider[1]:input$moSlider[2]])
+                  Partner = live$data$`Number of partners`[input$moSlider[1]:input$moSlider[2]])
     gvisLineChart(df, options=list(pointSize = 2, width = 400, height = 200, vAxis="{title:'# of Partners'}",
                                    hAxis="{title:'Months'}", series = "[{color: 'b8e986'}]", title = "Amount of Partners"))
   })
   #partner bonuses visual
   output$viz3 <-renderGvis({
     df=data.frame(Month = live$data[input$moSlider[1]:input$moSlider[2],"Month"], 
-                  Partner_Bonuses = live$data$`Partner Bonuses`[input$moSlider[1]:input$moSlider[2]])
+                  Partner_Bonuses = live$data$`Partner bonuses`[input$moSlider[1]:input$moSlider[2]])
     gvisLineChart(df, options=list(pointSize = 2, width = 400, height = 200, vAxis="{title:'Dollars($)'}",
                                    hAxis="{title:'Months'}", series = "[{color: 'b8e986'}]", title = "Partner Bonues"))
   })
   #comissons visual
   output$viz4 <-renderGvis({
     df=data.frame(Month= live$data[input$moSlider[1]:input$moSlider[2],"Month"], 
-                  Comissions = live$data$Comissions[input$moSlider[1]:input$moSlider[2]])
+                  Commissions = live$data$Commissions[input$moSlider[1]:input$moSlider[2]])
     gvisLineChart(df, options=list(pointSize = 2, width = 400, height = 200, vAxis="{title:'Dollars($)'}",
                                    hAxis="{title:'Months'}", series = "[{color: 'b8e986'}]", title = "Comissions"))
   })
   #total fixed costs visual
   output$viz5 <-renderGvis({
     df=data.frame(Month = live$data[input$moSlider[1]:input$moSlider[2],"Month"], 
-                  Subscription_Costs = live$data$`Subscription Costs`[input$moSlider[1]:input$moSlider[2]])
+                  Subscription_Costs = live$data$`Subscription costs`[input$moSlider[1]:input$moSlider[2]])
     gvisLineChart(df, options=list(pointSize = 2, width = 400, height = 200, vAxis="{title:'Dollars($)'}",
                                    hAxis="{title:'Months'}", series = "[{color: 'b8e986'}]", title = "Subscription Costs"))
   })
   #R&D costs Visual
   output$viz6 <-renderGvis({
     df=data.frame(Month = live$data[input$moSlider[1]:input$moSlider[2],"Month"], 
-                  RD_Costs = live$data$`R&D Costs`[input$moSlider[1]:input$moSlider[2]])
+                  RD_Costs = live$data$`Total R and D costs`[input$moSlider[1]:input$moSlider[2]])
     gvisLineChart(df, options=list(pointSize = 2, width = 400, height = 200, vAxis="{title:'Dollars($)'}",
                                    hAxis="{title:'Months'}", series = "[{color: 'b8e986'}]", title = "R&D Costs"))
   })
@@ -752,7 +766,7 @@ server <- function(input, output) {
   #######################################spreadsheet##############################################
   
   output$table <- renderDataTable({
-    datatable(MRT$data[, c("Client Growth", "Cost Multiplier", "Churn", "CAC", "CLTV", "Partner Bonuses")], 
+    datatable(MRT$data, 
               editable = TRUE, options = list(pageLength = nrow(MRT$data)))
     })
 

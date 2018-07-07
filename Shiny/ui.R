@@ -3,6 +3,7 @@ library(googleVis)
 library(googlesheets)
 library(shinythemes)
 library(shinyWidgets)
+library(DT)
 curr_date <-format(Sys.Date(), "%b '%y")
 
 #This is for the color of slide bar.
@@ -55,9 +56,9 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
                                       inputId = "growslide",
                                       label = "Client Growth:(UNDER CONSTRUCTION)",
                                       grid = TRUE,
-                                      choices = c("5%", "10%","15%","20%","25%","30%","35%","40%","45%","50%",
+                                      choices = c("Custom","5%", "10%","15%","20%","25%","30%","35%","40%","45%","50%",
                                                   "55%","60%","65%","70%", "75%", "80%", "85%", "90%","95%", "100%"),
-                                      selected = "50%" 
+                                      selected = "Custom" 
                                     ),
                                     
                                     #slider for Cost Multiplier
