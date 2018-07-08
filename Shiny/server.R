@@ -39,19 +39,25 @@ server <- function(input, output) {
               live$data <- MRT$data
             }
             else if(input$growslide == "5%"){
-              live$data$`Client growth percentage`[row_after_curr_mon] <- .5
+              live$data$`Client growth percentage`[row_after_curr_mon] <- .05
               Revenue_fn(row_after_curr_mon)
               Revenue_percent_change_fn(row_after_curr_mon)
+              Total_monthly_ARPA_fn(row_after_curr_mon)
+              Client_growth_after_churn_fn(row_after_curr_mon)
             }
             else if(input$growslide == "10%"){
               live$data$`Client growth percentage`[row_after_curr_mon] <- .10
               Revenue_fn(row_after_curr_mon)
               Revenue_percent_change_fn(row_after_curr_mon)
+              Total_monthly_ARPA_fn(row_after_curr_mon)
+              Client_growth_after_churn_fn(row_after_curr_mon)
             }
             else if(input$growslide == "15%"){
               live$data$`Client growth percentage`[row_after_curr_mon] <- .15
               Revenue_fn(row_after_curr_mon)
               Revenue_percent_change_fn(row_after_curr_mon)
+              Total_monthly_ARPA_fn(row_after_curr_mon)
+              Client_growth_after_churn_fn(row_after_curr_mon)
             }
             else if(input$growslide == "20%"){
               live$data$`Client growth percentage`[row_after_curr_mon] <- .20
@@ -61,66 +67,82 @@ server <- function(input, output) {
             else if(input$growslide == "25%"){
               live$data$`Client growth percentage`[row_after_curr_mon] <- .25
               Revenue_fn(row_after_curr_mon)
+              Revenue_percent_change_fn(row_after_curr_mon)
             }
             else if(input$growslide == "30%"){
               live$data$`Client growth percentage`[row_after_curr_mon] <- .30
               Revenue_fn(row_after_curr_mon)
+              Revenue_percent_change_fn(row_after_curr_mon)
             }
             else if(input$growslide == "35%"){
               live$data$`Client growth percentage`[row_after_curr_mon] <- .35
               Revenue_fn(row_after_curr_mon)
+              Revenue_percent_change_fn(row_after_curr_mon)
             }
             else if(input$growslide == "40%"){
               live$data$`Client growth percentage`[row_after_curr_mon] <- .40
               Revenue_fn(row_after_curr_mon)
+              Revenue_percent_change_fn(row_after_curr_mon)
             }
             else if(input$growslide == "45%"){
               live$data$`Client growth percentage`[row_after_curr_mon] <- .45
               Revenue_fn(row_after_curr_mon)
+              Revenue_percent_change_fn(row_after_curr_mon)
             }
             else if(input$growslide == "50%"){
               live$data$`Client growth percentage`[row_after_curr_mon] <- .50
               Revenue_fn(row_after_curr_mon)
+              Revenue_percent_change_fn(row_after_curr_mon)
             }
             else if(input$growslide == "55%"){
               live$data$`Client growth percentage`[row_after_curr_mon] <- .55
               Revenue_fn(row_after_curr_mon)
+              Revenue_percent_change_fn(row_after_curr_mon)
             }
             else if(input$growslide == "60%"){
               live$data$`Client growth percentage`[row_after_curr_mon] <- .60
               Revenue_fn(row_after_curr_mon)
+              Revenue_percent_change_fn(row_after_curr_mon)
             }
             else if(input$growslide == "65%"){
               live$data$`Client growth percentage`[row_after_curr_mon] <- .65
               Revenue_fn(row_after_curr_mon)
+              Revenue_percent_change_fn(row_after_curr_mon)
             }
             else if(input$growslide == "70%"){
               live$data$`Client growth percentage`[row_after_curr_mon] <- .70
               Revenue_fn(row_after_curr_mon)
+              Revenue_percent_change_fn(row_after_curr_mon)
             }
             else if(input$growslide == "75%"){
               live$data$`Client growth percentage`[row_after_curr_mon] <- .75
               Revenue_fn(row_after_curr_mon)
+              Revenue_percent_change_fn(row_after_curr_mon)
             }
             else if(input$growslide == "80%"){
               live$data$`Client growth percentage`[row_after_curr_mon] <- .80
               Revenue_fn(row_after_curr_mon)
+              Revenue_percent_change_fn(row_after_curr_mon)
             }
             else if(input$growslide == "85%"){
               live$data$`Client growth percentage`[row_after_curr_mon] <- .85
               Revenue_fn(row_after_curr_mon)
+              Revenue_percent_change_fn(row_after_curr_mon)
             }
             else if(input$growslide == "90%"){
               live$data$`Client growth percentage`[row_after_curr_mon] <- .90
               Revenue_fn(row_after_curr_mon)
+              Revenue_percent_change_fn(row_after_curr_mon)
             }
             else if(input$growslide == "95%"){
               live$data$`Client growth percentage`[row_after_curr_mon] <- .95
               Revenue_fn(row_after_curr_mon)
+              Revenue_percent_change_fn(row_after_curr_mon)
             }
             else if(input$growslide == "100%"){
               live$data$`Client growth percentage`[row_after_curr_mon] <- 1
               Revenue_fn(row_after_curr_mon)
+              Revenue_percent_change_fn(row_after_curr_mon)
             }
             row_after_curr_mon = row_after_curr_mon + 1
           }

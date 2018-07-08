@@ -5,7 +5,7 @@ rev1 <- function(dframe,index){
   dframe$Revenue[index] <- dollars
 }
 
-#1###################NESTED REVENUE FUCNTIONS#########################################
+#1###################NESTED REVENUE FUCNTIONS#########################################called in Client growth slider
 
 Revenue_fn <- function(index){
   live$data$Revenue[index] <- Enterprise_revenue_fn(index) + 
@@ -22,7 +22,8 @@ Enterprise_revenue_fn <- function(index){
 
 #########
 Total_enterprise_monthly_operator_fees_fn <- function(index){
-  live$data$`Total enterprise monthly operator fees`[index] <- Enterprise_monthly_operator_hrs_fn(index) * live$data$`Operator hrly rate`[index]
+  live$data$`Total enterprise monthly operator fees`[index] <- Enterprise_monthly_operator_hrs_fn(index) * 
+    live$data$`Operator hrly rate`[index]
 }
 Enterprise_monthly_operator_hrs_fn <- function(index){
   live$data$`Enterprise monthly operator hrs`[index] <- Enterprise_clients_fn(index) * 
@@ -56,11 +57,6 @@ Enterprise_monthly_strategist_specialist_hrs_fn <- function(index){
 
 Enterprise_clients_fn <- function(index){
   live$data$`Enterprise clients`[index] <- live$data$`Percent enterprise clients`[index] * Total_clients_fn(index)
-}
-
-Total_clients_fn <- function(index){
-  live$data$`Total clients`[index] <- (live$data$`Total clients`[index-1]) / 
-    (1 + live$data$`Churn percentage weighted by number of clients`[index] - live$data$`Client growth percentage`[index])
 }
 
 
@@ -161,7 +157,7 @@ Percent_personal_clients_fn <- function(index){
     live$data$`Percent small business clients`[index]
 }
 
-#2############################Revenue %#############################################
+#2############################Revenue %#############################################called in Client growth slider
 
 Revenue_percent_change_fn <- function(index){
   live$data$`Revenue percent change`[index] <- Month_over_month_revenue_fn(index) / Revenue_fn(index-1)
@@ -171,7 +167,65 @@ Month_over_month_revenue_fn <- function(index){
   live$data$`Month-over-month revenue`[index] <- Revenue_fn(index) - Revenue_fn(index - 1)
 }
 
-#3####################
+#3####################Total Clients#################
+
+Total_clients_fn <- function(index){
+  live$data$`Total clients`[index] <- (live$data$`Total clients`[index-1]) / 
+    (1 + live$data$`Churn percentage weighted by number of clients`[index] - live$data$`Client growth percentage`[index])
+}
+
+#4##############Total Monthly ARPA##########################called in Client growth slider
+
+
+Total_monthly_ARPA_fn <- function(index){
+  live$data$`Total monthly ARPA`[index] <- Revenue_fn(index) / Total_clients_fn(index)
+}
+
+
+#5#####################Churn############# May not be neccessary##########
+
+Churn_fn <- function(index){
+  live$data$`Churn percentage weighted by number of clients`[index] <- live$data$`Client churn`[index]
+}
+
+
+#6####################Client Growth After Churn##############called in Client growth slider
+
+Client_growth_after_churn_fn <- function(index){
+  live$data$`Client growth after churn`[index] <- live$data$`Client growth percentage`[index] - live$data$`Client Churn`[index]
+}
+
+#7#################Avg Customer Lifetime (months)###################
+Avg_customer_lifetime_months_fn <- function(index){
+  live$data$`Avg customer lifetime in months`[index] <- 1 / live$data$`Client Churn`[index]
+}
+
+#8#####################CLTV#############################
+
+CLTV_fn <- function(index){
+  live$data$`CLTV`[index] <- (Total_monthly_ARPA_fn(index) * Avg_customer_lifetime_months_fn(index)) - live$data$`CAC`[index]
+}
+
+
+#11######################Company Head Count##################
+Company_head_count_fn <- function(index){
+  live$data$`Company Head Count`[index] <- live$data$`Number of partners`[index] + Agents_fn(index)
+}
+
+
+#12###################Agents#################
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
