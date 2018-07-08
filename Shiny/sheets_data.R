@@ -184,20 +184,21 @@ Total_monthly_ARPA_fn <- function(index){
 
 #5#####################Churn############# May not be neccessary##########
 
-Churn_fn <- function(index){
-  live$data$`Churn percentage weighted by number of clients`[index] <- live$data$`Client churn`[index]
-}
+# Churn_fn <- function(index){
+#   live$data$`Churn percentage weighted by number of clients`[index] <- live$data$`Client churn`[index]
+# }
 
 
 #6####################Client Growth After Churn##############called in Client growth slider
 
 Client_growth_after_churn_fn <- function(index){
-  live$data$`Client growth after churn`[index] <- live$data$`Client growth percentage`[index] - live$data$`Client Churn`[index]
+  live$data$`Client growth after churn`[index] <- live$data$`Client growth percentage`[index] - 
+    live$data$`Churn percentage weighted by number of clients`[index]
 }
 
 #7#################Avg Customer Lifetime (months)###################
 Avg_customer_lifetime_months_fn <- function(index){
-  live$data$`Avg customer lifetime in months`[index] <- 1 / live$data$`Client Churn`[index]
+  live$data$`Avg customer lifetime in months`[index] <- 1 / live$data$`Churn percentage weighted by number of clients`[index]
 }
 
 #8#####################CLTV#############################
@@ -206,16 +207,228 @@ CLTV_fn <- function(index){
   live$data$`CLTV`[index] <- (Total_monthly_ARPA_fn(index) * Avg_customer_lifetime_months_fn(index)) - live$data$`CAC`[index]
 }
 
+#10###################CLTV/CAC##################
 
-#11######################Company Head Count##################
+CLTV_to_CAC_ratio_fn <- function(index){
+  live$data$`CLTV to CAC ratio`[index] <- CLTV_fn(index) / live$data$`CAC`[index]
+}
+
+#11######################Company Head Count##################called in Client growth slider
 Company_head_count_fn <- function(index){
-  live$data$`Company Head Count`[index] <- live$data$`Number of partners`[index] + Agents_fn(index)
+  live$data$`Company head count`[index] <- live$data$`Number of partners`[index] + Number_of_agents_fn(index)
 }
 
 
 #12###################Agents#################
 
+Number_of_agents_fn <- function(index){
+  live$data$`Number of agents`[index] <- 1.1 * Total_agents_not_including_set_managers_fn(index)
+}
 
+Total_agents_not_including_set_managers_fn <- function(index) {
+  live$data$`Total agents not including set managers`[index] <- Number_of_operators_invisible_decides_to_employ_this_month_fn(index) + 
+    Number_of_RRRs_invisible_decides_to_employ_this_month_fn(index) + Number_of_sentries_invisible_decides_to_employ_this_month_fn(index) + 
+    Number_of_specialists_and_strategists_invisible_decides_to_employ_this_month_fn(index)
+}
+
+#######################Number of operators invisible decides to employ this month
+Number_of_operators_invisible_decides_to_employ_this_month_fn <- function(index){
+  live$data$`Number of operators invisible decides to employ this month`[index] <- 
+    (1 - Percent_of_total_agent_workforce_hrs_made_up_by_sentries_fn(index)) * 
+    (1 - live$data$`Percent of RRRs that make up agent workforce`[index]) * 
+    (Actual_client_hours_operator_sentry_and_ten_dollar_per_hr_RRR_hrs_worked_fn(index) + 
+       Non_billable_operator_RRR_and_sentry_hrs_fn(index)) / ((live$data$`Avg hrs per week per operator`[index] * 52) / 12)
+}
+
+
+Non_billable_operator_RRR_and_sentry_hrs_fn <- function(index){
+  live$data$`Non billable operator RRR and sentry hrs`[index] <- Billable_operator_sentry_and_10_dollar_per_hr_RRR_hrs_fn(index) * 
+    live$data$`Percent of operator sentry and RRR hours that are NOT client billable`[index] / 
+    (1 - live$data$`Percent of operator sentry and RRR hours that are NOT client billable`[index])
+} 
+
+Percent_of_total_agent_workforce_hrs_made_up_by_sentries_fn <- function(index){
+  live$data$`Percent of total agent workforce hrs made up by sentries`[index] <- 
+    live$data$`Percent of total agent workforce hrs made up by sentries`[index - 1] - .0016
+}
+
+Actual_client_hours_operator_sentry_and_ten_dollar_per_hr_RRR_hrs_worked_fn <- function(index){
+  live$data$`Actual client hours operator sentry and ten dollar per hr RRR hrs worked`[index] <- 
+    Billable_operator_sentry_and_10_dollar_per_hr_RRR_hrs_fn(index) * 
+    live$data$`Reduction in agent task completion times relative to price benchmark`[index]
+}
+
+
+Billable_operator_sentry_and_10_dollar_per_hr_RRR_hrs_fn <- function(index){
+  live$data$`Billable operator sentry and 10 dollar per hr RRR hrs`[index] <- Enterprise_monthly_operator_hrs_fn(index) + 
+    Small_business_monthly_operator_hrs_fn(index) + Personal_monthly_operator_hrs_fn(index)
+} 
+
+
+Personal_monthly_operator_hrs_fn <- function(index){
+  live$data$`Personal monthly operator hrs`[index] <- live$data$`Avg personal monthly operator hrs`[index] * Personal_clients_fn(index)
+}
+
+
+###################Number of RRRs invisible decides to employ this month
+
+Number_of_RRRs_invisible_decides_to_employ_this_month_fn <- function(index){
+  live$data$`Number of RRRs invisible decides to employ this month`[index] <- 
+    (1 - Percent_of_total_agent_workforce_hrs_made_up_by_sentries_fn(index)) * 
+    (live$data$`Percent of RRRs that make up agent workforce`[index]) * 
+    (Actual_client_hours_operator_sentry_and_ten_dollar_per_hr_RRR_hrs_worked_fn(index) + 
+       Non_billable_operator_RRR_and_sentry_hrs_fn(index)) / ((live$data$`Avg hrs per week per RRR`[index] * 52) / 12)
+}
+
+
+####################Number of sentries invisible decides to employ this month
+Number_of_sentries_invisible_decides_to_employ_this_month_fn <- function(index){
+  live$data$`Number of sentries invisible decides to employ this month`[index] <-
+    (Percent_of_total_agent_workforce_hrs_made_up_by_sentries_fn(index)) * 
+    (1 - live$data$`Percent of RRRs that make up agent workforce`[index]) * 
+    (Actual_client_hours_operator_sentry_and_ten_dollar_per_hr_RRR_hrs_worked_fn(index) + 
+       Non_billable_operator_RRR_and_sentry_hrs_fn(index)) / ((live$data$`Avg hrs per week per sentry`[index] * 52) / 12)
+}
+
+##################Number of specialists and strategists invisible decides to employ this month
+Number_of_specialists_and_strategists_invisible_decides_to_employ_this_month_fn <- function(index){
+  live$data$`Number of specialists and strategists invisible decides to employ this month`[index] <-
+    (Actual_client_hrs_specialists_and_strategists_worked_fn(index) + 
+       Non_billable_specialist_and_strategist_hrs_fn(index)) / 
+    ((live$data$`Avg hrs per week per specialists and strategists`[index] * 52) / 12)
+}
+
+Actual_client_hrs_specialists_and_strategists_worked_fn <- function(index){
+  live$data$`Actual client hrs specialists and strategists worked`[index] <- Billable_specialist_and_strategist_hrs_fn(index) * 
+    live$data$`Reduction in agent task completion times relative to price benchmark`[index]
+}
+
+Billable_specialist_and_strategist_hrs_fn <- function(index){
+  live$data$`Billable specialist and strategist hrs`[index] <- Enterprise_monthly_strategist_specialist_hrs_fn(index) + 
+    Small_business_monthly_strategist_specialist_hrs_fn(index) + Personal_monthly_strategist_specialist_hrs_fn(index)
+}
+
+Non_billable_specialist_and_strategist_hrs_fn <- function(index) {
+  live$data$`Non billable specialist and strategist hrs`[index] <- (Billable_specialist_and_strategist_hrs_fn(index) * 
+    live$data$`Percent specialist and strategist hours that are not client billable`[index]) / 
+    (1 - live$data$`Percent specialist and strategist hours that are not client billable`[index])
+}
+
+#13##############Actual Labor Costs###############
+Actual_labor_costs_fn <- function(index){
+  live$data$`Actual labor costs`[index] <- Expected_operator_labor_costs_fn(index) + 
+    Expected_RRR_labor_costs_for_assistants_fn(index) + Expected_specialist_and_strategist_labor_costs_fn(index)
+}
+###############Expected operator labor costs
+Expected_operator_labor_costs_fn <- function(index){
+  live$data$`Expected operator labor costs`[index] <- 
+    (Actual_client_hours_operator_sentry_and_ten_dollar_per_hr_RRR_hrs_worked_fn(index) + 
+       Non_billable_operator_RRR_and_sentry_hrs_fn(index)) * 
+    live$data$`Avg rate for operators sentries and RRRs working for clients at 10 dollars per hr`[index]
+}
+
+################Expected RRR labor costs for assistants
+Expected_RRR_labor_costs_for_assistants_fn <- function(index){
+  live$data$`Expected RRR labor costs for assistants`[index] <- Actual_client_hours_RRRs_worked_fn(index) * 
+    live$data$`Avg RRR rate working for clients at 20 dollars per hr`[index]
+}
+
+Actual_client_hours_RRRs_worked_fn <- function(index){
+  live$data$`Actual client hours RRRs worked`[index] <- Billable_RRR_hrs_fn(index) * 
+    live$data$`Reduction in agent task completion times relative to price benchmark`[index]
+}
+
+Billable_RRR_hrs_fn <- function(index) {
+  live$data$`Billable RRR hrs`[index] <- Enterprise_monthly_assistant_hrs_fn(index) + Small_business_monthly_assistant_hrs_fn(index) + 
+    Personal_monthly_assistant_hrs_fn(index)
+}
+
+###################Expected specialist and strategist labor costs
+Expected_specialist_and_strategist_labor_costs_fn <- function(index){
+  live$data$`Expected_specialist_and_strategist_labor_costs` <- live$data$`Avg sentry rate`[index] * 
+    (Actual_client_hrs_specialists_and_strategists_worked_fn(index) + Non_billable_specialist_and_strategist_hrs_fn(index))
+}
+
+
+
+#14###########Revenue per Head####################running in client growth slider#########
+
+Revenue_per_head_fn <- function(index){
+  live$data$`Revenue per head`[index] <- Revenue_fn(index) / (Number_of_agents_fn(index) + live$data$`Number of partners`[index])  
+}
+
+#15###################### Gross Profit#############running in client growth slider
+Gross_profit_fn <- function(index){
+  live$data$`Gross profit`[index] <- Revenue_fn(index) - Actual_labor_costs_fn(index)
+}
+
+#16######################Gross Margins##############running in client growth slider
+Gross_margins_fn <- function(index){
+  live$data$`Gross margins`[index] <- Gross_profit_fn(index) /  Revenue_fn(index)
+}
+
+#18######################Total Partner pay########## used in client growth slider
+Total_partner_pay_fn <- function(index){
+  live$data$`Total partner pay`[index] <- live$data$`Number of partners`[index] * Avg_partner_salary_fn(index)
+}
+
+Avg_partner_salary_fn <- function(index){
+  live$data$`Avg partner salary`[index] <-  live$data$`Avg salary cap per partner`[index] + Avg_dollars_shy_of_partner_salary_cap_fn(index)
+}
+
+Avg_dollars_shy_of_partner_salary_cap_fn <- function(index){
+  if(Gross_margins_split_pre_partner_pay_fn(index) - live$data$`Avg salary cap per partner`[index] > 0){
+    live$data$`Avg dollars shy of partner salary cap`[index] = 0
+  }
+  else {
+  live$data$`Avg dollars shy of partner salary cap`[index] <- Gross_margins_split_pre_partner_pay_fn(index) -
+    live$data$`Avg salary cap per partner`[index]
+  }
+}
+
+Gross_margins_split_pre_partner_pay_fn <- function(index){
+  live$data$`Gross margins split pre partner pay`[index] <- Gross_profit_fn(index) / live$data$`Number of partners`[index]
+}
+
+
+
+#19#######################Partner Bonuses
+# Partner_bonuses_fn <- function(index){
+#   live$data$`Partner bonuses`[index] <- 
+# }
+
+
+
+#20#####################Commissions
+Commissions_fn <- function(index){
+  live$data$Commissions[index] <- Revenue_fn(index) * live$data$`Percent commission`[index]
+}
+
+
+
+
+
+
+
+
+
+#27####################Net profit
+
+# Net_profit_fn <- function(index) {
+#   live$data$`Net profit`[index] <- Gross_profit_fn(index) - Total_partner_pay_fn(index) - Burn(index)
+# }
+
+
+
+
+
+
+
+#31######################Burn
+
+# Burn_fn <- function(index){
+#   live$data$`Burn`[index] <- Partner_bonuses_fn(index) + Subscription_costs_fn(index) +  
+# }
 
 
 

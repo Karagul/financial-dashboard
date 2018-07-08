@@ -44,6 +44,13 @@ server <- function(input, output) {
               Revenue_percent_change_fn(row_after_curr_mon)
               Total_monthly_ARPA_fn(row_after_curr_mon)
               Client_growth_after_churn_fn(row_after_curr_mon)
+              Company_head_count_fn(row_after_curr_mon)
+              Revenue_per_head_fn(row_after_curr_mon)
+              Actual_labor_costs_fn(row_after_curr_mon)
+              Gross_profit_fn(row_after_curr_mon)
+              Gross_margins_fn(row_after_curr_mon)
+              Total_partner_pay_fn(row_after_curr_mon)
+              Commissions_fn(row_after_curr_mon)
             }
             else if(input$growslide == "10%"){
               live$data$`Client growth percentage`[row_after_curr_mon] <- .10
@@ -51,6 +58,13 @@ server <- function(input, output) {
               Revenue_percent_change_fn(row_after_curr_mon)
               Total_monthly_ARPA_fn(row_after_curr_mon)
               Client_growth_after_churn_fn(row_after_curr_mon)
+              Company_head_count_fn(row_after_curr_mon)
+              Revenue_per_head_fn(row_after_curr_mon)
+              Actual_labor_costs_fn(row_after_curr_mon)
+              Gross_profit_fn(row_after_curr_mon)
+              Gross_margins_fn(row_after_curr_mon)
+              Total_partner_pay_fn(row_after_curr_mon)
+              Commissions_fn(row_after_curr_mon)
             }
             else if(input$growslide == "15%"){
               live$data$`Client growth percentage`[row_after_curr_mon] <- .15
@@ -58,6 +72,13 @@ server <- function(input, output) {
               Revenue_percent_change_fn(row_after_curr_mon)
               Total_monthly_ARPA_fn(row_after_curr_mon)
               Client_growth_after_churn_fn(row_after_curr_mon)
+              Company_head_count_fn(row_after_curr_mon)
+              Revenue_per_head_fn(row_after_curr_mon)
+              Actual_labor_costs_fn(row_after_curr_mon)
+              Gross_profit_fn(row_after_curr_mon)
+              Gross_margins_fn(row_after_curr_mon)
+              Total_partner_pay_fn(row_after_curr_mon)
+              Commissions_fn(row_after_curr_mon)
             }
             else if(input$growslide == "20%"){
               live$data$`Client growth percentage`[row_after_curr_mon] <- .20
