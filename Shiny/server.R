@@ -21,7 +21,7 @@ server <- function(input, output) {
   }, ignoreNULL=FALSE)
   output$clics <- renderText(input$reload)
   ###########################################General PAGE#########################################################################
-  #bottoom page table
+  #bottom page table
   observeEvent(input$newTable, {
     output$main_table <-renderGvis({
       gvisTable(live$data[,c(1,118:151)])
@@ -94,7 +94,7 @@ server <- function(input, output) {
   }, ignoreNULL=TRUE)
   
   
-  #effects the slider for the cost multiplier slider
+  #Effects the slider for the cost multiplier slider
   observeEvent(input$mCost, {
     i <- 1
     while(i <= nrow(MRT$data)){
