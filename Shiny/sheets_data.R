@@ -1,10 +1,6 @@
 source('server.R')
 #We try not to use "return" in any of the functions
 
-rev1 <- function(dframe,index){
-  dframe$Revenue[index] <- dollars
-}
-
 #1###################NESTED REVENUE FUCNTIONS#########################################called in Client growth slider
 
 Revenue_fn <- function(index){
@@ -160,11 +156,11 @@ Percent_personal_clients_fn <- function(index){
 #2############################Revenue %#############################################called in Client growth slider
 
 Revenue_percent_change_fn <- function(index){
-  live$data$`Revenue percent change`[index] <- Month_over_month_revenue_fn(index) / Revenue_fn(index-1)
+  live$data$`Revenue percent change`[index] <- Month_over_month_revenue_fn(index) / live$data$Revenue[index-1]
 }
 
 Month_over_month_revenue_fn <- function(index){
-  live$data$`Month-over-month revenue`[index] <- Revenue_fn(index) - Revenue_fn(index - 1)
+  live$data$`Month-over-month revenue`[index] <- live$data$Revenue[index] - live$data$Revenue[index-1]
 }
 
 #3####################Total Clients#################
@@ -178,7 +174,7 @@ Total_clients_fn <- function(index){
 
 
 Total_monthly_ARPA_fn <- function(index){
-  live$data$`Total monthly ARPA`[index] <- Revenue_fn(index) / Total_clients_fn(index)
+  live$data$`Total monthly ARPA`[index] <- live$data$Revenue[index] / Total_clients_fn(index)
 }
 
 
@@ -210,7 +206,7 @@ CLTV_fn <- function(index){
 #10###################CLTV/CAC##################
 
 CLTV_to_CAC_ratio_fn <- function(index){
-  live$data$`CLTV to CAC ratio`[index] <- CLTV_fn(index) / live$data$`CAC`[index]
+  live$data$`CLTV to CAC ratio`[index] <- CLTV_fn(index) / live$data$CAC[index]
 }
 
 #11######################Company Head Count##################called in Client growth slider
@@ -354,17 +350,18 @@ Expected_specialist_and_strategist_labor_costs_fn <- function(index){
 #14###########Revenue per Head####################running in client growth slider#########
 
 Revenue_per_head_fn <- function(index){
-  live$data$`Revenue per head`[index] <- Revenue_fn(index) / (Number_of_agents_fn(index) + live$data$`Number of partners`[index])  
+  live$data$`Revenue per head`[index] <- live$data$Revenue[index] / (live$data$`Number of agents`[index] + 
+                                                                       live$data$`Number of partners`[index])  
 }
 
 #15###################### Gross Profit#############running in client growth slider
 Gross_profit_fn <- function(index){
-  live$data$`Gross profit`[index] <- Revenue_fn(index) - Actual_labor_costs_fn(index)
+  live$data$`Gross profit`[index] <- live$data$Revenue[index] - live$data$`Actual labor costs`[index]
 }
 
 #16######################Gross Margins##############running in client growth slider
 Gross_margins_fn <- function(index){
-  live$data$`Gross margins`[index] <- Gross_profit_fn(index) /  Revenue_fn(index)
+  live$data$`Gross margins`[index] <- Gross_profit_fn(index) /  live$data$Revenue[index]
 }
 
 #18######################Total Partner pay########## used in client growth slider
@@ -393,54 +390,132 @@ Gross_margins_split_pre_partner_pay_fn <- function(index){
 
 
 #19#######################Partner Bonuses
-# Partner_bonuses_fn <- function(index){
-#   live$data$`Partner bonuses`[index] <- 
-# }
+Partner_bonuses_fn <- function(index){
+  live$data$`Partner bonuses`[index] <- live$data$`Partner bonuses`[index]
+}
 
 
 
 #20#####################Commissions
 Commissions_fn <- function(index){
-  live$data$Commissions[index] <- Revenue_fn(index) * live$data$`Percent commission`[index]
+  live$data$Commissions[index] <- live$data$Revenue[index] * live$data$`Percent commission`[index]
+}
+
+#21####################Subscrption costs
+Subscription_costs_fn <- function(index){
+  live$data$`Subscription costs`[index] <- Engineering_software_fn(index) + Operations_software_fn(index)
+}
+
+Engineering_software_fn <- function(index){
+  live$data$`Engineering software`[index] <- live$data$`Engineering software`[index-1] + 
+    (live$data$`Engineering software`[index-1] * live$data$`Composite costs multiplier`[index])
+}
+
+
+Operations_software_fn <- function(index){
+  live$data$`Operations software`[index]<- live$data$`Operations software`[index-1] + 
+    (live$data$`Operations software`[index-1] * live$data$`Composite costs multiplier`[index])
+}
+
+
+#22#################RandD costs
+
+Total_R_and_D_costs_fn <- function(index){
+  live$data$`Total R and D costs`[index] <- Set_managers_costs_fn(index) + Sales_agents_costs_fn(index) + 
+    Trainers_costs_fn(index) + Invisible_Sales_processes_fn(index) + Process_architecture_fn(index)
+}
+
+Set_managers_costs_fn <- function(index){
+  live$data$`Set managers costs`[index] <- live$data$`Set managers costs`[index-1] + (live$data$`Set managers costs`[index-1] *
+                                                                                        live$data$`Composite costs multiplier`[index])
+}
+
+Sales_agents_costs_fn <- function(index){
+  live$data$`Sales agents costs`[index] <- live$data$`Sales agents costs`[index-1] + (live$data$`Sales agents costs`[index-1] * 
+                                                                                        live$data$`Composite costs multiplier`[index])
+}
+
+Trainers_costs_fn <- function(index){
+  live$data$`Trainers costs`[index] <- live$data$`Trainers costs`[index-1] + (live$data$`Trainers costs`[index-1] * 
+                                                                                live$data$`Composite costs multiplier`[index])
+}
+
+Invisible_Sales_processes_fn <- function(index){
+  live$data$`Invisible sales processes`[index] <- live$data$`Invisible sales processes`[index-1] + 
+    (live$data$`Invisible sales processes`[index-1] * live$data$`Composite costs multiplier`[index])
+}
+
+Process_architecture_fn <- function(index){
+  live$data$`Process architecture`[index] <- live$data$`Process architecture`[index-1] + 
+    (live$data$`Process architecture`[index-1] * live$data$`Composite costs multiplier`[index])
 }
 
 
 
+#23####################BD Costs
+
+BD_costs_fn <- function(index){
+  live$data$`BD costs`[index]<- live$data$`BD costs`[index-1] + 
+    (live$data$`BD costs`[index-1] * live$data$`Composite costs multiplier`[index])
+}
 
 
+#24####################Discretionary Spending 
+Discretionary_spending_fn <- function(index){
+  live$data$`Discretionary spending`[index]<- live$data$`Discretionary spending`[index-1] + 
+    (live$data$`Discretionary spending`[index-1] * live$data$`Composite costs multiplier`[index])
+}
 
+#25#####################overhead
 
+Overhead_fn <- function(index){
+  live$data$Overhead[index] <- Total_partner_pay_fn(index) + Partner_bonuses_fn(index) + Subscription_costs_fn(index) + 
+    BD_costs_fn(index) + Total_R_and_D_costs_fn(index) + Discretionary_spending_fn(index)
+}
 
+#26####################Overhead to Opex
+Overhead_to_opex_fn <- function(index){
+  live$data$`Overhead to opex`[index] <- live$data$Overhead[index] / (live$data$Commissions[index] + live$data$`Actual labor costs`[index])
+}
 
 #27####################Net profit
 
-# Net_profit_fn <- function(index) {
-#   live$data$`Net profit`[index] <- Gross_profit_fn(index) - Total_partner_pay_fn(index) - Burn(index)
-# }
+Net_profit_fn <- function(index) {
+  live$data$`Net profit`[index] <- live$data$`Gross profit`[index] - live$data$`Total partner pay`[index] - Burn_fn(index)
+}
+
+#28####################Net Margins
+
+Net_margins_fn <- function(index) {
+  live$data$`Net margins`[index] <- live$data$`Net profit`[index] / live$data$Revenue[index]
+}
+
+#29#####################
 
 
-
-
-
+#30#####################
+Cash_in_bank_fn <- function(index){
+  live$data$`Cash in bank`[index] <- live$data$`Cash in bank`[index - 1] + live$data$`Net profit`[index] + live$data$`Funds raised`[index]
+}
 
 
 #31######################Burn
 
-# Burn_fn <- function(index){
-#   live$data$`Burn`[index] <- Partner_bonuses_fn(index) + Subscription_costs_fn(index) +  
-# }
+Burn_fn <- function(index){
+  live$data$Burn[index] <- Partner_bonuses_fn(index) + Commissions_fn(index) + Subscription_costs_fn(index) + 
+    Total_R_and_D_costs_fn(index) + BD_costs_fn(index) + Discretionary_spending_fn(index)
+}
 
 
 
+###########################################################################################################################################
 
+#Costs Multiplier Slider
 
-
-
-
-
-
-
-
+Composite_costs_multiplier_fn <- function(index, percent){
+  live$data$`Overhead to revenue ratio`[index] <- percent
+  live$data$`Composite costs multiplier`[index] <- Revenue_percent_change_fn(index) * percent
+}
 
 
 
