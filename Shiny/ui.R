@@ -14,7 +14,7 @@ background: #36454f;
 border-color: #36454f;
 } "
 
-# Define UI for application that plots features of movies 
+# Define UI for application
 ui <- fluidPage(theme = shinytheme("sandstone"),
     #top bar
     navbarPage("Invisible Technologies",
@@ -48,7 +48,7 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
                                           step = 1,
                                           min = 1,
                                           max = 72,
-                                          value=c(5,24),
+                                          value=c(6,19),
                                           animate = TRUE
                               ),
                               #slider for Client Growth
@@ -161,7 +161,7 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
                               )
                             )
                             ),
-              #this is the table at the bottom of the investor page. 
+              #this is the table at the bottom of the General page. 
               fluidRow(
                 column(12,
                        htmlOutput("main_table")
@@ -170,7 +170,7 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
      ),
      
      #############################################Growth page###########################################################################  
-     tabPanel("Growth",  #general page
+     tabPanel("Growth",  #Growth page
               titlePanel(paste0("The Model"), windowTitle = "TheMoodel3.0"), # App title
               sidebarLayout(position = "right", # Sidebar is on right side
                             sidebarPanel(
@@ -185,13 +185,13 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
                               tags$style(mycss),
                               
                               h3("Current Date: ", curr_date),
-                              #first slider bar for months
+                              #slider bar for months
                               sliderInput(inputId = "grow_moSlider",
                                           label = "Month Range:",
                                           step = 1,
                                           min = 1,
                                           max = 72,
-                                          value=c(5,24),
+                                          value=c(6,19),
                                           animate = TRUE
                               ),
                               #slider for Client Growth
@@ -343,7 +343,7 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
                                           step = 1,
                                           min = 1,
                                           max = 72,
-                                          value=c(5,24),
+                                          value=c(6,19),
                                           animate = TRUE
                               ),
                               #slider for Client Growth
