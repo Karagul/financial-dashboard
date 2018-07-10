@@ -24,7 +24,7 @@ server <- function(input, output) {
   #bottoom page table
   observeEvent(input$newTable, {
     output$main_table <-renderGvis({
-      gvisTable(live$data)
+      gvisTable(live$data[,c(1,118:151)])
     })
   }, ignoreNULL = TRUE)
   
@@ -32,68 +32,68 @@ server <- function(input, output) {
   
   observeEvent(input$growslide, {
     i <- 1
-      while(i <= nrow(MRT$data)){
-        if(MRT$data$Month[i] == curr_date){
-          row_after_curr_mon<-i+1
-          while(row_after_curr_mon <= nrow(MRT$data)){
-            if(input$growslide == "Custom"){
-              live$data$`Client growth percentage`[row_after_curr_mon] <- live$data$`Custom client growth`[row_after_curr_mon]
-              Revenue_fn(row_after_curr_mon)
-              Company_head_count_fn(row_after_curr_mon)
-              Revenue_percent_change_fn(row_after_curr_mon)
-              Total_monthly_ARPA_fn(row_after_curr_mon)
-              Client_growth_after_churn_fn(row_after_curr_mon)
-              CLTV_fn(row_after_curr_mon)
-              CLTV_to_CAC_ratio_fn(row_after_curr_mon)
-              Company_head_count_fn(row_after_curr_mon)
-              Actual_labor_costs_fn(row_after_curr_mon)
-              Revenue_per_head_fn(row_after_curr_mon)
-              Gross_profit_fn(row_after_curr_mon)
-              Gross_margins_fn(row_after_curr_mon)
-              Total_partner_pay_fn(row_after_curr_mon)
-              Commissions_fn(row_after_curr_mon)
-              
-              Composite_costs_multiplier_fn(row_after_curr_mon, live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
-              Overhead_fn(row_after_curr_mon)
-              Overhead_to_opex_fn(row_after_curr_mon)
-              Net_profit_fn(row_after_curr_mon)
-              Net_margins_fn(row_after_curr_mon)
-              Cash_in_bank_fn(row_after_curr_mon)
-            }
-            else {
-              growslide_numeric = as.numeric(gsub("[\\%,]", "", input$growslide))
-              growslide_numeric = growslide_numeric / 100
-              live$data$`Client growth percentage`[row_after_curr_mon] <- growslide_numeric
-              Revenue_fn(row_after_curr_mon)
-              Company_head_count_fn(row_after_curr_mon)
-              Revenue_percent_change_fn(row_after_curr_mon)
-              Total_monthly_ARPA_fn(row_after_curr_mon)
-              Client_growth_after_churn_fn(row_after_curr_mon)
-              CLTV_fn(row_after_curr_mon)
-              CLTV_to_CAC_ratio_fn(row_after_curr_mon)
-              Company_head_count_fn(row_after_curr_mon)
-              Actual_labor_costs_fn(row_after_curr_mon)
-              Revenue_per_head_fn(row_after_curr_mon)
-              Gross_profit_fn(row_after_curr_mon)
-              Gross_margins_fn(row_after_curr_mon)
-              Total_partner_pay_fn(row_after_curr_mon)
-              Commissions_fn(row_after_curr_mon)
-              
-              Composite_costs_multiplier_fn(row_after_curr_mon, live$data$`Overhead to revenue ratio`[row_after_curr_mon])
-              Overhead_fn(row_after_curr_mon)
-              Overhead_to_opex_fn(row_after_curr_mon)
-              Net_profit_fn(row_after_curr_mon)
-              Net_margins_fn(row_after_curr_mon)
-              Cash_in_bank_fn(row_after_curr_mon)
-            }
-            row_after_curr_mon = row_after_curr_mon + 1
+    while(i <= nrow(MRT$data)){
+      if(MRT$data$Month[i] == curr_date){
+        row_after_curr_mon<-i+1
+        while(row_after_curr_mon <= nrow(MRT$data)){
+          if(input$growslide == "Custom"){
+            live$data$`Client growth percentage`[row_after_curr_mon] <- live$data$`Custom client growth`[row_after_curr_mon]
+            Revenue_fn(row_after_curr_mon)
+            Company_head_count_fn(row_after_curr_mon)
+            Revenue_percent_change_fn(row_after_curr_mon)
+            Total_monthly_ARPA_fn(row_after_curr_mon)
+            Client_growth_after_churn_fn(row_after_curr_mon)
+            CLTV_fn(row_after_curr_mon)
+            CLTV_to_CAC_ratio_fn(row_after_curr_mon)
+            Company_head_count_fn(row_after_curr_mon)
+            Actual_labor_costs_fn(row_after_curr_mon)
+            Revenue_per_head_fn(row_after_curr_mon)
+            Gross_profit_fn(row_after_curr_mon)
+            Gross_margins_fn(row_after_curr_mon)
+            Total_partner_pay_fn(row_after_curr_mon)
+            Commissions_fn(row_after_curr_mon)
+            
+            Composite_costs_multiplier_fn(row_after_curr_mon, live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
+            Overhead_fn(row_after_curr_mon)
+            Overhead_to_opex_fn(row_after_curr_mon)
+            Net_profit_fn(row_after_curr_mon)
+            Net_margins_fn(row_after_curr_mon)
+            Cash_in_bank_fn(row_after_curr_mon)
           }
+          else {
+            growslide_numeric = as.numeric(gsub("[\\%,]", "", input$growslide))
+            growslide_numeric = growslide_numeric / 100
+            live$data$`Client growth percentage`[row_after_curr_mon] <- growslide_numeric
+            Revenue_fn(row_after_curr_mon)
+            Company_head_count_fn(row_after_curr_mon)
+            Revenue_percent_change_fn(row_after_curr_mon)
+            Total_monthly_ARPA_fn(row_after_curr_mon)
+            Client_growth_after_churn_fn(row_after_curr_mon)
+            CLTV_fn(row_after_curr_mon)
+            CLTV_to_CAC_ratio_fn(row_after_curr_mon)
+            Company_head_count_fn(row_after_curr_mon)
+            Actual_labor_costs_fn(row_after_curr_mon)
+            Revenue_per_head_fn(row_after_curr_mon)
+            Gross_profit_fn(row_after_curr_mon)
+            Gross_margins_fn(row_after_curr_mon)
+            Total_partner_pay_fn(row_after_curr_mon)
+            Commissions_fn(row_after_curr_mon)
+            
+            Composite_costs_multiplier_fn(row_after_curr_mon, live$data$`Overhead to revenue ratio`[row_after_curr_mon])
+            Overhead_fn(row_after_curr_mon)
+            Overhead_to_opex_fn(row_after_curr_mon)
+            Net_profit_fn(row_after_curr_mon)
+            Net_margins_fn(row_after_curr_mon)
+            Cash_in_bank_fn(row_after_curr_mon)
+          }
+          row_after_curr_mon = row_after_curr_mon + 1
         }
-        i = i + 1
+      }
+      i = i + 1
     }
-  }, ignoreNULL=FALSE)
-
-
+  }, ignoreNULL=TRUE)
+  
+  
   #effects the slider for the cost multiplier slider
   observeEvent(input$mCost, {
     i <- 1
@@ -124,7 +124,7 @@ server <- function(input, output) {
       }
       i = i + 1
     }
-  }, ignoreNULL=FALSE)
+  }, ignoreNULL=TRUE)
   
   # observeEvent(input$churn, {
   #   i <- 1
@@ -189,43 +189,8 @@ server <- function(input, output) {
   #     i = i + 1
   #   }
   # }, ignoreNULL=FALSE)
-
-  #####################################Profit Page####################################################################################
-  #profit visual
-  output$profit <- renderGvis({
-    df=data.frame(Month = live$data[input$moSlider[1]:input$moSlider[2],"Month"], 
-                  Gross_Profit = live$data$`Gross profit`[input$moSlider[1]:input$moSlider[2]],
-                  Net_Profit = live$data$`Net profit`[input$moSlider[1]:input$moSlider[2]])
-    gvisColumnChart(df, xvar = "Month", 
-                    yvar = c("Gross_Profit", "Net_Profit"),
-                    options=list(bar="{groupWidth:'70%'}", width = "800", height = "400",
-                                 isStacked = TRUE, vAxis="{title:'Dollars($)'}",
-                                 hAxis="{title:'Months'}", title = "Profit",
-                                 series = "[{color:'8497e5'}, {color:'b8e986'}]"))
-  })
-  #gross/ net margins visual
-  output$gross <-renderGvis({
-    df=data.frame(Revenue = live$data$Revenue[input$moSlider[1]:input$moSlider[2]],
-                  Gross_Margins= live$data$`Gross margins`[input$moSlider[1]:input$moSlider[2]],
-                  Net_Margins= live$data$`Net margins`[input$moSlider[1]:input$moSlider[2]])
-    gvisLineChart(df, options=list(pointSize = 6, width = 800, height = 400, vAxis="{title:'Profit Margins'}",
-                                   hAxis="{title:'Revenue'}", series = "[{color:'8497e5'}, {color:'b8e986'}]", 
-                                   title = "Margins(%)"))
-  })
   
-  ################################Runway page########################################################################################
-  #runway visual
-  output$runway <- renderGvis({
-    df=data.frame(Month= live$data[input$moSlider[1]:input$moSlider[2],"Month"], 
-                  Cash_in_Bank= live$data$`Cash in bank`[input$moSlider[1]:input$moSlider[2]],
-                  Net_Profit = live$data$`Net profit`[input$moSlider[1]:input$moSlider[2]],
-                  Funds_Raised = live$data$`Cumulative funds raised`[input$moSlider[1]:input$moSlider[2]])
-    gvisLineChart(df, options=list(pointSize=6,width = 800, height = 400,vAxis="{title:'Dollars($)'}",
-                                   hAxis="{title:'Months'}", title = "Runway", 
-                                   series = "[{color:'8497e5'}, {color:'b8e986'}, {color:'grey'}]"))
-  })
-  
-  #Profit and Revenue visual
+ ##################################################Profits#######################################################################
   output$profRev <-renderGvis({
     df=data.frame(Revenue= live$data$Revenue[input$moSlider[1]:input$moSlider[2]],
                   Overhead= live$data$Overhead[input$moSlider[1]:input$moSlider[2]],
@@ -235,46 +200,8 @@ server <- function(input, output) {
                                    hAxis="{title:'Revenue'}", series = "[{color:'8497e5'}, {color:'b8e986'}, {color:'grey'}]", 
                                    title = "Profit/Revenue"))
   })
-  
-  ###########################Growth Page##############################################################################################
-  #client growth and revenue visual
-  output$num_client <- renderGvis({
-    df=data.frame(Month = live$data[input$moSlider[1]:input$moSlider[2],"Month"], 
-                  Revenue = live$data$Revenue[input$moSlider[1]:input$moSlider[2]],
-                  Enterprise_Clients = live$data$`Enterprise clients`[input$moSlider[1]:input$moSlider[2]],
-                  Small_Business_Clients = live$data$`Small business clients`[input$moSlider[1]:input$moSlider[2]],
-                  Personal_Clients = live$data$`Personal clients`[input$moSlider[1]:input$moSlider[2]])
-    gvisComboChart(df, xvar="Month",
-                   yvar=c("Personal_Clients", "Revenue", "Small_Business_Clients", 
-                          "Enterprise_Clients"),
-                   options=list(pointSize = 3, seriesType="bar",
-                                series="[{type:'bars',targetAxisIndex:0, color:'b8e986'}, 
-                                {type:'line', targetAxisIndex:1, color:'8497e5'},
-                                {type:'bars', color:'grey'},
-                                {type: 'bars', color: 'black'}]",
-                                vAxes="[{title:'Number of Clients'}, {title:'Revenue'}]",  isStacked = TRUE,
-                                width = 800, height = 400, title = "Client Growth and Revenue", hAxis="{title:'Months'}"))
-})
-  #revenue from clients visual
-  output$rev_client <- renderGvis({
-    df=data.frame(Month = live$data[input$moSlider[1]:input$moSlider[2],"Month"], 
-                  Revenue = live$data$Revenue[input$moSlider[1]:input$moSlider[2]],
-                  Enterprise_Revenue = live$data$`Enterprise revenue`[input$moSlider[1]:input$moSlider[2]],
-                  Small_Business_Revenue = live$data$`Small business revenue`[input$moSlider[1]:input$moSlider[2]],
-                  Personal_Revenue = live$data$`Personal revenue`[input$moSlider[1]:input$moSlider[2]])
-    gvisComboChart(df, xvar="Month",
-                   yvar=c("Personal_Revenue", "Revenue", "Small_Business_Revenue", 
-                          "Enterprise_Revenue"),
-                   options=list(pointSize = 3, seriesType="bar",
-                                series="[{type:'bars', color:'b8e986'}, 
-                                {type:'line', color:'8497e5'},
-                                {type:'bars', color:'grey'},
-                                {type: 'bars', color: 'black'}]",
-                                vAxes="[{title:'Revenue'}]",  isStacked = TRUE,
-                                width = 800, height = 400, title = "Revenue from Clients", hAxis="{title:'Months'}"))
-  })
-  
-  #######################################churn page#################################################################################
+ 
+  #######################################churn/client growth#################################################################################
   #churn vs client growth visual
   output$client <-renderGvis({
     df=data.frame(Month = live$data[input$moSlider[1]:input$moSlider[2],"Month"], 
@@ -286,7 +213,7 @@ server <- function(input, output) {
   })
   
   
-  ############################Workforce Page##########################################################################################
+  ############################Revenue per Head##########################################################################################
   
   #Revenue per head visual
   output$workForce <-renderGvis({
@@ -296,89 +223,15 @@ server <- function(input, output) {
                   Partners= live$data$`Number of partners`[input$moSlider[1]:input$moSlider[2]])
     gvisLineChart(df, options=list(pointSize = 6, width = 800, height = 400, vAxis="{title:'Head Count'}",
                                    hAxis="{title:'Revenue'}", 
-                                    series = "[{type:'line', 
-                                    targetAxisIndex:0,
-                                    color:'b8e986'}, 
-                                    {type:'line', 
-                                    targetAxisIndex:1,
-                                    color:'8497e5'}]", title = "Revenue per Head",
+                                   series = "[{type:'line', 
+                                   targetAxisIndex:0,
+                                   color:'b8e986'}, 
+                                   {type:'line', 
+                                   targetAxisIndex:1,
+                                   color:'8497e5'}]", title = "Revenue per Head",
                                    vAxes="[{title:'Company Head Count'}, {title:'Revenue per Head'}]"))
-  })
-  
-  #Labor costs Visual
-  output$Lcost <- renderGvis({
-    df=data.frame(Month = live$data[input$moSlider[1]:input$moSlider[2],"Month"], 
-                  Actual_Labor_Cost = live$data$`Actual labor costs`[input$moSlider[1]:input$moSlider[2]],
-                  Expected_Operator_Labor_cost = live$data$`Expected operator labor costs`[input$moSlider[1]:input$moSlider[2]],
-                  Expected_RRR_Labor_Cost = live$data$`Expected RRR labor costs for assistants`[input$moSlider[1]:input$moSlider[2]],
-                  Expected_Specialist_and_Strategist_Labor_Costs = 
-                    live$data$`Expected specialist and strategist labor costs`[input$moSlider[1]:input$moSlider[2]]
-    )
-    gvisComboChart(df, xvar="Month",
-                   yvar=c("Expected_Operator_Labor_cost", "Actual_Labor_Cost", "Expected_RRR_Labor_Cost", 
-                          "Expected_Specialist_and_Strategist_Labor_Costs"),
-                   options=list(pointSize = 3, seriesType="line",
-                                series="[{type:'line', 
-                                targetAxisIndex:0,
-                                color:'b8e986'}, 
-                                {type:'bars', 
-                                targetAxisIndex:1,
-                                color:'8497e5'},
-                                {color:'grey'}, {color:'black'}]",
-                                vAxes="[{title:'Expected_Operator_Labor_cost'}, {title:'Actual_Labor_Cost'}]", 
-                                width = 800, height = 400, title = "Labor Costs", hAxis="{title:'Months'}"))
 })
   
-  
-  ############################Partner pay########################################################################################
-  #partner pay visual
-  output$combo <- renderGvis({
-    df=data.frame(Month = live$data[input$moSlider[1]:input$moSlider[2],"Month"], 
-                  Partner_Pay = live$data$`Total partner pay`[input$moSlider[1]:input$moSlider[2]],
-                  Gross_Profits = live$data$`Gross profit`[input$moSlider[1]:input$moSlider[2]])
-    gvisComboChart(df, xvar = "Month", 
-                   yvar = c("Partner_Pay", "Gross_Profits"),
-                   options=list(seriesType="bars",
-                                series="[{type:'line', color: '8497e5'},
-                                {type:'bars', color: 'b8e986'}]", 
-                                width = 800, height = 400, vAxis="{title:'Dollars($)'}", pointSize = 4,
-                                hAxis="{title:'Months'}", title = "Partner Pay"))
-  })
-  
-  #partner pay comapred to revenue visual
-  output$linechart <- renderGvis({
-    df=data.frame(Revenue = live$data$Revenue[input$moSlider[1]:input$moSlider[2]], 
-                  Partner_Pay = live$data$`Total partner pay`[input$moSlider[1]:input$moSlider[2]],
-                  Gross_Profits = live$data$`Gross profit`[input$moSlider[1]:input$moSlider[2]],
-                  Net_Profit = live$data$`Net profit`[input$moSlider[1]:input$moSlider[2]])
-    gvisLineChart(df, options=list(pointSize = 4, width = 800, height = 400, vAxis="{title:'Dollars($)'}",
-                                   hAxis="{title:'Revenue'}", series = "[{color:'8497e5'}, {color:'b8e986'}, 
-                                   {color:'grey'}, {color:'Black'}, {color:'Red'}]", title = "Partner Pay Compared to Revenue"))
-  })
-  
-  ########################################Overhead Page##############################################################################
-  #overhead visual
-  output$overhead <-renderGvis({
-    df=data.frame(Month = live$data[input$moSlider[1]:input$moSlider[2],"Month"],
-                  Total_Overhead = live$data$Overhead[input$moSlider[1]:input$moSlider[2]],
-                  BD_Costs = live$data$`BD costs`[input$moSlider[1]:input$moSlider[2]],
-                  RD_Costs = live$data$`Total R and D costs`[input$moSlider[1]:input$moSlider[2]],
-                  Subscription_Costs = live$data$`Subscription costs`[input$moSlider[1]:input$moSlider[2]],
-                  Discretionary_Spending = live$data$`Discretionary spending`[input$moSlider[1]:input$moSlider[2]],
-                  Partner_Pay = live$data$`Total partner pay`[input$moSlider[1]:input$moSlider[2]],
-                  Partner_Bonuses = live$data$`Partner bonuses`[input$moSlider[1]:input$moSlider[2]])
-    gvisLineChart(df, options=list(pointSize = 2, width = 800, height = 400, vAxis="{title:'Dollars($)'}",
-                                   hAxis="{title:'Months'}", series = "[{color:'8497e5'}, {color:'b8e986'}, 
-                                   {color:'grey'}, {color:'Red'}]", title = "Overhead"))
-  })
-  
-  #Ecoomies of Scale visual
-  output$econScale <-renderGvis({
-    df=data.frame(Revenue = live$data$Revenue[input$moSlider[1]:input$moSlider[2]],
-                  `Overhead/Opex %`= live$data$`Overhead to opex`[input$moSlider[1]:input$moSlider[2]])
-    gvisLineChart(df, options=list(pointSize = 4, width = 800, height = 400, vAxis="{title:'Overhead/Opex %'}",
-                                   hAxis="{title:'Revenue'}", series = "[{color: '8497e5'}]", title = "Economies of Scale"))
-  })
   
   
   # #######################################other################################################################################
@@ -431,11 +284,20 @@ server <- function(input, output) {
   
   
   ############################################Growth Page############################################################################
+  MRT <- reactiveValues()
+  live <- reactiveValues()
+  observeEvent(input$grow_reload, {
+    MRT$data <- gs_read( gs_key("1KdOJJ9rj3eWUKA4F6mX-MIEQKe5XJAMeJf4aZvQ1m8A"), ws = "Frozen Shiny Sheet")
+    live$data <- MRT$data
+  }, ignoreNULL = TRUE)
+  output$grow_clics <- renderText(input$grow_reload)
   #bottoom page table
   
+  observeEvent(input$grow_newTable, {
     output$grow_main_table <-renderGvis({
-      gvisTable(live$data)
+      gvisTable(live$data[,c(1,118:151)])
     })
+  }, ignoreNULL = TRUE)
   
   
   #Effects the slider for the client growth slider
@@ -501,7 +363,7 @@ server <- function(input, output) {
       }
       i = i + 1
     }
-  }, ignoreNULL=FALSE)
+  }, ignoreNULL=TRUE)
   
   
   #effects the slider for the cost multiplier slider
@@ -534,7 +396,7 @@ server <- function(input, output) {
       }
       i = i + 1
     }
-  }, ignoreNULL=FALSE)
+  }, ignoreNULL=TRUE)
   
   # observeEvent(input$churn, {
   #   i <- 1
@@ -674,7 +536,7 @@ server <- function(input, output) {
                                 width = 800, height = 400, title = "Revenue from Clients", hAxis="{title:'Months'}"))
   })
   
-
+  
   
   
   
@@ -683,65 +545,170 @@ server <- function(input, output) {
   
   
   ######################################Costs PAGE##################################################################################
+  MRT <- reactiveValues()
+  live <- reactiveValues()
+  observeEvent(input$part_reload, {
+    MRT$data <- gs_read( gs_key("1KdOJJ9rj3eWUKA4F6mX-MIEQKe5XJAMeJf4aZvQ1m8A"), ws = "Frozen Shiny Sheet")
+    live$data <- MRT$data
+  }, ignoreNULL = TRUE)
+  output$part_clics <- renderText(input$part_reload)
   #bottom page table
+  observeEvent(input$part_newTable, {
     output$part_main_table <-renderGvis({
-      gvisTable(live$data)
+      gvisTable(live$data[,c(1,118:151)])
     })
+  }, ignoreNULL = TRUE)
   
   #Effects the slider for the client growth slider
+  observeEvent(input$part_growslide, {
+    i <- 1
+    while(i <= nrow(MRT$data)){
+      if(MRT$data$Month[i] == curr_date){
+        row_after_curr_mon<-i+1
+        while(row_after_curr_mon <= nrow(MRT$data)){
+          if(input$part_growslide == "Custom"){
+            live$data$`Client growth percentage`[row_after_curr_mon] <- live$data$`Custom client growth`[row_after_curr_mon]
+            Revenue_fn(row_after_curr_mon)
+            Company_head_count_fn(row_after_curr_mon)
+            Revenue_percent_change_fn(row_after_curr_mon)
+            Total_monthly_ARPA_fn(row_after_curr_mon)
+            Client_growth_after_churn_fn(row_after_curr_mon)
+            CLTV_fn(row_after_curr_mon)
+            CLTV_to_CAC_ratio_fn(row_after_curr_mon)
+            Company_head_count_fn(row_after_curr_mon)
+            Actual_labor_costs_fn(row_after_curr_mon)
+            Revenue_per_head_fn(row_after_curr_mon)
+            Gross_profit_fn(row_after_curr_mon)
+            Gross_margins_fn(row_after_curr_mon)
+            Total_partner_pay_fn(row_after_curr_mon)
+            Commissions_fn(row_after_curr_mon)
+            
+            Composite_costs_multiplier_fn(row_after_curr_mon, live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
+            Overhead_fn(row_after_curr_mon)
+            Overhead_to_opex_fn(row_after_curr_mon)
+            Net_profit_fn(row_after_curr_mon)
+            Net_margins_fn(row_after_curr_mon)
+            Cash_in_bank_fn(row_after_curr_mon)
+          }
+          else {
+            growslide_numeric = as.numeric(gsub("[\\%,]", "", input$part_growslide))
+            growslide_numeric = growslide_numeric / 100
+            live$data$`Client growth percentage`[row_after_curr_mon] <- growslide_numeric
+            Revenue_fn(row_after_curr_mon)
+            Company_head_count_fn(row_after_curr_mon)
+            Revenue_percent_change_fn(row_after_curr_mon)
+            Total_monthly_ARPA_fn(row_after_curr_mon)
+            Client_growth_after_churn_fn(row_after_curr_mon)
+            CLTV_fn(row_after_curr_mon)
+            CLTV_to_CAC_ratio_fn(row_after_curr_mon)
+            Company_head_count_fn(row_after_curr_mon)
+            Actual_labor_costs_fn(row_after_curr_mon)
+            Revenue_per_head_fn(row_after_curr_mon)
+            Gross_profit_fn(row_after_curr_mon)
+            Gross_margins_fn(row_after_curr_mon)
+            Total_partner_pay_fn(row_after_curr_mon)
+            Commissions_fn(row_after_curr_mon)
+            
+            Composite_costs_multiplier_fn(row_after_curr_mon, live$data$`Overhead to revenue ratio`[row_after_curr_mon])
+            Overhead_fn(row_after_curr_mon)
+            Overhead_to_opex_fn(row_after_curr_mon)
+            Net_profit_fn(row_after_curr_mon)
+            Net_margins_fn(row_after_curr_mon)
+            Cash_in_bank_fn(row_after_curr_mon)
+          }
+          row_after_curr_mon = row_after_curr_mon + 1
+        }
+      }
+      i = i + 1
+    }
+  }, ignoreNULL=TRUE)
   
-  # observeEvent(input$part_growslide, {
+  
+  #effects the slider for the cost multiplier slider
+  observeEvent(input$part_mCost, {
+    i <- 1
+    while(i <= nrow(MRT$data)){
+      if(MRT$data$Month[i] == curr_date){
+        row_after_curr_mon<-i+1
+        while(row_after_curr_mon <= nrow(MRT$data)){
+          if(input$part_mCost == "Custom"){
+            Composite_costs_multiplier_fn(row_after_curr_mon, live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
+            Overhead_fn(row_after_curr_mon)
+            Overhead_to_opex_fn(row_after_curr_mon)
+            Net_profit_fn(row_after_curr_mon)
+            Net_margins_fn(row_after_curr_mon)
+            Cash_in_bank_fn(row_after_curr_mon)
+          }
+          else{
+            mCost_numeric = as.numeric(gsub("[\\%,]", "", input$part_mCost))
+            mCost_numeric = mCost_numeric / 100
+            Composite_costs_multiplier_fn(row_after_curr_mon, mCost_numeric)
+            Overhead_fn(row_after_curr_mon)
+            Overhead_to_opex_fn(row_after_curr_mon)
+            Net_profit_fn(row_after_curr_mon)
+            Net_margins_fn(row_after_curr_mon)
+            Cash_in_bank_fn(row_after_curr_mon)
+          }
+          row_after_curr_mon = row_after_curr_mon + 1
+        }
+      }
+      i = i + 1
+    }
+  }, ignoreNULL=TRUE)
+  
+  # observeEvent(input$churn, {
   #   i <- 1
   #   while(i <= nrow(MRT$data)){
   #     if(MRT$data$Month[i] == curr_date){
   #       row_after_curr_mon<-i+1
   #       while(row_after_curr_mon <= nrow(MRT$data)){
-  #         if(input$part_growslide == "Custom"){
-  #           live$data <- MRT$data
-  #         }
-  #         else {
-  #           growslide_numeric = as.numeric(gsub("[\\%,]", "", input$part_growslide))
-  #           growslide_numeric = growslide_numeric / 100
-  #           live$data$`Client growth percentage`[row_after_curr_mon] <- growslide_numeric
+  #         if(input$churn == "Custom"){
+  #           live$data$`Churn percentage weighted by number of clients`[row_after_curr_mon] <- 
+  #             live$data$`Custom client churn`[row_after_curr_mon]
   #           Revenue_fn(row_after_curr_mon)
   #           Company_head_count_fn(row_after_curr_mon)
-  #           Actual_labor_costs_fn(row_after_curr_mon)
-  #           Total_partner_pay_fn(row_after_curr_mon)
   #           Revenue_percent_change_fn(row_after_curr_mon)
   #           Total_monthly_ARPA_fn(row_after_curr_mon)
   #           Client_growth_after_churn_fn(row_after_curr_mon)
   #           CLTV_fn(row_after_curr_mon)
   #           CLTV_to_CAC_ratio_fn(row_after_curr_mon)
+  #           Company_head_count_fn(row_after_curr_mon)
+  #           Actual_labor_costs_fn(row_after_curr_mon)
   #           Revenue_per_head_fn(row_after_curr_mon)
   #           Gross_profit_fn(row_after_curr_mon)
   #           Gross_margins_fn(row_after_curr_mon)
+  #           Total_partner_pay_fn(row_after_curr_mon)
   #           Commissions_fn(row_after_curr_mon)
-  #         }
-  #         row_after_curr_mon = row_after_curr_mon + 1
-  #       }
-  #     }
-  #     i = i + 1
-  #   }
-  # }, ignoreNULL=FALSE)
-  # 
-  # 
-  # #effects the slider for the cost multiplier slider
-  # observeEvent(input$part_mCost, {
-  #   i <- 1
-  #   while(i <= nrow(MRT$data)){
-  #     if(MRT$data$Month[i] == curr_date){
-  #       row_after_curr_mon<-i+1
-  #       while(row_after_curr_mon <= nrow(MRT$data)){
-  #         if(input$part_mCost == "Custom"){
-  #           live$data = MRT$data
-  #         }
-  #         else{
-  #           mCost_numeric = as.numeric(gsub("[\\%,]", "", input$part_mCost))
-  #           mCost_numeric = mCost_numeric / 100
-  #           Composite_costs_multiplier_fn(row_after_curr_mon, mCost_numeric)
+  #           
+  #           Composite_costs_multiplier_fn(row_after_curr_mon, live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
   #           Overhead_fn(row_after_curr_mon)
   #           Overhead_to_opex_fn(row_after_curr_mon)
-  #           Burn_fn(row_after_curr_mon)
+  #           Net_profit_fn(row_after_curr_mon)
+  #           Net_margins_fn(row_after_curr_mon)
+  #           Cash_in_bank_fn(row_after_curr_mon)
+  #         }
+  #         else {
+  #           churn_numeric = as.numeric(gsub("[\\%,]", "", input$churn))
+  #           churn_numeric = churn_numeric / 100
+  #           live$data$`Churn percentage weighted by number of clients`[row_after_curr_mon] <- churn_numeric
+  #           Revenue_fn(row_after_curr_mon)
+  #           Company_head_count_fn(row_after_curr_mon)
+  #           Revenue_percent_change_fn(row_after_curr_mon)
+  #           Total_monthly_ARPA_fn(row_after_curr_mon)
+  #           Client_growth_after_churn_fn(row_after_curr_mon)
+  #           CLTV_fn(row_after_curr_mon)
+  #           CLTV_to_CAC_ratio_fn(row_after_curr_mon)
+  #           Company_head_count_fn(row_after_curr_mon)
+  #           Actual_labor_costs_fn(row_after_curr_mon)
+  #           Revenue_per_head_fn(row_after_curr_mon)
+  #           Gross_profit_fn(row_after_curr_mon)
+  #           Gross_margins_fn(row_after_curr_mon)
+  #           Total_partner_pay_fn(row_after_curr_mon)
+  #           Commissions_fn(row_after_curr_mon)
+  #           
+  #           Composite_costs_multiplier_fn(row_after_curr_mon, live$data$`Overhead to revenue ratio`[row_after_curr_mon])
+  #           Overhead_fn(row_after_curr_mon)
+  #           Overhead_to_opex_fn(row_after_curr_mon)
   #           Net_profit_fn(row_after_curr_mon)
   #           Net_margins_fn(row_after_curr_mon)
   #           Cash_in_bank_fn(row_after_curr_mon)
@@ -753,7 +720,8 @@ server <- function(input, output) {
   #   }
   # }, ignoreNULL=FALSE)
   
-
+  
+  
   ##############################################Labor Costs #######################################################################
   output$part_Lcost <- renderGvis({
     df=data.frame(Month = live$data[input$moSlider[1]:input$moSlider[2],"Month"], 
@@ -776,7 +744,7 @@ server <- function(input, output) {
                                 {color:'grey'}, {color:'black'}]",
                                 vAxes="[{title:'Expected_Operator_Labor_cost'}, {title:'Actual_Labor_Cost'}]", 
                                 width = 800, height = 400, title = "Labor Costs", hAxis="{title:'Months'}"))
-})
+  })
   
   
   ############################Partner pay########################################################################################
@@ -836,5 +804,5 @@ server <- function(input, output) {
   output$table <-renderGvis({
     gvisTable(live$data)
   })
-
+  
   }
