@@ -160,7 +160,7 @@ Revenue_percent_change_fn <- function(index){
 }
 
 Month_over_month_revenue_fn <- function(index){
-  live$data$`Month-over-month revenue`[index] <- live$data$Revenue[index] - live$data$Revenue[index-1]
+  live$data$`Month over month revenue`[index] <- live$data$Revenue[index] - live$data$Revenue[index-1]
 }
 
 #3####################Total Clients#################
@@ -396,14 +396,14 @@ Partner_bonuses_fn <- function(index){
 
 
 
-#20#####################Commissions
-Commissions_fn <- function(index){
-  live$data$Commissions[index] <- live$data$Revenue[index] * live$data$`Percent commission`[index]
+#20#####################Sales and marketing costs
+Sales_and_marketing_costs_fn <- function(index){
+  live$data$`Sales and marketing costs`[index] <- live$data$Revenue[index] * live$data$`Percent commission`[index]
 }
 
 #21####################Subscrption costs
-Subscription_costs_fn <- function(index){
-  live$data$`Subscription costs`[index] <- Engineering_software_fn(index) + Operations_software_fn(index)
+Additional_subscription_costs_fn <- function(index){
+  live$data$`Additional subscription costs`[index] <- Engineering_software_fn(index) + Operations_software_fn(index)
 }
 
 Engineering_software_fn <- function(index){
@@ -421,7 +421,7 @@ Operations_software_fn <- function(index){
 #22#################RandD costs
 
 Total_R_and_D_costs_fn <- function(index){
-  live$data$`Total R and D costs`[index] <- Set_managers_costs_fn(index) + Sales_agents_costs_fn(index) + 
+  live$data$`Total R and D costs`[index] <- Set_managers_costs_fn(index) + Sales_agents_fn(index) + 
     Trainers_costs_fn(index) + Invisible_Sales_processes_fn(index) + Process_architecture_fn(index)
 }
 
@@ -430,8 +430,8 @@ Set_managers_costs_fn <- function(index){
                                                                                         live$data$`Composite costs multiplier`[index])
 }
 
-Sales_agents_costs_fn <- function(index){
-  live$data$`Sales agents costs`[index] <- live$data$`Sales agents costs`[index-1] + (live$data$`Sales agents costs`[index-1] * 
+Sales_agents_fn <- function(index){
+  live$data$`Sales agents`[index] <- live$data$`Sales agents`[index-1] + (live$data$`Sales agents`[index-1] * 
                                                                                         live$data$`Composite costs multiplier`[index])
 }
 
@@ -469,13 +469,14 @@ Discretionary_spending_fn <- function(index){
 #25#####################overhead
 
 Overhead_fn <- function(index){
-  live$data$Overhead[index] <- Total_partner_pay_fn(index) + Partner_bonuses_fn(index) + Subscription_costs_fn(index) + 
+  live$data$Overhead[index] <- Total_partner_pay_fn(index) + Partner_bonuses_fn(index) + Additional_subscription_costs_fn(index) + 
     BD_costs_fn(index) + Total_R_and_D_costs_fn(index) + Discretionary_spending_fn(index)
 }
 
 #26####################Overhead to Opex
 Overhead_to_opex_fn <- function(index){
-  live$data$`Overhead to opex`[index] <- live$data$Overhead[index] / (live$data$Commissions[index] + live$data$`Actual labor costs`[index])
+  live$data$`Overhead to opex`[index] <- live$data$Overhead[index] / (live$data$`Sales and marketing costs`[index] + 
+                                                                        live$data$`Actual labor costs`[index])
 }
 
 #27####################Net profit
@@ -502,7 +503,7 @@ Cash_in_bank_fn <- function(index){
 #31######################Burn
 
 Burn_fn <- function(index){
-  live$data$Burn[index] <- Partner_bonuses_fn(index) + Commissions_fn(index) + Subscription_costs_fn(index) + 
+  live$data$Burn[index] <- Partner_bonuses_fn(index) + Sales_and_marketing_costs_fn(index) + Additional_subscription_costs_fn(index) + 
     Total_R_and_D_costs_fn(index) + BD_costs_fn(index) + Discretionary_spending_fn(index)
 }
 

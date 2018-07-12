@@ -68,7 +68,7 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
                                 grid = TRUE,
                                 choices = c("Custom","10%", "20%","25%","30%","40%","50%","60%","70%","80%","90%","100%",
                                             "110%","125%","150%","200%"),
-                                selected = "25%" 
+                                selected = "Custom" 
                               ),
                               #hr(style="border-color: black;"),
                               
@@ -83,7 +83,20 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
                                             "31%","32%","33%","34%","35%","36%","37%","38%","39%","40%"),
                                 selected = "Custom" 
                               ),
-                              
+                              # sliderTextInput(
+                              #   inputId = "Partners",
+                              #   label = "Partners added per month:",
+                              #   grid = TRUE,
+                              #   choices = c("Custom","1","2","3","4","5","6","7","8","9","10"),
+                              #   selected = "Custom"
+                              # ),
+                              # radioButtons(
+                              #   inputId = "partbox",
+                              #   label = "Choose one for Partners:",
+                              #   choices = c("Linear", "Exponential"),
+                              #   inline = TRUE,
+                              #   selected = "Linear"
+                              # ),
                               
                               # #slider for Cost Multiplier
                               # sliderTextInput(
@@ -154,9 +167,9 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
                             # main panel outputs
                             mainPanel(
                               tabsetPanel(type = "tab",
-                                          tabPanel("Profits", htmlOutput("profRev")),      
-                                          tabPanel("Churn/Client Growth", htmlOutput("client")),
-                                          tabPanel("Revenue per Head", htmlOutput("workForce"))
+                                          tabPanel("Profit", htmlOutput("profRev"), htmlOutput("cltvcac")), 
+                                          tabPanel("Revenue per Head", htmlOutput("workForce")),
+                                          tabPanel("Churn", htmlOutput("client"))
                                           
                               )
                             )
@@ -211,7 +224,7 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
                                 grid = TRUE,
                                 choices = c("Custom","10%", "20%","25%","30%","40%","50%","60%","70%","80%","90%","100%",
                                             "110%","125%","150%","200%"),
-                                selected = "25%" 
+                                selected = "Custom" 
                               ),
                               #hr(style="border-color: black;"),
                               
@@ -226,7 +239,20 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
                                             "31%","32%","33%","34%","35%","36%","37%","38%","39%","40%"),
                                 selected = "Custom" 
                               ),
-                              
+                              # sliderTextInput(
+                              #   inputId = "grow_Partners",
+                              #   label = "Partners added per month:",
+                              #   grid = TRUE,
+                              #   choices = c("Custom","1","2","3","4","5","6","7","8","9","10"),
+                              #   selected = "Custom"
+                              # ),
+                              # radioButtons(
+                              #   inputId = "grow_partbox",
+                              #   label = "Choose one for Partners:",
+                              #   choices = c("Linear", "Exponential"),
+                              #   inline = TRUE,
+                              #   selected = "Linear"
+                              # ),
                               
                               # #slider for Cost Multiplier
                               # sliderTextInput(
@@ -296,9 +322,9 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
                             # main panel outputs
                             mainPanel(
                               tabsetPanel(type = "tab",
-                                          tabPanel("Profit", htmlOutput("grow_profit"), htmlOutput("grow_gross")),
+                                          tabPanel("Margins", htmlOutput("grow_gross"), htmlOutput("grow_profit")),
                                           tabPanel("Runway", htmlOutput("grow_runway")),
-                                          tabPanel("Client Growth",htmlOutput("grow_num_client"), htmlOutput("grow_rev_client"))
+                                          tabPanel("Growth by Cohort",htmlOutput("grow_num_client"), htmlOutput("grow_rev_client"))
                                           
                               )
                             )
@@ -363,7 +389,7 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
                                 grid = TRUE,
                                 choices = c("Custom","10%", "20%","25%","30%","40%","50%","60%","70%","80%","90%","100%",
                                             "110%","125%","150%","200%"),
-                                selected = "25%" 
+                                selected = "Custom" 
                               ),
                               #slider for Churn
                               sliderTextInput(
@@ -375,6 +401,20 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
                                             "31%","32%","33%","34%","35%","36%","37%","38%","39%","40%"),
                                 selected = "Custom" 
                               ),
+                              # sliderTextInput(
+                              #   inputId = "part_Partners",
+                              #   label = "Partners added per month:",
+                              #   grid = TRUE,
+                              #   choices = c("Custom","1","2","3","4","5","6","7","8","9","10"),
+                              #   selected = "Custom"
+                              # ),
+                              # radioButtons(
+                              #   inputId = "part_partbox",
+                              #   label = "Choose one for Partners:",
+                              #   choices = c("Linear", "Exponential"),
+                              #   inline = TRUE,
+                              #   selected = "Linear"
+                              # ),
                               
                               # #slider for Cost Multiplier
                               # sliderTextInput(
@@ -462,7 +502,7 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
      
      # more page that had spreadsheet and demo dropdowns
      navbarMenu("More",
-                tabPanel("Further Customization",
+                tabPanel("Table",
                          htmlOutput('table')
                 ),
                 #youtube video in demo dropdown 
