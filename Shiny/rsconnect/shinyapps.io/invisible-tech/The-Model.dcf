@@ -5,9 +5,9 @@ account: invisible-tech
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 364062
-bundleId: 1476536
+bundleId: 1478192
 url: https://invisible-tech.shinyapps.io/The-Model/
-when: 1531378049.26018
+when: 1531435155.78744
 asMultiple: FALSE
 asStatic: FALSE
 ignoredFiles: gs_MRT|gs_MRT2|gs_MRT3|test.R

@@ -78,68 +78,34 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
                                 label = "Monthly Churn:",
                                 grid = TRUE,
                                 choices = c("Custom","1%","2%","3%","4%","5%","6%","7%","8%","9%","10%","11%","12%","13%","14%",
-                                            "15%","16%",
-                                            "17%","18%","19%","20%","21%", "22%", "23%", "24%","25%","26%","27%","28%","29%","30%",
-                                            "31%","32%","33%","34%","35%","36%","37%","38%","39%","40%"),
+                                            "15%","16%","17%","18%","19%","20%","21%", "22%", "23%", "24%","25%","26%","27%","28%",
+                                            "29%","30%","31%","32%","33%","34%","35%","36%","37%","38%","39%","40%"),
                                 selected = "Custom" 
                               ),
-                              # sliderTextInput(
-                              #   inputId = "Partners",
-                              #   label = "Partners added per month:",
-                              #   grid = TRUE,
-                              #   choices = c("Custom","1","2","3","4","5","6","7","8","9","10"),
-                              #   selected = "Custom"
-                              # ),
-                              # radioButtons(
-                              #   inputId = "partbox",
-                              #   label = "Choose one for Partners:",
-                              #   choices = c("Linear", "Exponential"),
-                              #   inline = TRUE,
-                              #   selected = "Linear"
-                              # ),
+                              sliderTextInput(
+                                inputId = "Partners",
+                                label = "Partners added per month:",
+                                grid = TRUE,
+                                choices = c("Custom","1","2","3","4","5","6","7","8","9","10"),
+                                selected = "Custom"
+                              ),
+                              radioButtons(
+                                inputId = "partbox",
+                                label = "Choose one for Partner Growth:",
+                                choices = c("Linear", "Exponential"),
+                                inline = TRUE,
+                                selected = "Linear"
+                              ),
                               
-                              # #slider for Cost Multiplier
-                              # sliderTextInput(
-                              #   inputId = "Gross Margins",
-                              #   label = "Gross Margins:(UNDER CONSTRUCTION)",
-                              #   grid = TRUE,
-                              #   choices = c("10%", "20%","30%","40%","50%","60%","70%","80%","90%","100%",
-                              #               "110%","125%","150%","200%"),
-                              #   selected = "30%" 
-                              # ),
-                              # 
-                              # sliderInput(inputId = "cacslide",
-                              #             label = "CAC Slider:(UNDER CONSTRUCTION)",
-                              #             step = 1,
-                              #             min = 1,
-                              #             max = 72,
-                              #             value=c(5,24),
-                              #             animate = TRUE
-                              # ),
-                              # 
-                              # sliderInput(inputId = "ltvslide",
-                              #             label = "LTV Slider:(UNDER CONSTRUCTION)",
-                              #             step = 1,
-                              #             min = 1,
-                              #             max = 36,
-                              #             value=c(4,12),
-                              #             animate = TRUE
-                              # ),
-                              # sliderInput(inputId = "partnerbonus",
-                              #             label = "Partner Bonuses:(UNDER CONSTRUCTION)",
-                              #             step = 1,
-                              #             min = 1,
-                              #             max = 36,
-                              #             value=c(4,12),
-                              #             animate = TRUE
-                              # ),
-                              # hr(),
-                              # 
-                              # checkboxGroupInput(inputId = "growthbox",
-                              #                    label = "Growth Options:(UNDER CONSTRUCTION)",
-                              #                    choices = c("Linear",
-                              #                                "Exponential"),
-                              #                    selected = c("Type")),
+                              sliderTextInput(
+                                inputId = "auto",
+                                label = "Automation Multiplier",
+                                grid = TRUE,
+                                choices = c("Custom", "0%","0.25%","0.5%","0.75%","1%","1.25%","1.5%","1.75%","2%","2.25%",
+                                            "2.5%","2.75%","3%","3.25%","3.5%","3.75%","4%"),
+                                selected = "Custom"
+                              ),
+                              
                               # #check box for random options
                               # checkboxGroupInput(inputId = "Options",
                               #                    label = "Other Options:(UNDER CONSTRUCTION)",
@@ -239,64 +205,29 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
                                             "31%","32%","33%","34%","35%","36%","37%","38%","39%","40%"),
                                 selected = "Custom" 
                               ),
-                              # sliderTextInput(
-                              #   inputId = "grow_Partners",
-                              #   label = "Partners added per month:",
-                              #   grid = TRUE,
-                              #   choices = c("Custom","1","2","3","4","5","6","7","8","9","10"),
-                              #   selected = "Custom"
-                              # ),
-                              # radioButtons(
-                              #   inputId = "grow_partbox",
-                              #   label = "Choose one for Partners:",
-                              #   choices = c("Linear", "Exponential"),
-                              #   inline = TRUE,
-                              #   selected = "Linear"
-                              # ),
+                              sliderTextInput(
+                                inputId = "grow_Partners",
+                                label = "Partners added per month:",
+                                grid = TRUE,
+                                choices = c("Custom","1","2","3","4","5","6","7","8","9","10"),
+                                selected = "Custom"
+                              ),
+                              radioButtons(
+                                inputId = "grow_partbox",
+                                label = "Choose one for Partner Growth:",
+                                choices = c("Linear", "Exponential"),
+                                inline = TRUE,
+                                selected = "Linear"
+                              ),
+                              sliderTextInput(
+                                inputId = "grow_auto",
+                                label = "Automation Multiplier",
+                                grid = TRUE,
+                                choices = c("Custom", "0%","0.25%","0.5%","0.75%","1%","1.25%","1.5%","1.75%","2%","2.25%",
+                                            "2.5%","2.75%","3%","3.25%","3.5%","3.75%","4%"),
+                                selected = "Custom"
+                              ),
                               
-                              # #slider for Cost Multiplier
-                              # sliderTextInput(
-                              #   inputId = "Gross Margins",
-                              #   label = "Gross Margins:(UNDER CONSTRUCTION)",
-                              #   grid = TRUE,
-                              #   choices = c("10%", "20%","30%","40%","50%","60%","70%","80%","90%","100%",
-                              #               "110%","125%","150%","200%"),
-                              #   selected = "30%" 
-                              # ),
-                              # 
-                              # sliderInput(inputId = "cacslide",
-                              #             label = "CAC Slider:(UNDER CONSTRUCTION)",
-                              #             step = 1,
-                              #             min = 1,
-                              #             max = 72,
-                              #             value=c(5,24),
-                              #             animate = TRUE
-                              # ),
-                              # 
-                              # sliderInput(inputId = "ltvslide",
-                              #             label = "LTV Slider:(UNDER CONSTRUCTION)",
-                              #             step = 1,
-                              #             min = 1,
-                              #             max = 36,
-                              #             value=c(4,12),
-                              #             animate = TRUE
-                              # ),
-                              # sliderInput(inputId = "partnerbonus",
-                              #             label = "Partner Bonuses:(UNDER CONSTRUCTION)",
-                              #             step = 1,
-                              #             min = 1,
-                              #             max = 36,
-                              #             value=c(4,12),
-                              #             animate = TRUE
-                              # ),
-                              # hr(),
-                              # 
-                              # checkboxGroupInput(inputId = "growthbox",
-                              #                    label = "Growth Options:(UNDER CONSTRUCTION)",
-                              #                    choices = c("Linear",
-                              #                                "Exponential"),
-                              #                    selected = c("Type")),
-                              # #check box for random options
                               # checkboxGroupInput(inputId = "Options",
                               #                    label = "Other Options:(UNDER CONSTRUCTION)",
                               #                    choices = c("Include Agent Guarantee of 30 hrs/mo",
@@ -401,64 +332,30 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
                                             "31%","32%","33%","34%","35%","36%","37%","38%","39%","40%"),
                                 selected = "Custom" 
                               ),
-                              # sliderTextInput(
-                              #   inputId = "part_Partners",
-                              #   label = "Partners added per month:",
-                              #   grid = TRUE,
-                              #   choices = c("Custom","1","2","3","4","5","6","7","8","9","10"),
-                              #   selected = "Custom"
-                              # ),
-                              # radioButtons(
-                              #   inputId = "part_partbox",
-                              #   label = "Choose one for Partners:",
-                              #   choices = c("Linear", "Exponential"),
-                              #   inline = TRUE,
-                              #   selected = "Linear"
-                              # ),
+                              sliderTextInput(
+                                inputId = "part_Partners",
+                                label = "Partners added per month:",
+                                grid = TRUE,
+                                choices = c("Custom","1","2","3","4","5","6","7","8","9","10"),
+                                selected = "Custom"
+                              ),
+                              radioButtons(
+                                inputId = "part_partbox",
+                                label = "Choose one for Partner Growth:",
+                                choices = c("Linear", "Exponential"),
+                                inline = TRUE,
+                                selected = "Linear"
+                              ),
                               
-                              # #slider for Cost Multiplier
-                              # sliderTextInput(
-                              #   inputId = "part_gross_margins",
-                              #   label = "Gross Margins:(UNDER CONSTRUCTION)",
-                              #   grid = TRUE,
-                              #   choices = c("10%", "20%","30%","40%","50%","60%","70%","80%","90%","100%",
-                              #               "110%","125%","150%","200%"),
-                              #   selected = "30%" 
-                              # ),
-                              # 
-                              # sliderInput(inputId = "part_cacslide",
-                              #             label = "CAC Slider:(UNDER CONSTRUCTION)",
-                              #             step = 1,
-                              #             min = 1,
-                              #             max = 36,
-                              #             value=c(4,12),
-                              #             animate = TRUE
-                              # ),
-                              # 
-                              # sliderInput(inputId = "part_ltvslide",
-                              #             label = "LTV Slider:(UNDER CONSTRUCTION)",
-                              #             step = 1,
-                              #             min = 1,
-                              #             max = 36,
-                              #             value=c(4,12),
-                              #             animate = TRUE
-                              # ),
-                              # sliderInput(inputId = "part_partnerbonus",
-                              #             label = "Partner Bonuses:(UNDER CONSTRUCTION)",
-                              #             step = 1,
-                              #             min = 1,
-                              #             max = 36,
-                              #             value=c(4,12),
-                              #             animate = TRUE
-                              # ),
-                              # hr(),
-                              # 
-                              # checkboxGroupInput(inputId = "part_growthbox",
-                              #                    label = "Growth Options:(UNDER CONSTRUCTION)",
-                              #                    choices = c("Linear",
-                              #                                "Exponential"),
-                              #                    selected = c("Type")),
-                              # #check box for random options
+                              sliderTextInput(
+                                inputId = "part_auto",
+                                label = "Automation Multiplier",
+                                grid = TRUE,
+                                choices = c("Custom", "0%","0.25%","0.5%","0.75%","1%","1.25%","1.5%","1.75%","2%","2.25%",
+                                            "2.5%","2.75%","3%","3.25%","3.5%","3.75%","4%"),
+                                selected = "Custom"
+                              ),
+                              
                               # checkboxGroupInput(inputId = "part_Options",
                               #                    label = "Other Options:(UNDER CONSTRUCTION)",
                               #                    choices = c("Include Agent Guarantee of 30 hrs/mo",
