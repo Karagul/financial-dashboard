@@ -223,26 +223,24 @@ Number_of_agents_fn <- function(index){
 
 Total_agents_not_including_set_managers_fn <- function(index) {
   live$data$`Total agents not including set managers`[index] <- Number_of_operators_invisible_decides_to_employ_this_month_fn(index) + 
-    Number_of_RRRs_invisible_decides_to_employ_this_month_fn(index) + Number_of_sentries_invisible_decides_to_employ_this_month_fn(index) + 
+    Number_of_RRRs_invisible_decides_to_employ_this_month_fn(index) + 
     Number_of_specialists_and_strategists_invisible_decides_to_employ_this_month_fn(index)
 }
 
 #######################Number of operators invisible decides to employ this month
 Number_of_operators_invisible_decides_to_employ_this_month_fn <- function(index){
-  live$data$`Number of operators invisible decides to employ this month`[index] <- 
-    (1 - Percent_of_total_agent_workforce_hrs_made_up_by_sentries_fn(index)) * 
-    (1 - live$data$`Percent of RRRs that make up agent workforce`[index]) * 
+  live$data$`Number of operators invisible decides to employ this month`[index] <-  
     (Actual_client_hours_operator_sentry_and_ten_dollar_per_hr_RRR_hrs_worked_fn(index) + 
-       Non_billable_operator_RRR_and_sentry_hrs_fn(index)) / ((live$data$`Avg hrs per week per operator`[index] * 52) / 12)
+       Non_billable_operator_RRR_and_sentry_hrs_fn(index)) / (live$data$`Avg hrs per week per operator`[index] * 4.35)
 }
 
 
 Non_billable_operator_RRR_and_sentry_hrs_fn <- function(index){
   live$data$`Non billable operator RRR and sentry hrs`[index] <- Billable_operator_sentry_and_10_dollar_per_hr_RRR_hrs_fn(index) * 
-    live$data$`Percent of operator sentry and RRR hours that are NOT client billable`[index] / 
-    (1 - live$data$`Percent of operator sentry and RRR hours that are NOT client billable`[index])
+    live$data$`Percent of operator sentry and RRR hours that are NOT client billable`[index]
 } 
 
+#not needed?
 Percent_of_total_agent_workforce_hrs_made_up_by_sentries_fn <- function(index){
   live$data$`Percent of total agent workforce hrs made up by sentries`[index] <- 
     live$data$`Percent of total agent workforce hrs made up by sentries`[index - 1] - .0016
@@ -260,7 +258,7 @@ Billable_operator_sentry_and_10_dollar_per_hr_RRR_hrs_fn <- function(index){
     Small_business_monthly_operator_hrs_fn(index) + Personal_monthly_operator_hrs_fn(index)
 } 
 
-
+#Not needed?
 Personal_monthly_operator_hrs_fn <- function(index){
   live$data$`Personal monthly operator hrs`[index] <- live$data$`Avg personal monthly operator hrs`[index] * Personal_clients_fn(index)
 }
@@ -269,29 +267,18 @@ Personal_monthly_operator_hrs_fn <- function(index){
 ###################Number of RRRs invisible decides to employ this month
 
 Number_of_RRRs_invisible_decides_to_employ_this_month_fn <- function(index){
-  live$data$`Number of RRRs invisible decides to employ this month`[index] <- 
-    (1 - Percent_of_total_agent_workforce_hrs_made_up_by_sentries_fn(index)) * 
-    (live$data$`Percent of RRRs that make up agent workforce`[index]) * 
-    (Actual_client_hours_operator_sentry_and_ten_dollar_per_hr_RRR_hrs_worked_fn(index) + 
-       Non_billable_operator_RRR_and_sentry_hrs_fn(index)) / ((live$data$`Avg hrs per week per RRR`[index] * 52) / 12)
+  live$data$`Number of RRRs invisible decides to employ this month`[index] <-  
+    (Actual_client_hours_RRRs_worked_fn(index)) /
+       (live$data$`Avg hrs per week per RRR`[index] * 4.35)
 }
 
 
-####################Number of sentries invisible decides to employ this month
-Number_of_sentries_invisible_decides_to_employ_this_month_fn <- function(index){
-  live$data$`Number of sentries invisible decides to employ this month`[index] <-
-    (Percent_of_total_agent_workforce_hrs_made_up_by_sentries_fn(index)) * 
-    (1 - live$data$`Percent of RRRs that make up agent workforce`[index]) * 
-    (Actual_client_hours_operator_sentry_and_ten_dollar_per_hr_RRR_hrs_worked_fn(index) + 
-       Non_billable_operator_RRR_and_sentry_hrs_fn(index)) / ((live$data$`Avg hrs per week per sentry`[index] * 52) / 12)
-}
-
+####NOT ACTUALLTY CORRECT##########
 ##################Number of specialists and strategists invisible decides to employ this month
 Number_of_specialists_and_strategists_invisible_decides_to_employ_this_month_fn <- function(index){
   live$data$`Number of specialists and strategists invisible decides to employ this month`[index] <-
-    (Actual_client_hrs_specialists_and_strategists_worked_fn(index) + 
-       Non_billable_specialist_and_strategist_hrs_fn(index)) / 
-    ((live$data$`Avg hrs per week per specialists and strategists`[index] * 52) / 12)
+     (Actual_client_hrs_specialists_and_strategists_worked_fn(index)) / 
+    (live$data$`Avg hrs per week per specialists and strategists`[index] * 4.35)
 }
 
 Actual_client_hrs_specialists_and_strategists_worked_fn <- function(index){
@@ -302,12 +289,6 @@ Actual_client_hrs_specialists_and_strategists_worked_fn <- function(index){
 Billable_specialist_and_strategist_hrs_fn <- function(index){
   live$data$`Billable specialist and strategist hrs`[index] <- Enterprise_monthly_strategist_specialist_hrs_fn(index) + 
     Small_business_monthly_strategist_specialist_hrs_fn(index) + Personal_monthly_strategist_specialist_hrs_fn(index)
-}
-
-Non_billable_specialist_and_strategist_hrs_fn <- function(index) {
-  live$data$`Non billable specialist and strategist hrs`[index] <- (Billable_specialist_and_strategist_hrs_fn(index) * 
-    live$data$`Percent specialist and strategist hours that are not client billable`[index]) / 
-    (1 - live$data$`Percent specialist and strategist hours that are not client billable`[index])
 }
 
 #13##############Actual Labor Costs###############
@@ -341,8 +322,8 @@ Billable_RRR_hrs_fn <- function(index) {
 
 ###################Expected specialist and strategist labor costs
 Expected_specialist_and_strategist_labor_costs_fn <- function(index){
-  live$data$`Expected_specialist_and_strategist_labor_costs` <- live$data$`Avg sentry rate`[index] * 
-    (Actual_client_hrs_specialists_and_strategists_worked_fn(index) + Non_billable_specialist_and_strategist_hrs_fn(index))
+  live$data$`Expected_specialist_and_strategist_labor_costs` <- ((Actual_client_hrs_specialists_and_strategists_worked_fn(index) *
+                                                                   live$data$`Avg sentry rate`[index]))
 }
 
 
