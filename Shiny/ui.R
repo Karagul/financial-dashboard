@@ -42,7 +42,7 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                                           step = 1,
                                           min = 1,
                                           max = 72,
-                                          value=c(6,19),
+                                          value=c(9,27),
                                           animate = TRUE
                               ),
                               #slider for Client Growth
@@ -119,7 +119,8 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                               tabsetPanel(type = "tab",
                                           tabPanel("Profit", htmlOutput("grow_profit"), htmlOutput("grow_gross")),
                                           tabPanel("Runway", htmlOutput("grow_runway")),
-                                          tabPanel("Cohort Analysis",htmlOutput("grow_num_client"), htmlOutput("grow_rev_client"))
+                                          tabPanel("Cohort Analysis",htmlOutput("grow_num_client"), htmlOutput("grow_rev_client")),
+                                          tabPanel("More Cohort Analysis", htmlOutput("grow_bubble"))
                                           
                               )
                             )
@@ -155,7 +156,7 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                                           step = 1,
                                           min = 1,
                                           max = 72,
-                                          value=c(6,19),
+                                          value=c(9,27),
                                           animate = TRUE
                               ),
                               #slider for Client Growth
@@ -268,7 +269,7 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                                                      step = 1,
                                                      min = 1,
                                                      max = 72,
-                                                     value=c(6,19),
+                                                     value=c(9,27),
                                                      animate = TRUE
                                          ),
                                          #slider for Client Growth
@@ -359,6 +360,10 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                            )
                          )
                 ),
+                ##Functional Mapping in more
+                tabPanel("Functional Mapping",
+                        htmlOutput('funcmap')
+                        ),
                 
                 #Table dropdown in More 
                 tabPanel("Table",

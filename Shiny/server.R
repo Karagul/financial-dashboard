@@ -789,7 +789,40 @@ server <- function(input, output, session) {
                                 width = 800, height = 400, title = "Cohort Analysis by Revenue", hAxis="{title:'Months'}"))
   })
   
-  
+  output$grow_bubble <- renderGvis({
+    df=data.frame(
+        Name = c("Enterprise_Clients", "Small_Business_Clients", "Personal_Clients"),
+        Client_Percentage = c((100 / (input$grow_moSlider[2] - input$grow_moSlider[1])) * 
+                                sum(grow_live$data$`Percent enterprise clients`[input$grow_moSlider[1]:input$grow_moSlider[2]]), 
+                              (100 / (input$grow_moSlider[2] - input$grow_moSlider[1])) * 
+                                sum(grow_live$data$`Percent small business clients`[input$grow_moSlider[1]:input$grow_moSlider[2]]), 
+                              (100 / (input$grow_moSlider[2] - input$grow_moSlider[1])) * 
+                                sum(grow_live$data$`Percent personal clients`[input$grow_moSlider[1]:input$grow_moSlider[2]])),
+        Client_Percentage_Weighted_by_Dollar_Value = 
+          c((100 / (input$grow_moSlider[2] - input$grow_moSlider[1])) * 
+              sum(grow_live$data$`Percent enterprise clients weighted by dollar value`[input$grow_moSlider[1]:input$grow_moSlider[2]]), 
+            (100 / (input$grow_moSlider[2] - input$grow_moSlider[1])) * 
+              sum(grow_live$data$`Percent small business clients weighted by dollar value`[input$grow_moSlider[1]:input$grow_moSlider[2]]),
+            (100 / (input$grow_moSlider[2] - input$grow_moSlider[1])) * 
+              sum(grow_live$data$`Percent personal clients weighted by dollar value`[input$grow_moSlider[1]:input$grow_moSlider[2]])),
+        Revenue = c((1 / (input$grow_moSlider[2] - input$grow_moSlider[1])) * 
+                      sum(grow_live$data$`Enterprise revenue`[input$grow_moSlider[1]:input$grow_moSlider[2]]), 
+                    (1 / (input$grow_moSlider[2] - input$grow_moSlider[1])) * 
+                      sum(grow_live$data$`Small business revenue`[input$grow_moSlider[1]:input$grow_moSlider[2]]),
+                    (1 / (input$grow_moSlider[2] - input$grow_moSlider[1])) * 
+                      sum(grow_live$data$`Personal revenue`[input$grow_moSlider[1]:input$grow_moSlider[2]])))
+    
+    gvisBubbleChart(df,  idvar = "Name", 
+                    xvar = "Client_Percentage_Weighted_by_Dollar_Value", 
+                    yvar = "Client_Percentage", 
+                    colorvar = "Name",
+                    sizevar = "Revenue",
+                    options=list(title = "Cohort Analysis of Clients", width = 850, height = 500,
+                                 colors = "['b8e986', '8497e5', 'Grey']",
+                                 hAxis="{title:'Client Percentage Weighted by Dollar Value'}",
+                                 vAxis="{title:'Client Percentage'}")
+    )
+  })
   
   
   
@@ -1123,12 +1156,14 @@ server <- function(input, output, session) {
                     part_live$data$`Expected operator labor costs`[input$part_moSlider[1]:input$part_moSlider[2]],
                   RRR_Labor_Costs = 
                     part_live$data$`Expected RRR labor costs for assistants`[input$part_moSlider[1]:input$part_moSlider[2]],
-                  Specialist_and_Strategist_Labor_Costs = 
-                    part_live$data$`Expected specialist and strategist labor costs`[input$part_moSlider[1]:input$part_moSlider[2]]
+                  Specialist_Labor_Costs = 
+                    part_live$data$`Expected specialist labor costs`[input$part_moSlider[1]:input$part_moSlider[2]],
+                  Strategist_Labor_Costs = 
+                    part_live$data$`Expected strategist labor costs`[input$part_moSlider[1]:input$part_moSlider[2]]
     )
     gvisComboChart(df, xvar="Month",
                    yvar=c("Total_Labor_Costs","Operator_Labor_Costs", "RRR_Labor_Costs", 
-                          "Specialist_and_Strategist_Labor_Costs"),
+                          "Specialist_Labor_Costs", "Strategist_Labor_Costs"),
                    options=list(pointSize = 3, seriesType="line",
                                 series="[{type:'bars', 
                                 targetAxisIndex:0,
@@ -1209,7 +1244,30 @@ server <- function(input, output, session) {
   
   #########################################MORE PAGE###############################################
   
-  #######################################spreadsheet##############################################
+  ########################################Functional mapping#######################################################
+  output$funcmap <-renderGvis({
+    df=data.frame(From = c('Revenue',
+                           'Enterprise Revenue',
+                           'Small Business Revenue',
+                           'Personal Revenue'),
+                  To =   c('Enterprise Revenue',
+                             'Total enterprise monthly operator fees','Total enterprise monthly assistant fees',
+                             'Total enterprise monthly strategist specialist fees',
+                           'Small Business Revenue',
+                             'Total small business monthly operator fees', 'Total small business monthly assistant fees',
+                             'Total small business monthly strategist specialist fees',
+                           'Personal Revenue',
+                             'Total personal monthly operator fees', 'Total personal monthly assistant fees',
+                             'Total personal monthly strategist specialist fees'),
+                  Weight = c(3,3,3,3,3,3,3,3,3,3,3,3))
+    gvisSankey(df, from = "From", to = "To", weight = "Weight", 
+               options=list(
+                 sankey="{link: {colorMode: 'gradient', color: { fill: '8497e5' } },
+                 node: { color: { fill: 'b8e986' },
+                 label: { color: 'Grey' } }}")
+               )
+  })
+  #######################################Table##############################################
   
   output$table <-renderGvis({
     gvisTable(MRT$data)

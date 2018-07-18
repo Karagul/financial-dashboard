@@ -5,7 +5,7 @@ source('server.R')
 
 Revenue_growfn <- function(index){
   grow_live$data$Revenue[index] <- Enterprise_revenue_growfn(index) + 
-    Small_business_revenue(index) + 
+    Small_business_revenue_growfn(index) + 
     Personal_revenue_growfn(index)
 }
 
@@ -13,7 +13,8 @@ Revenue_growfn <- function(index){
 Enterprise_revenue_growfn <- function(index){
   grow_live$data$`Enterprise revenue`[index] <- Total_enterprise_monthly_operator_fees_growfn(index) + 
     Total_enterprise_monthly_assistant_fees_growfn(index) + 
-    Total_enterprise_monthly_strategist_specialist_fees_growfn(index)
+    Total_enterprise_monthly_specialist_fees_growfn(index) +
+    Total_enterprise_monthly_strategist_fees_growfn(index)
 }
 
 #########
@@ -39,16 +40,26 @@ Enterprise_monthly_assistant_hrs_growfn <- function(index){
     grow_live$data$`Avg enterprise monthly assistant hrs`[index]
 }
 
-
 #####
-Total_enterprise_monthly_strategist_specialist_fees_growfn <- function(index){
-  grow_live$data$`Total enterprise monthly strategist specialist fees`[index] <- 
-    Enterprise_monthly_strategist_specialist_hrs_growfn(index) * grow_live$data$`Strategist specialist hrly rate`[index]
+Total_enterprise_monthly_specialist_fees_growfn <- function(index){
+  grow_live$data$`Total enterprise monthly specialist fees`[index] <- 
+    Enterprise_monthly_specialist_hrs_growfn(index) * grow_live$data$`Specialist hrly rate`[index]
 }
 
-Enterprise_monthly_strategist_specialist_hrs_growfn <- function(index){
-  grow_live$data$`Enterprise monthly strategist specialist hrs`[index] <- Enterprise_clients_growfn(index) * 
-    grow_live$data$`Avg enterprise monthly strategist specialist hrs`[index]
+Enterprise_monthly_specialist_hrs_growfn <- function(index){
+  grow_live$data$`Enterprise monthly specialist hrs`[index] <- Enterprise_clients_growfn(index) * 
+    grow_live$data$`Avg enterprise monthly specialist hrs`[index]
+}
+
+#####
+Total_enterprise_monthly_strategist_fees_growfn <- function(index){
+  grow_live$data$`Total enterprise monthly strategist fees`[index] <- 
+    Enterprise_monthly_strategist_hrs_growfn(index) * grow_live$data$`Strategist hrly rate`[index]
+}
+
+Enterprise_monthly_strategist_hrs_growfn <- function(index){
+  grow_live$data$`Enterprise monthly strategist hrs`[index] <- Enterprise_clients_growfn(index) * 
+    grow_live$data$`Avg enterprise monthly strategist hrs`[index]
 }
 
 Enterprise_clients_growfn <- function(index){
@@ -58,10 +69,11 @@ Enterprise_clients_growfn <- function(index){
 
 ######Small Buisness#######
 
-Small_business_revenue <- function(index){
+Small_business_revenue_growfn <- function(index){
   grow_live$data$`Small business revenue`[index] <- Total_small_business_monthly_operator_fees_growfn(index) + 
     Total_small_business_monthly_assistant_fees_growfn(index) + 
-    Total_small_business_monthly_strategist_specialist_fees_growfn(index)
+    Total_small_business_monthly_specialist_fees_growfn(index) +
+    Total_small_business_monthly_strategist_fees_growfn(index)
 }
 
 #######
@@ -87,14 +99,25 @@ Small_business_monthly_assistant_hrs_growfn <- function(index){
 }
 
 ######
-Total_small_business_monthly_strategist_specialist_fees_growfn <- function(index){
-  grow_live$data$`Total small business monthly strategist specialist fees`[index] <- 
-    Small_business_monthly_strategist_specialist_hrs_growfn(index) * grow_live$data$`Strategist specialist hrly rate`[index]
+Total_small_business_monthly_specialist_fees_growfn <- function(index){
+  grow_live$data$`Total small business monthly specialist fees`[index] <- 
+    Small_business_monthly_specialist_hrs_growfn(index) * grow_live$data$`Specialist hrly rate`[index]
 }
 
-Small_business_monthly_strategist_specialist_hrs_growfn <- function(index){
-  grow_live$data$`Small business monthly strategist specialist hrs`[index] <- Small_business_clients_growfn(index) * 
-    grow_live$data$`Avg small business monthly strategist specialist hrs`[index]
+Small_business_monthly_specialist_hrs_growfn <- function(index){
+  grow_live$data$`Small business monthly specialist hrs`[index] <- Small_business_clients_growfn(index) * 
+    grow_live$data$`Avg small business monthly specialist hrs`[index]
+}
+
+######
+Total_small_business_monthly_strategist_fees_growfn <- function(index){
+  grow_live$data$`Total small business monthly strategist fees`[index] <- 
+    Small_business_monthly_strategist_hrs_growfn(index) * grow_live$data$`Strategist hrly rate`[index]
+}
+
+Small_business_monthly_strategist_hrs_growfn <- function(index){
+  grow_live$data$`Small business monthly strategist hrs`[index] <- Small_business_clients_growfn(index) * 
+    grow_live$data$`Avg small business monthly strategist hrs`[index]
 }
 
 Small_business_clients_growfn <- function(index){
@@ -106,7 +129,8 @@ Small_business_clients_growfn <- function(index){
 Personal_revenue_growfn <-function(index){
   grow_live$data$`Personal revenue`[index] <- Total_personal_monthly_operator_fees_growfn(index) + 
     Total_personal_monthly_assistant_fees_growfn(index) + 
-    Total_personal_monthly_strategist_specialist_fees_growfn(index)
+    Total_personal_monthly_specialist_fees_growfn(index) + 
+    Total_personal_monthly_strategist_fees_growfn(index)
 }
 
 
@@ -134,13 +158,24 @@ Personal_monthly_assistant_hrs_growfn <- function(index){
 }
 
 #######
-Total_personal_monthly_strategist_specialist_fees_growfn <- function(index){
-  grow_live$data$`Total personal monthly strategist specialist fees`[index] <- Personal_monthly_strategist_specialist_hrs_growfn(index) * 
-    grow_live$data$`Strategist specialist hrly rate`[index]
+Total_personal_monthly_specialist_fees_growfn <- function(index){
+  grow_live$data$`Total personal monthly specialist fees`[index] <- Personal_monthly_specialist_hrs_growfn(index) * 
+    grow_live$data$`Specialist hrly rate`[index]
 }
 
-Personal_monthly_strategist_specialist_hrs_growfn <- function(index){
-  grow_live$data$`Personal monthly strategist specialist hrs`[index] <- grow_live$data$`Avg personal monthly strategist specialist hrs`[index] * 
+Personal_monthly_specialist_hrs_growfn <- function(index){
+  grow_live$data$`Personal monthly specialist hrs`[index] <- grow_live$data$`Avg personal monthly specialist hrs`[index] * 
+    Personal_clients_growfn(index)
+}
+
+#######
+Total_personal_monthly_strategist_fees_growfn <- function(index){
+  grow_live$data$`Total personal monthly strategist fees`[index] <- Personal_monthly_strategist_hrs_growfn(index) * 
+    grow_live$data$`Strategist hrly rate`[index]
+}
+
+Personal_monthly_strategist_hrs_growfn <- function(index){
+  grow_live$data$`Personal monthly strategist hrs`[index] <- grow_live$data$`Avg personal monthly strategist hrs`[index] * 
     Personal_clients_growfn(index)
 }
 
@@ -176,13 +211,6 @@ Total_clients_growfn <- function(index){
 Total_monthly_ARPA_growfn <- function(index){
   grow_live$data$`Total monthly ARPA`[index] <- grow_live$data$Revenue[index] / Total_clients_growfn(index)
 }
-
-
-#5#####################Churn############# May not be neccessary##########
-
-# Churn_growfn <- function(index){
-#   grow_live$data$`Churn percentage weighted by number of clients`[index] <- grow_live$data$`Client churn`[index]
-# }
 
 
 #6####################Client Growth After Churn##############called in Client growth slider
@@ -224,30 +252,25 @@ Number_of_agents_growfn <- function(index){
 Total_agents_not_including_set_managers_growfn <- function(index) {
   grow_live$data$`Total agents not including set managers`[index] <- Number_of_operators_invisible_decides_to_employ_this_month_growfn(index) + 
     Number_of_RRRs_invisible_decides_to_employ_this_month_growfn(index) + 
-    Number_of_specialists_and_strategists_invisible_decides_to_employ_this_month_growfn(index)
+    Number_of_specialists_invisible_decides_to_employ_this_month_growfn(index) +
+    Number_of_strategists_invisible_decides_to_employ_this_month_growfn(index)
 }
 
 #######################Number of operators invisible decides to employ this month
 Number_of_operators_invisible_decides_to_employ_this_month_growfn <- function(index){
   grow_live$data$`Number of operators invisible decides to employ this month`[index] <-  
-    (Actual_client_hours_operator_sentry_and_ten_dollar_per_hr_RRR_hrs_worked_growfn(index) + 
+    (Actual_client_hrs_operator_sentry_and_ten_dollar_per_hr_RRR_hrs_worked_growfn(index) + 
        Non_billable_operator_RRR_and_sentry_hrs_growfn(index)) / (grow_live$data$`Avg hrs per week per operator`[index] * 4.35)
 }
 
 
 Non_billable_operator_RRR_and_sentry_hrs_growfn <- function(index){
   grow_live$data$`Non billable operator RRR and sentry hrs`[index] <- Billable_operator_sentry_and_10_dollar_per_hr_RRR_hrs_growfn(index) * 
-    grow_live$data$`Percent of operator sentry and RRR hours that are NOT client billable`[index]
+    grow_live$data$`Percent of operator sentry and RRR hrs that are NOT client billable`[index]
 } 
 
-#not needed?
-Percent_of_total_agent_workforce_hrs_made_up_by_sentries_growfn <- function(index){
-  grow_live$data$`Percent of total agent workforce hrs made up by sentries`[index] <- 
-    grow_live$data$`Percent of total agent workforce hrs made up by sentries`[index - 1] - .0016
-}
-
-Actual_client_hours_operator_sentry_and_ten_dollar_per_hr_RRR_hrs_worked_growfn <- function(index){
-  grow_live$data$`Actual client hours operator sentry and ten dollar per hr RRR hrs worked`[index] <- 
+Actual_client_hrs_operator_sentry_and_ten_dollar_per_hr_RRR_hrs_worked_growfn <- function(index){
+  grow_live$data$`Actual client hrs operator sentry and ten dollar per hr RRR hrs worked`[index] <- 
     Billable_operator_sentry_and_10_dollar_per_hr_RRR_hrs_growfn(index) * 
     grow_live$data$`Reduction in agent task completion times relative to price benchmark`[index]
 }
@@ -258,48 +281,64 @@ Billable_operator_sentry_and_10_dollar_per_hr_RRR_hrs_growfn <- function(index){
     Small_business_monthly_operator_hrs_growfn(index) + Personal_monthly_operator_hrs_growfn(index)
 } 
 
-#Not needed?
-Personal_monthly_operator_hrs_growfn <- function(index){
-  grow_live$data$`Personal monthly operator hrs`[index] <- grow_live$data$`Avg personal monthly operator hrs`[index] * Personal_clients_growfn(index)
-}
+##############Not needed?
+# Personal_monthly_operator_hrs_growfn <- function(index){
+#   grow_live$data$`Personal monthly operator hrs`[index] <- grow_live$data$`Avg personal monthly operator hrs`[index] * Personal_clients_growfn(index)
+# }
 
 
 ###################Number of RRRs invisible decides to employ this month
 
 Number_of_RRRs_invisible_decides_to_employ_this_month_growfn <- function(index){
   grow_live$data$`Number of RRRs invisible decides to employ this month`[index] <-  
-    (Actual_client_hours_RRRs_worked_growfn(index)) /
+    (Actual_client_hrs_RRRs_worked_growfn(index)) /
     (grow_live$data$`Avg hrs per week per RRR`[index] * 4.35)
 }
 
-
-####NOT ACTUALLTY CORRECT##########
-##################Number of specialists and strategists invisible decides to employ this month
-Number_of_specialists_and_strategists_invisible_decides_to_employ_this_month_growfn <- function(index){
-  grow_live$data$`Number of specialists and strategists invisible decides to employ this month`[index] <-
-    (Actual_client_hrs_specialists_and_strategists_worked_growfn(index)) / 
-    (grow_live$data$`Avg hrs per week per specialists and strategists`[index] * 4.35)
+############Number of specialists invisible decides to employ this month
+Number_of_specialists_invisible_decides_to_employ_this_month_growfn <- function(index){
+  grow_live$data$`Number of specialists invisible decides to employ this month`[index] <-
+    (Actual_client_hrs_specialists_worked_growfn(index)) / 
+    (grow_live$data$`Avg hrs per week per specialists`[index] * 4.35)
 }
 
-Actual_client_hrs_specialists_and_strategists_worked_growfn <- function(index){
-  grow_live$data$`Actual client hrs specialists and strategists worked`[index] <- Billable_specialist_and_strategist_hrs_growfn(index) * 
+Actual_client_hrs_specialists_worked_growfn <- function(index){
+  grow_live$data$`Actual client hrs specialists worked`[index] <- Billable_specialist_hrs_growfn(index) * 
     grow_live$data$`Reduction in agent task completion times relative to price benchmark`[index]
 }
 
-Billable_specialist_and_strategist_hrs_growfn <- function(index){
-  grow_live$data$`Billable specialist and strategist hrs`[index] <- Enterprise_monthly_strategist_specialist_hrs_growfn(index) + 
-    Small_business_monthly_strategist_specialist_hrs_growfn(index) + Personal_monthly_strategist_specialist_hrs_growfn(index)
+Billable_specialist_hrs_growfn <- function(index){
+  grow_live$data$`Billable specialist hrs`[index] <- Enterprise_monthly_specialist_hrs_growfn(index) + 
+    Small_business_monthly_specialist_hrs_growfn(index) + Personal_monthly_specialist_hrs_growfn(index)
+}
+
+##################Number of strategists invisible decides to employ this month
+Number_of_strategists_invisible_decides_to_employ_this_month_growfn <- function(index){
+  grow_live$data$`Number of strategists invisible decides to employ this month`[index] <-
+    (Actual_client_hrs_strategists_worked_growfn(index)) / 
+    (grow_live$data$`Avg hrs per week per strategists`[index] * 4.35)
+}
+
+Actual_client_hrs_strategists_worked_growfn <- function(index){
+  grow_live$data$`Actual client hrs strategists worked`[index] <- Billable_strategist_hrs_growfn(index) * 
+    grow_live$data$`Reduction in agent task completion times relative to price benchmark`[index]
+}
+
+Billable_strategist_hrs_growfn <- function(index){
+  grow_live$data$`Billable strategist hrs`[index] <- Enterprise_monthly_strategist_hrs_growfn(index) + 
+    Small_business_monthly_strategist_hrs_growfn(index) + Personal_monthly_strategist_hrs_growfn(index)
 }
 
 #13##############Actual Labor Costs###############
 Actual_labor_costs_growfn <- function(index){
   grow_live$data$`Actual labor costs`[index] <- Expected_operator_labor_costs_growfn(index) + 
-    Expected_RRR_labor_costs_for_assistants_growfn(index) + Expected_specialist_and_strategist_labor_costs_growfn(index)
+    Expected_RRR_labor_costs_for_assistants_growfn(index) + Expected_specialist_labor_costs_growfn(index)
+  + Expected_strategist_labor_costs_growfn(index)
 }
 ###############Expected operator labor costs
 Expected_operator_labor_costs_growfn <- function(index){
   grow_live$data$`Expected operator labor costs`[index] <- 
-    (Actual_client_hours_operator_sentry_and_ten_dollar_per_hr_RRR_hrs_worked_growfn(index) + 
+    (Actual_client_hrs_operator_sentry_and_ten_dollar_per_hr_RRR_hrs_worked_growfn(index) + 
        Non_billable_operator_RRR_and_sentry_hrs_growfn(index)) * 
     grow_live$data$`Avg rate for operators sentries and RRRs working for clients at 10 dollars per hr`[index]
 }
@@ -310,8 +349,8 @@ Expected_RRR_labor_costs_for_assistants_growfn <- function(index){
     grow_live$data$`Avg RRR rate working for clients at 20 dollars per hr`[index]
 }
 
-Actual_client_hours_RRRs_worked_growfn <- function(index){
-  grow_live$data$`Actual client hours RRRs worked`[index] <- Billable_RRR_hrs_growfn(index) * 
+Actual_client_hrs_RRRs_worked_growfn <- function(index){
+  grow_live$data$`Actual client hrs RRRs worked`[index] <- Billable_RRR_hrs_growfn(index) * 
     grow_live$data$`Reduction in agent task completion times relative to price benchmark`[index]
 }
 
@@ -320,12 +359,17 @@ Billable_RRR_hrs_growfn <- function(index) {
     Personal_monthly_assistant_hrs_growfn(index)
 }
 
-###################Expected specialist and strategist labor costs
-Expected_specialist_and_strategist_labor_costs_growfn <- function(index){
-  grow_live$data$`Expected_specialist_and_strategist_labor_costs` <- ((Actual_client_hrs_specialists_and_strategists_worked_growfn(index) *
-                                                                    grow_live$data$`Avg sentry rate`[index]))
+###################Expected specialist labor costs
+Expected_specialist_labor_costs_growfn <- function(index){
+  grow_live$data$`Expected_specialist_labor_costs`[index] <- ((Actual_client_hrs_specialists_worked_growfn(index) *
+                                                            grow_live$data$`Avg specialist rate`[index]))
 }
 
+###################Expected strategist labor costs
+Expected_strategist_labor_costs_growfn <- function(index){
+  grow_live$data$`Expected_strategist_labor_costs`[index] <- ((Actual_client_hrs_strategists_worked_growfn(index) *
+                                                            grow_live$data$`Avg strategist rate`[index]))
+}
 
 
 #14###########Revenue per Head####################running in client growth slider#########
@@ -368,15 +412,7 @@ Gross_margins_split_pre_partner_pay_growfn <- function(index){
   grow_live$data$`Gross margins split pre partner pay`[index] <- Gross_profit_growfn(index) / grow_live$data$`Number of partners`[index]
 }
 
-
-
-#19#######################Partner Bonuses
-Partner_bonuses_growfn <- function(index){
-  grow_live$data$`Partner bonuses`[index] <- grow_live$data$`Partner bonuses`[index]
-}
-
-
-
+################FIXX##########
 #20#####################Sales and marketing costs
 Sales_and_marketing_costs_growfn <- function(index){
   grow_live$data$`Sales and marketing costs`[index] <- grow_live$data$Revenue[index] * grow_live$data$`Percent commission`[index]
@@ -384,82 +420,48 @@ Sales_and_marketing_costs_growfn <- function(index){
 
 #21####################Subscrption costs
 Additional_subscription_costs_growfn <- function(index){
-  grow_live$data$`Additional subscription costs`[index] <- Engineering_software_growfn(index) + Operations_software_growfn(index)
-}
-
-Engineering_software_growfn <- function(index){
-  grow_live$data$`Engineering software`[index] <- grow_live$data$`Engineering software`[index-1] + 
-    (grow_live$data$`Engineering software`[index-1] * grow_live$data$`Composite costs multiplier`[index])
-}
-
-
-Operations_software_growfn <- function(index){
-  grow_live$data$`Operations software`[index]<- grow_live$data$`Operations software`[index-1] + 
-    (grow_live$data$`Operations software`[index-1] * grow_live$data$`Composite costs multiplier`[index])
+  grow_live$data$`Additional subscription costs`[index] <- grow_live$data$`Additional subscription costs`[index - 1] * 
+    (1 + grow_live$data$`Composite costs multiplier`[index])
 }
 
 
 #22#################RandD costs
 
 Total_R_and_D_costs_growfn <- function(index){
-  grow_live$data$`Total R and D costs`[index] <- Set_managers_costs_growfn(index) + Sales_agents_growfn(index) + 
-    Trainers_costs_growfn(index) + Invisible_Sales_processes_growfn(index) + Process_architecture_growfn(index)
+  grow_live$data$`Total R and D costs`[index] <- grow_live$data$`Total R and D costs`[index - 1] * 
+    (1 + grow_live$data$`Composite costs multiplier`[index])
 }
-
-Set_managers_costs_growfn <- function(index){
-  grow_live$data$`Set managers costs`[index] <- grow_live$data$`Set managers costs`[index-1] + (grow_live$data$`Set managers costs`[index-1] *
-                                                                                        grow_live$data$`Composite costs multiplier`[index])
-}
-
-Sales_agents_growfn <- function(index){
-  grow_live$data$`Sales agents`[index] <- grow_live$data$`Sales agents`[index-1] + (grow_live$data$`Sales agents`[index-1] * 
-                                                                            grow_live$data$`Composite costs multiplier`[index])
-}
-
-Trainers_costs_growfn <- function(index){
-  grow_live$data$`Trainers costs`[index] <- grow_live$data$`Trainers costs`[index-1] + (grow_live$data$`Trainers costs`[index-1] * 
-                                                                                grow_live$data$`Composite costs multiplier`[index])
-}
-
-Invisible_Sales_processes_growfn <- function(index){
-  grow_live$data$`Invisible sales processes`[index] <- grow_live$data$`Invisible sales processes`[index-1] + 
-    (grow_live$data$`Invisible sales processes`[index-1] * grow_live$data$`Composite costs multiplier`[index])
-}
-
-Process_architecture_growfn <- function(index){
-  grow_live$data$`Process architecture`[index] <- grow_live$data$`Process architecture`[index-1] + 
-    (grow_live$data$`Process architecture`[index-1] * grow_live$data$`Composite costs multiplier`[index])
-}
-
 
 
 #23####################BD Costs
 
 BD_costs_growfn <- function(index){
-  grow_live$data$`BD costs`[index]<- grow_live$data$`BD costs`[index-1] + 
-    (grow_live$data$`BD costs`[index-1] * grow_live$data$`Composite costs multiplier`[index])
+  grow_live$data$`BD costs`[index]<- grow_live$data$`BD costs`[index-1] * 
+    (1 + grow_live$data$`Composite costs multiplier`[index])
 }
 
 
 #24####################Discretionary Spending 
 Discretionary_spending_growfn <- function(index){
-  grow_live$data$`Discretionary spending`[index]<- grow_live$data$`Discretionary spending`[index-1] + 
-    (grow_live$data$`Discretionary spending`[index-1] * grow_live$data$`Composite costs multiplier`[index])
+  grow_live$data$`Discretionary spending`[index]<- grow_live$data$`Discretionary spending`[index-1] * 
+    (1 + grow_live$data$`Composite costs multiplier`[index])
 }
 
 #25#####################overhead
 
 Overhead_growfn <- function(index){
-  grow_live$data$Overhead[index] <- Total_partner_pay_growfn(index) + Partner_bonuses_growfn(index) + Additional_subscription_costs_growfn(index) + 
+  grow_live$data$Overhead[index] <- Sales_and_marketing_costs_growfn(index) + Additional_subscription_costs_growfn(index) + 
     BD_costs_growfn(index) + Total_R_and_D_costs_growfn(index) + Discretionary_spending_growfn(index)
 }
 
 #26####################Overhead to Opex
 Overhead_to_opex_growfn <- function(index){
-  grow_live$data$`Overhead to opex`[index] <- grow_live$data$Overhead[index] / (grow_live$data$`Sales and marketing costs`[index] + 
-                                                                        grow_live$data$`Actual labor costs`[index])
+  grow_live$data$`Overhead to opex`[index] <- grow_live$data$Overhead[index] / (Opex_growfn(index))
 }
 
+Opex_growfn <- function(index) {
+  grow_live$data$Opex[index] <- grow_live$data$Overhead[index] + grow_live$data$`Actual labor costs`[index]
+}
 #27####################Net profit
 
 Net_profit_growfn <- function(index) {
