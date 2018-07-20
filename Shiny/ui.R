@@ -3,7 +3,6 @@ library(googleVis)
 library(googlesheets)
 library(shinythemes)
 library(shinyWidgets)
-#load("InvLogo.png")
 curr_date <-format(Sys.Date(), "%b '%y")
 
 #This is for the color of slide bar.
@@ -17,9 +16,11 @@ border-color: #36454f;
 
 # Define UI for application
 ui <- fluidPage(theme = shinytheme("cosmo"),
+                
     #top bar
-    navbarPage(a(img(src="InvLogo.png", height = 30, width = 35, style="float:left"),"Invisible Technologies", href="https://inv.tech", target="_blank", color = "White"), windowTitle = "The Model",
-
+    navbarPage(a(img(src="InvLogo.png", height = 30, width = 35, style="float:left"),
+                 "Invisible Technologies", href="https://inv.tech", target="_blank", color = "White"), windowTitle = "The Model",
+                  
      
      #############################################Growth page###########################################################################  
      tabPanel("Growth",  #Growth page
@@ -111,13 +112,7 @@ ui <- fluidPage(theme = shinytheme("cosmo"),
                                 choices = c("Custom","1","2","3","4","5","6","7","8","9","10"),
                                 selected = "Custom"
                               ),
-                              radioButtons(
-                                inputId = "grow_partbox",
-                                label = "Choose one for Partner Growth:",
-                                choices = c("Linear", "Exponential"),
-                                inline = TRUE,
-                                selected = "Linear"
-                              ),
+                              
                               sliderTextInput(
                                 inputId = "grow_auto",
                                 label = "Automation Multiplier",
@@ -126,9 +121,6 @@ ui <- fluidPage(theme = shinytheme("cosmo"),
                                             "2.5%","2.75%","3%","3.25%","3.5%","3.75%","4%"),
                                 selected = "Custom"
                               ),
-                              h6("* Costs multiplier refers to the percentage that Business Development Costs, 
-                                 Subscription Costs, R&D Costs, 
-                                 and Sales/Marketing Costs increase at relative to revenue."),
                               
                               #reload data clicker
                               fluidRow(
@@ -148,7 +140,9 @@ ui <- fluidPage(theme = shinytheme("cosmo"),
                                           tabPanel("Profit", htmlOutput("grow_profit"), htmlOutput("grow_gross")),
                                           tabPanel("Runway", htmlOutput("grow_runway")),
                                           tabPanel("Cohort Analysis",htmlOutput("grow_num_client"), htmlOutput("grow_rev_client")),
-                                          tabPanel("More Cohort Analysis", htmlOutput("grow_bubble"))
+                                          tabPanel("More Cohort Analysis", htmlOutput("grow_bubble"), 
+                                                   h6(tags$i("**Values dislayed in this chart are dictated by the location of the 
+                                                             rightmost \"Month Range\" slider")))
                                           
                               )
                             )
@@ -250,13 +244,7 @@ ui <- fluidPage(theme = shinytheme("cosmo"),
                                 choices = c("Custom","1","2","3","4","5","6","7","8","9","10"),
                                 selected = "Custom"
                               ),
-                              radioButtons(
-                                inputId = "part_partbox",
-                                label = "Choose one for Partner Growth:",
-                                choices = c("Linear", "Exponential"),
-                                inline = TRUE,
-                                selected = "Linear"
-                              ),
+                              
                               
                               sliderTextInput(
                                 inputId = "part_auto",
@@ -266,9 +254,6 @@ ui <- fluidPage(theme = shinytheme("cosmo"),
                                             "2.5%","2.75%","3%","3.25%","3.5%","3.75%","4%"),
                                 selected = "Custom"
                               ),
-                              h6("* Costs multiplier refers to the percentage that Business Development Costs, 
-                                 Subscription Costs, R&D Costs, 
-                                 and Sales/Marketing Costs increase at relative to revenue."),
                               
                               #reload data clicker
                               fluidRow(
@@ -392,13 +377,6 @@ ui <- fluidPage(theme = shinytheme("cosmo"),
                                            choices = c("Custom","1","2","3","4","5","6","7","8","9","10"),
                                            selected = "Custom"
                                          ),
-                                         radioButtons(
-                                           inputId = "partbox",
-                                           label = "Choose one for Partner Growth:",
-                                           choices = c("Linear", "Exponential"),
-                                           inline = TRUE,
-                                           selected = "Linear"
-                                         ),
                                          
                                          sliderTextInput(
                                            inputId = "auto",
@@ -408,9 +386,6 @@ ui <- fluidPage(theme = shinytheme("cosmo"),
                                                        "2.5%","2.75%","3%","3.25%","3.5%","3.75%","4%"),
                                            selected = "Custom"
                                          ),
-                                         h6("* Costs multiplier refers to the percentage that Business Development Costs, 
-                                            Subscription Costs, R&D Costs, 
-                                            and Sales/Marketing Costs increase at relative to revenue."),
                                          
                                          #reload data clicker
                                          fluidRow(

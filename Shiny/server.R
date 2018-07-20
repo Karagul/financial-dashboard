@@ -6,7 +6,6 @@ library(shinyWidgets)
 
 
 curr_date <- format(Sys.Date(), "%b '%y")
-#end_date <-
 
 # Define server function required to create the scatterplot
 server <- function(input, output, session) {
@@ -21,18 +20,19 @@ server <- function(input, output, session) {
   grow_live <-reactiveValues()
   part_live <-reactiveValues()
   observeEvent(input$reload, {
-    MRT$data <- gs_read( gs_key("1K4hHyfnJhuWijJpDT6KRZtI1bLHlukTb4svKT4HKVeA"), ws = "Shiny sheet")
+    MRT$data <- gs_read( gs_key("14AmPkfN5b51fSBsT223khVg_gH9-lzl2WAtyWp9zEkc"), ws = "Shiny sheet")
     live$data <- MRT$data
     grow_live$data <- MRT$data
     part_live$data <- MRT$data
   }, ignoreNULL=FALSE)
   output$clics <- renderText(input$reload)
+  
+  #
   observeEvent(input$reload, {
     updateSliderTextInput(session, inputId = "growslide", selected = isolate("Custom"))
     updateSliderTextInput(session, inputId = "mCost", selected = isolate("Custom"))
     updateSliderTextInput(session, inputId = "churn", selected = isolate("Custom"))
     updateSliderTextInput(session, inputId = "Partners", selected = isolate("Custom"))
-    updateRadioButtons(session, inputId = "partbox", selected = isolate("Linear"))
     updateSliderTextInput(session, inputId = "auto", selected = isolate("Custom"))
   },ignoreInit = TRUE)  
   
@@ -87,6 +87,7 @@ server <- function(input, output, session) {
         while(row_after_curr_mon <= nrow(MRT$data)){
           if(input$growslide == "Custom"){
             live$data$`Client growth percentage`[row_after_curr_mon] <- live$data$`Custom client growth`[row_after_curr_mon]
+            Composite_costs_multiplier_fn(row_after_curr_mon, live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
             Revenue_fn(row_after_curr_mon)
             Company_head_count_fn(row_after_curr_mon)
             Revenue_percent_change_fn(row_after_curr_mon)
@@ -97,12 +98,10 @@ server <- function(input, output, session) {
             Company_head_count_fn(row_after_curr_mon)
             Actual_labor_costs_fn(row_after_curr_mon)
             Revenue_per_head_fn(row_after_curr_mon)
-            Gross_profit_fn(row_after_curr_mon)
             Gross_margins_fn(row_after_curr_mon)
             Total_partner_pay_fn(row_after_curr_mon)
             Sales_and_marketing_costs_fn(row_after_curr_mon)
             
-            Composite_costs_multiplier_fn(row_after_curr_mon, live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
             Overhead_fn(row_after_curr_mon)
             Overhead_to_opex_fn(row_after_curr_mon)
             Net_profit_fn(row_after_curr_mon)
@@ -113,6 +112,7 @@ server <- function(input, output, session) {
             growslide_numeric = as.numeric(gsub("[\\%,]", "", input$growslide))
             growslide_numeric = growslide_numeric / 100
             live$data$`Client growth percentage`[row_after_curr_mon] <- growslide_numeric
+            Composite_costs_multiplier_fn(row_after_curr_mon, live$data$`Overhead to revenue ratio`[row_after_curr_mon])
             Revenue_fn(row_after_curr_mon)
             Company_head_count_fn(row_after_curr_mon)
             Revenue_percent_change_fn(row_after_curr_mon)
@@ -123,12 +123,10 @@ server <- function(input, output, session) {
             Company_head_count_fn(row_after_curr_mon)
             Actual_labor_costs_fn(row_after_curr_mon)
             Revenue_per_head_fn(row_after_curr_mon)
-            Gross_profit_fn(row_after_curr_mon)
             Gross_margins_fn(row_after_curr_mon)
             Total_partner_pay_fn(row_after_curr_mon)
             Sales_and_marketing_costs_fn(row_after_curr_mon)
             
-            Composite_costs_multiplier_fn(row_after_curr_mon, live$data$`Overhead to revenue ratio`[row_after_curr_mon])
             Overhead_fn(row_after_curr_mon)
             Overhead_to_opex_fn(row_after_curr_mon)
             Net_profit_fn(row_after_curr_mon)
@@ -184,6 +182,7 @@ server <- function(input, output, session) {
           if(input$churn == "Custom"){
             live$data$`Churn percentage weighted by number of clients`[row_after_curr_mon] <-
               live$data$`Custom client churn`[row_after_curr_mon]
+            Composite_costs_multiplier_fn(row_after_curr_mon, live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
             Revenue_fn(row_after_curr_mon)
             Company_head_count_fn(row_after_curr_mon)
             Revenue_percent_change_fn(row_after_curr_mon)
@@ -199,7 +198,6 @@ server <- function(input, output, session) {
             Total_partner_pay_fn(row_after_curr_mon)
             Sales_and_marketing_costs_fn(row_after_curr_mon)
 
-            Composite_costs_multiplier_fn(row_after_curr_mon, live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
             Overhead_fn(row_after_curr_mon)
             Overhead_to_opex_fn(row_after_curr_mon)
             Net_profit_fn(row_after_curr_mon)
@@ -210,6 +208,7 @@ server <- function(input, output, session) {
             churn_numeric = as.numeric(gsub("[\\%,]", "", input$churn))
             churn_numeric = churn_numeric / 100
             live$data$`Churn percentage weighted by number of clients`[row_after_curr_mon] <- churn_numeric
+            Composite_costs_multiplier_fn(row_after_curr_mon, live$data$`Overhead to revenue ratio`[row_after_curr_mon])
             Revenue_fn(row_after_curr_mon)
             Company_head_count_fn(row_after_curr_mon)
             Revenue_percent_change_fn(row_after_curr_mon)
@@ -225,7 +224,6 @@ server <- function(input, output, session) {
             Total_partner_pay_fn(row_after_curr_mon)
             Sales_and_marketing_costs_fn(row_after_curr_mon)
 
-            Composite_costs_multiplier_fn(row_after_curr_mon, live$data$`Overhead to revenue ratio`[row_after_curr_mon])
             Overhead_fn(row_after_curr_mon)
             Overhead_to_opex_fn(row_after_curr_mon)
             Net_profit_fn(row_after_curr_mon)
@@ -236,23 +234,6 @@ server <- function(input, output, session) {
         }
       }
       i = i + 1
-    }
-  }, ignoreInit = TRUE)
-  
-  observeEvent(input$partbox, {
-    if(input$partbox == "Linear"){
-      updateSliderTextInput(session,
-                            inputId = "Partners",
-                            choices = c("Custom","1","2","3","4","5","6","7","8","9","10"),
-                            selected = "Custom"
-      )
-    }
-    else {
-      updateSliderTextInput(session,
-                            inputId = "Partners",
-                            choices = c("Custom", "0.1%", "0.5%", "1%", "2%", "3%", "5%", "7.5%", "10%", "15%", "20%", "25%", "50%"),
-                            selected = "Custom"
-      )
     }
   }, ignoreInit = TRUE)
   
@@ -273,22 +254,9 @@ server <- function(input, output, session) {
             Net_margins_fn(row_after_curr_mon)
             Cash_in_bank_fn(row_after_curr_mon)
           }
-          else if(input$partbox == "Linear"){
+          else {
             part_numeric = as.numeric(input$Partners)
             live$data$`Number of partners`[row_after_curr_mon] <- (live$data$`Number of partners`[row_after_curr_mon - 1] + part_numeric)
-            Composite_costs_multiplier_fn(row_after_curr_mon, live$data$`Overhead to revenue ratio`[row_after_curr_mon])
-            Company_head_count_fn(row_after_curr_mon)
-            Revenue_per_head_fn(row_after_curr_mon)
-            Total_partner_pay_fn(row_after_curr_mon)
-            Net_profit_fn(row_after_curr_mon)
-            Net_margins_fn(row_after_curr_mon)
-            Cash_in_bank_fn(row_after_curr_mon)
-          }
-          else if(input$partbox == "Exponential"){
-            part_per_numeric = as.numeric(gsub("[\\%,]", "", input$Partners))
-            part_per_numeric = part_per_numeric / 100
-            live$data$`Number of partners`[row_after_curr_mon] <-
-              round((live$data$`Number of partners`[row_after_curr_mon - 1] * (1 + part_per_numeric)), 0)
             Composite_costs_multiplier_fn(row_after_curr_mon, live$data$`Overhead to revenue ratio`[row_after_curr_mon])
             Company_head_count_fn(row_after_curr_mon)
             Revenue_per_head_fn(row_after_curr_mon)
@@ -435,7 +403,7 @@ server <- function(input, output, session) {
   output$grow_montext2 <- renderText({live$data$Month[input$grow_moSlider[2]]})
   
   observeEvent(input$grow_reload, {
-    MRT$data <- gs_read( gs_key("1K4hHyfnJhuWijJpDT6KRZtI1bLHlukTb4svKT4HKVeA"), ws = "Shiny sheet")
+    MRT$data <- gs_read( gs_key("14AmPkfN5b51fSBsT223khVg_gH9-lzl2WAtyWp9zEkc"), ws = "Shiny sheet")
     grow_live$data <- MRT$data
   }, ignoreNULL = TRUE)
   output$grow_clics <- renderText(input$grow_reload)
@@ -444,7 +412,6 @@ server <- function(input, output, session) {
     updateSliderTextInput(session, inputId = "grow_mCost", selected = isolate("Custom"))
     updateSliderTextInput(session, inputId = "grow_churn", selected = isolate("Custom"))
     updateSliderTextInput(session, inputId = "grow_Partners", selected = isolate("Custom"))
-    updateRadioButtons(session, inputId = "grow_partbox", selected = isolate("Linear"))
     updateSliderTextInput(session, inputId = "grow_auto", selected = isolate("Custom"))
   },ignoreInit = TRUE)
   
@@ -473,6 +440,8 @@ server <- function(input, output, session) {
         while(row_after_curr_mon <= nrow(MRT$data)){
           if(input$grow_growslide == "Custom"){
             grow_live$data$`Client growth percentage`[row_after_curr_mon] <- grow_live$data$`Custom client growth`[row_after_curr_mon]
+            Composite_costs_multiplier_growfn(row_after_curr_mon, 
+                                              grow_live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
             Revenue_growfn(row_after_curr_mon)
             Company_head_count_growfn(row_after_curr_mon)
             Revenue_percent_change_growfn(row_after_curr_mon)
@@ -483,13 +452,10 @@ server <- function(input, output, session) {
             Company_head_count_growfn(row_after_curr_mon)
             Actual_labor_costs_growfn(row_after_curr_mon)
             Revenue_per_head_growfn(row_after_curr_mon)
-            Gross_profit_growfn(row_after_curr_mon)
             Gross_margins_growfn(row_after_curr_mon)
             Total_partner_pay_growfn(row_after_curr_mon)
             Sales_and_marketing_costs_growfn(row_after_curr_mon)
             
-            Composite_costs_multiplier_growfn(row_after_curr_mon, 
-                                              grow_live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
             Overhead_growfn(row_after_curr_mon)
             Overhead_to_opex_growfn(row_after_curr_mon)
             Net_profit_growfn(row_after_curr_mon)
@@ -500,6 +466,7 @@ server <- function(input, output, session) {
             growslide_numeric = as.numeric(gsub("[\\%,]", "", input$grow_growslide))
             growslide_numeric = growslide_numeric / 100
             grow_live$data$`Client growth percentage`[row_after_curr_mon] <- growslide_numeric
+            Composite_costs_multiplier_growfn(row_after_curr_mon, grow_live$data$`Overhead to revenue ratio`[row_after_curr_mon])
             Revenue_growfn(row_after_curr_mon)
             Company_head_count_growfn(row_after_curr_mon)
             Revenue_percent_change_growfn(row_after_curr_mon)
@@ -510,12 +477,10 @@ server <- function(input, output, session) {
             Company_head_count_growfn(row_after_curr_mon)
             Actual_labor_costs_growfn(row_after_curr_mon)
             Revenue_per_head_growfn(row_after_curr_mon)
-            Gross_profit_growfn(row_after_curr_mon)
             Gross_margins_growfn(row_after_curr_mon)
             Total_partner_pay_growfn(row_after_curr_mon)
             Sales_and_marketing_costs_growfn(row_after_curr_mon)
             
-            Composite_costs_multiplier_growfn(row_after_curr_mon, grow_live$data$`Overhead to revenue ratio`[row_after_curr_mon])
             Overhead_growfn(row_after_curr_mon)
             Overhead_to_opex_growfn(row_after_curr_mon)
             Net_profit_growfn(row_after_curr_mon)
@@ -572,6 +537,8 @@ server <- function(input, output, session) {
           if(input$grow_churn == "Custom"){
             grow_live$data$`Churn percentage weighted by number of clients`[row_after_curr_mon] <-
               grow_live$data$`Custom client churn`[row_after_curr_mon]
+            Composite_costs_multiplier_growfn(row_after_curr_mon, 
+                                              grow_live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
             Revenue_growfn(row_after_curr_mon)
             Company_head_count_growfn(row_after_curr_mon)
             Revenue_percent_change_growfn(row_after_curr_mon)
@@ -587,8 +554,6 @@ server <- function(input, output, session) {
             Total_partner_pay_growfn(row_after_curr_mon)
             Sales_and_marketing_costs_growfn(row_after_curr_mon)
             
-            Composite_costs_multiplier_growfn(row_after_curr_mon, 
-                                              grow_live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
             Overhead_growfn(row_after_curr_mon)
             Overhead_to_opex_growfn(row_after_curr_mon)
             Net_profit_growfn(row_after_curr_mon)
@@ -599,6 +564,7 @@ server <- function(input, output, session) {
             churn_numeric = as.numeric(gsub("[\\%,]", "", input$grow_churn))
             churn_numeric = churn_numeric / 100
             grow_live$data$`Churn percentage weighted by number of clients`[row_after_curr_mon] <- churn_numeric
+            Composite_costs_multiplier_growfn(row_after_curr_mon, grow_live$data$`Overhead to revenue ratio`[row_after_curr_mon])
             Revenue_growfn(row_after_curr_mon)
             Company_head_count_growfn(row_after_curr_mon)
             Revenue_percent_change_growfn(row_after_curr_mon)
@@ -614,7 +580,6 @@ server <- function(input, output, session) {
             Total_partner_pay_growfn(row_after_curr_mon)
             Sales_and_marketing_costs_growfn(row_after_curr_mon)
             
-            Composite_costs_multiplier_growfn(row_after_curr_mon, grow_live$data$`Overhead to revenue ratio`[row_after_curr_mon])
             Overhead_growfn(row_after_curr_mon)
             Overhead_to_opex_growfn(row_after_curr_mon)
             Net_profit_growfn(row_after_curr_mon)
@@ -625,23 +590,6 @@ server <- function(input, output, session) {
         }
       }
       i = i + 1
-    }
-  }, ignoreInit = TRUE)
-  
-  observeEvent(input$grow_partbox, {
-    if(input$grow_partbox == "Linear"){
-      updateSliderTextInput(session,
-                            inputId = "grow_Partners",
-                            choices = c("Custom","1","2","3","4","5","6","7","8","9","10"),
-                            selected = "Custom"
-      )
-    }
-    else {
-      updateSliderTextInput(session,
-                            inputId = "grow_Partners",
-                            choices = c("Custom", "0.1%", "0.5%", "1%", "2%", "3%", "5%", "7.5%", "10%", "15%", "20%", "25%", "50%"),
-                            selected = "Custom"
-      )
     }
   }, ignoreInit = TRUE)
  
@@ -663,23 +611,10 @@ server <- function(input, output, session) {
             Net_margins_growfn(row_after_curr_mon)
             Cash_in_bank_growfn(row_after_curr_mon)
           }
-          else if(input$grow_partbox == "Linear"){
+          else{
             part_numeric = as.numeric(input$grow_Partners)
             grow_live$data$`Number of partners`[row_after_curr_mon] <- (grow_live$data$`Number of partners`[row_after_curr_mon - 1] + 
                                                                           part_numeric)
-            Composite_costs_multiplier_growfn(row_after_curr_mon, grow_live$data$`Overhead to revenue ratio`[row_after_curr_mon])
-            Company_head_count_growfn(row_after_curr_mon)
-            Revenue_per_head_growfn(row_after_curr_mon)
-            Total_partner_pay_growfn(row_after_curr_mon)
-            Net_profit_growfn(row_after_curr_mon)
-            Net_margins_growfn(row_after_curr_mon)
-            Cash_in_bank_growfn(row_after_curr_mon)
-          }
-          else if(input$grow_partbox == "Exponential"){
-            part_per_numeric = as.numeric(gsub("[\\%,]", "", input$grow_Partners))
-            part_per_numeric = part_per_numeric / 100
-            grow_live$data$`Number of partners`[row_after_curr_mon] <-
-              round((grow_live$data$`Number of partners`[row_after_curr_mon - 1] * (1 + part_per_numeric)), 0)
             Composite_costs_multiplier_growfn(row_after_curr_mon, grow_live$data$`Overhead to revenue ratio`[row_after_curr_mon])
             Company_head_count_growfn(row_after_curr_mon)
             Revenue_per_head_growfn(row_after_curr_mon)
@@ -833,13 +768,12 @@ server <- function(input, output, session) {
                     yvar = "Client_Percentage", 
                     colorvar = "Name",
                     sizevar = "Revenue",
-                    options=list(title = "Cohort Analysis of Clients", width = 850, height = 500,
+                    options=list(title = "Cohort Analysis of Clients", width = 800, height = 550,
                                  colors = "['b8e986', '8497e5', 'Grey']",
                                  hAxis="{title:'Client Percentage Weighted by Dollar Value'}",
                                  vAxis="{title:'Client Percentage'}")
     )
   })
-  
   
   
   ################################################################################################################################### 
@@ -871,7 +805,7 @@ server <- function(input, output, session) {
   output$part_montext2 <- renderText({live$data$Month[input$part_moSlider[2]]})
   
   observeEvent(input$part_reload, {
-    MRT$data <- gs_read( gs_key("1K4hHyfnJhuWijJpDT6KRZtI1bLHlukTb4svKT4HKVeA"), ws = "Shiny sheet")
+    MRT$data <- gs_read( gs_key("14AmPkfN5b51fSBsT223khVg_gH9-lzl2WAtyWp9zEkc"), ws = "Shiny sheet")
     part_live$data <- MRT$data
   }, ignoreNULL = TRUE)
   output$part_clics <- renderText(input$part_reload)
@@ -880,7 +814,6 @@ server <- function(input, output, session) {
     updateSliderTextInput(session, inputId = "part_mCost", selected = isolate("Custom"))
     updateSliderTextInput(session, inputId = "part_churn", selected = isolate("Custom"))
     updateSliderTextInput(session, inputId = "part_Partners", selected = isolate("Custom"))
-    updateRadioButtons(session, inputId = "part_partbox", selected = isolate("Linear"))
     updateSliderTextInput(session, inputId = "part_auto", selected = isolate("Custom"))
   },ignoreInit = TRUE) 
   
@@ -908,6 +841,8 @@ server <- function(input, output, session) {
         while(row_after_curr_mon <= nrow(MRT$data)){
           if(input$part_growslide == "Custom"){
             part_live$data$`Client growth percentage`[row_after_curr_mon] <- part_live$data$`Custom client growth`[row_after_curr_mon]
+            Composite_costs_multiplier_partfn(row_after_curr_mon, 
+                                              part_live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
             Revenue_partfn(row_after_curr_mon)
             Company_head_count_partfn(row_after_curr_mon)
             Revenue_percent_change_partfn(row_after_curr_mon)
@@ -918,13 +853,10 @@ server <- function(input, output, session) {
             Company_head_count_partfn(row_after_curr_mon)
             Actual_labor_costs_partfn(row_after_curr_mon)
             Revenue_per_head_partfn(row_after_curr_mon)
-            Gross_profit_partfn(row_after_curr_mon)
             Gross_margins_partfn(row_after_curr_mon)
             Total_partner_pay_partfn(row_after_curr_mon)
             Sales_and_marketing_costs_partfn(row_after_curr_mon)
             
-            Composite_costs_multiplier_partfn(row_after_curr_mon, 
-                                              part_live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
             Overhead_partfn(row_after_curr_mon)
             Overhead_to_opex_partfn(row_after_curr_mon)
             Net_profit_partfn(row_after_curr_mon)
@@ -935,6 +867,7 @@ server <- function(input, output, session) {
             growslide_numeric = as.numeric(gsub("[\\%,]", "", input$part_growslide))
             growslide_numeric = growslide_numeric / 100
             part_live$data$`Client growth percentage`[row_after_curr_mon] <- growslide_numeric
+            Composite_costs_multiplier_partfn(row_after_curr_mon, part_live$data$`Overhead to revenue ratio`[row_after_curr_mon])
             Revenue_partfn(row_after_curr_mon)
             Company_head_count_partfn(row_after_curr_mon)
             Revenue_percent_change_partfn(row_after_curr_mon)
@@ -945,12 +878,10 @@ server <- function(input, output, session) {
             Company_head_count_partfn(row_after_curr_mon)
             Actual_labor_costs_partfn(row_after_curr_mon)
             Revenue_per_head_partfn(row_after_curr_mon)
-            Gross_profit_partfn(row_after_curr_mon)
             Gross_margins_partfn(row_after_curr_mon)
             Total_partner_pay_partfn(row_after_curr_mon)
             Sales_and_marketing_costs_partfn(row_after_curr_mon)
             
-            Composite_costs_multiplier_partfn(row_after_curr_mon, part_live$data$`Overhead to revenue ratio`[row_after_curr_mon])
             Overhead_partfn(row_after_curr_mon)
             Overhead_to_opex_partfn(row_after_curr_mon)
             Net_profit_partfn(row_after_curr_mon)
@@ -1007,6 +938,8 @@ server <- function(input, output, session) {
           if(input$part_churn == "Custom"){
             part_live$data$`Churn percentage weighted by number of clients`[row_after_curr_mon] <-
               part_live$data$`Custom client churn`[row_after_curr_mon]
+            Composite_costs_multiplier_partfn(row_after_curr_mon, 
+                                              part_live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
             Revenue_partfn(row_after_curr_mon)
             Company_head_count_partfn(row_after_curr_mon)
             Revenue_percent_change_partfn(row_after_curr_mon)
@@ -1022,8 +955,6 @@ server <- function(input, output, session) {
             Total_partner_pay_partfn(row_after_curr_mon)
             Sales_and_marketing_costs_partfn(row_after_curr_mon)
             
-            Composite_costs_multiplier_partfn(row_after_curr_mon, 
-                                              part_live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
             Overhead_partfn(row_after_curr_mon)
             Overhead_to_opex_partfn(row_after_curr_mon)
             Net_profit_partfn(row_after_curr_mon)
@@ -1034,6 +965,7 @@ server <- function(input, output, session) {
             churn_numeric = as.numeric(gsub("[\\%,]", "", input$part_churn))
             churn_numeric = churn_numeric / 100
             part_live$data$`Churn percentage weighted by number of clients`[row_after_curr_mon] <- churn_numeric
+            Composite_costs_multiplier_partfn(row_after_curr_mon, part_live$data$`Overhead to revenue ratio`[row_after_curr_mon])
             Revenue_partfn(row_after_curr_mon)
             Company_head_count_partfn(row_after_curr_mon)
             Revenue_percent_change_partfn(row_after_curr_mon)
@@ -1049,7 +981,6 @@ server <- function(input, output, session) {
             Total_partner_pay_partfn(row_after_curr_mon)
             Sales_and_marketing_costs_partfn(row_after_curr_mon)
             
-            Composite_costs_multiplier_partfn(row_after_curr_mon, part_live$data$`Overhead to revenue ratio`[row_after_curr_mon])
             Overhead_partfn(row_after_curr_mon)
             Overhead_to_opex_partfn(row_after_curr_mon)
             Net_profit_partfn(row_after_curr_mon)
@@ -1060,23 +991,6 @@ server <- function(input, output, session) {
         }
       }
       i = i + 1
-    }
-  }, ignoreInit = TRUE)
-  
-  observeEvent(input$part_partbox, {
-    if(input$part_partbox == "Linear"){
-      updateSliderTextInput(session,
-                            inputId = "part_Partners",
-                            choices = c("Custom","1","2","3","4","5","6","7","8","9","10"),
-                            selected = "Custom"
-      )
-    }
-    else {
-      updateSliderTextInput(session,
-                            inputId = "part_Partners",
-                            choices = c("Custom", "0.1%", "0.5%", "1%", "2%", "3%", "5%", "7.5%", "10%", "15%", "20%", "25%", "50%"),
-                            selected = "Custom"
-      )
     }
   }, ignoreInit = TRUE)
   
@@ -1097,23 +1011,10 @@ server <- function(input, output, session) {
             Net_margins_partfn(row_after_curr_mon)
             Cash_in_bank_partfn(row_after_curr_mon)
           }
-          else if(input$part_partbox == "Linear"){
+          else{
             part_numeric = as.numeric(input$part_Partners)
             part_live$data$`Number of partners`[row_after_curr_mon] <- (part_live$data$`Number of partners`[row_after_curr_mon - 1] + 
                                                                           part_numeric)
-            Composite_costs_multiplier_partfn(row_after_curr_mon, part_live$data$`Overhead to revenue ratio`[row_after_curr_mon])
-            Company_head_count_partfn(row_after_curr_mon)
-            Revenue_per_head_partfn(row_after_curr_mon)
-            Total_partner_pay_partfn(row_after_curr_mon)
-            Net_profit_partfn(row_after_curr_mon)
-            Net_margins_partfn(row_after_curr_mon)
-            Cash_in_bank_partfn(row_after_curr_mon)
-          }
-          else if(input$part_partbox == "Exponential"){
-            part_per_numeric = as.numeric(gsub("[\\%,]", "", input$part_Partners))
-            part_per_numeric = part_per_numeric / 100
-            part_live$data$`Number of partners`[row_after_curr_mon] <-
-              round((part_live$data$`Number of partners`[row_after_curr_mon - 1] * (1 + part_per_numeric)), 0)
             Composite_costs_multiplier_partfn(row_after_curr_mon, part_live$data$`Overhead to revenue ratio`[row_after_curr_mon])
             Company_head_count_partfn(row_after_curr_mon)
             Revenue_per_head_partfn(row_after_curr_mon)
@@ -1667,7 +1568,7 @@ server <- function(input, output, session) {
   #######################################Table##############################################
   
   output$table <-renderGvis({
-    gvisTable(MRT$data, options = list(frozenColumns = 1))
+    gvisTable(grow_live$data, options = list(frozenColumns = 1))
   })
 }
   
