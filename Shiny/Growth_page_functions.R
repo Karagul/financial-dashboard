@@ -295,6 +295,16 @@ Number_of_RRRs_invisible_decides_to_employ_this_month_growfn <- function(index){
     (grow_live$data$`Avg hrs per week per RRR`[index] * 4.35)
 }
 
+Actual_client_hrs_RRRs_worked_growfn <- function(index){
+  grow_live$data$`Actual client hrs RRRs worked`[index] <- Billable_RRR_hrs_growfn(index) * 
+    grow_live$data$`Reduction in agent task completion times relative to price benchmark`[index]
+}
+
+Billable_RRR_hrs_growfn <- function(index) {
+  grow_live$data$`Billable RRR hrs`[index] <- Enterprise_monthly_assistant_hrs_growfn(index) + Small_business_monthly_assistant_hrs_growfn(index) + 
+    Personal_monthly_assistant_hrs_growfn(index)
+}
+
 ############Number of specialists invisible decides to employ this month
 Number_of_specialists_invisible_decides_to_employ_this_month_growfn <- function(index){
   grow_live$data$`Number of specialists invisible decides to employ this month`[index] <-
@@ -332,8 +342,8 @@ Billable_strategist_hrs_growfn <- function(index){
 #13##############Actual Labor Costs###############
 Actual_labor_costs_growfn <- function(index){
   grow_live$data$`Actual labor costs`[index] <- Expected_operator_labor_costs_growfn(index) + 
-    Expected_RRR_labor_costs_for_assistants_growfn(index) + Expected_specialist_labor_costs_growfn(index)
-  + Expected_strategist_labor_costs_growfn(index)
+    Expected_RRR_labor_costs_for_assistants_growfn(index) + Expected_specialist_labor_costs_growfn(index) + 
+    Expected_strategist_labor_costs_growfn(index)
 }
 ###############Expected operator labor costs
 Expected_operator_labor_costs_growfn <- function(index){
@@ -345,29 +355,19 @@ Expected_operator_labor_costs_growfn <- function(index){
 
 ################Expected RRR labor costs for assistants
 Expected_RRR_labor_costs_for_assistants_growfn <- function(index){
-  grow_live$data$`Expected RRR labor costs for assistants`[index] <- Actual_client_hours_RRRs_worked_growfn(index) * 
+  grow_live$data$`Expected RRR labor costs for assistants`[index] <- Actual_client_hrs_RRRs_worked_growfn(index) * 
     grow_live$data$`Avg RRR rate working for clients at 20 dollars per hr`[index]
-}
-
-Actual_client_hrs_RRRs_worked_growfn <- function(index){
-  grow_live$data$`Actual client hrs RRRs worked`[index] <- Billable_RRR_hrs_growfn(index) * 
-    grow_live$data$`Reduction in agent task completion times relative to price benchmark`[index]
-}
-
-Billable_RRR_hrs_growfn <- function(index) {
-  grow_live$data$`Billable RRR hrs`[index] <- Enterprise_monthly_assistant_hrs_growfn(index) + Small_business_monthly_assistant_hrs_growfn(index) + 
-    Personal_monthly_assistant_hrs_growfn(index)
 }
 
 ###################Expected specialist labor costs
 Expected_specialist_labor_costs_growfn <- function(index){
-  grow_live$data$`Expected_specialist_labor_costs`[index] <- ((Actual_client_hrs_specialists_worked_growfn(index) *
+  grow_live$data$`Expected specialist labor costs`[index] <- ((Actual_client_hrs_specialists_worked_growfn(index) *
                                                             grow_live$data$`Avg specialist rate`[index]))
 }
 
 ###################Expected strategist labor costs
 Expected_strategist_labor_costs_growfn <- function(index){
-  grow_live$data$`Expected_strategist_labor_costs`[index] <- ((Actual_client_hrs_strategists_worked_growfn(index) *
+  grow_live$data$`Expected strategist labor costs`[index] <- ((Actual_client_hrs_strategists_worked_growfn(index) *
                                                             grow_live$data$`Avg strategist rate`[index]))
 }
 
@@ -390,33 +390,69 @@ Gross_margins_growfn <- function(index){
 }
 
 #18######################Total Partner pay########## used in client growth slider
+# Total_partner_pay_growfn <- function(index){
+#   grow_live$data$`Total partner pay`[index] <- grow_live$data$`Number of partners`[index] * Avg_partner_salary_growfn(index)
+# }
+# 
+# Avg_partner_salary_growfn <- function(index){
+#   grow_live$data$`Avg partner salary`[index] <-  grow_live$data$`Avg salary cap per partner`[index] + Avg_dollars_shy_of_partner_salary_cap_growfn(index)
+# }
+# 
+# Avg_dollars_shy_of_partner_salary_cap_growfn <- function(index){
+#   if((Gross_margins_split_pre_partner_pay_growfn(index) - grow_live$data$`Avg salary cap per partner`[index]) > 0){
+#     grow_live$data$`Avg dollars shy of partner salary cap`[index] = 0
+#   }
+#   else {
+#   grow_live$data$`Avg dollars shy of partner salary cap`[index] <- Gross_margins_split_pre_partner_pay_growfn(index) -
+#     grow_live$data$`Avg salary cap per partner`[index]
+#   }
+# }
+# 
+# Gross_margins_split_pre_partner_pay_growfn <- function(index){
+#   grow_live$data$`Gross margins split pre partner pay`[index] <- Gross_profit_growfn(index) / grow_live$data$`Number of partners`[index]
+# }
+
+###############Question???????????????????
 Total_partner_pay_growfn <- function(index){
   grow_live$data$`Total partner pay`[index] <- grow_live$data$`Number of partners`[index] * Avg_partner_salary_growfn(index)
 }
 
 Avg_partner_salary_growfn <- function(index){
-  grow_live$data$`Avg partner salary`[index] <-  grow_live$data$`Avg salary cap per partner`[index] + Avg_dollars_shy_of_partner_salary_cap_growfn(index)
+  grow_live$data$`Avg partner salary`[index] <-  grow_live$data$`Avg salary cap per partner`[index] + 
+    grow_live$data$`Avg dollars shy of partner salary cap`[index]
 }
 
-Avg_dollars_shy_of_partner_salary_cap_growfn <- function(index){
-  if(Gross_margins_split_pre_partner_pay_growfn(index) - grow_live$data$`Avg salary cap per partner`[index] > 0){
-    grow_live$data$`Avg dollars shy of partner salary cap`[index] = 0
-  }
-  else {
-    grow_live$data$`Avg dollars shy of partner salary cap`[index] <- Gross_margins_split_pre_partner_pay_growfn(index) -
-      grow_live$data$`Avg salary cap per partner`[index]
-  }
-}
 
-Gross_margins_split_pre_partner_pay_growfn <- function(index){
-  grow_live$data$`Gross margins split pre partner pay`[index] <- Gross_profit_growfn(index) / grow_live$data$`Number of partners`[index]
-}
 
-################FIXX##########
 #20#####################Sales and marketing costs
 Sales_and_marketing_costs_growfn <- function(index){
-  grow_live$data$`Sales and marketing costs`[index] <- grow_live$data$Revenue[index] * grow_live$data$`Percent commission`[index]
+  grow_live$data$`Sales and marketing costs`[index] <- Commissions_growfn(index) + Growth_software_costs_growfn(index) + Advertising_costs_growfn(index) + 
+    Sales_agents_growfn(index) + Invisible_sales_processes_growfn(index)
 }
+
+Commissions_growfn <- function(index){
+  grow_live$data$`Commissions`[index] <- grow_live$data$Revenue[index] * grow_live$data$`Percent commission`[index]
+}
+
+Growth_software_costs_growfn <- function(index){
+  grow_live$data$`Growth software`[index] <-grow_live$data$`Growth software`[index - 1] * 
+    (1 + grow_live$data$`Composite costs multiplier`[index])
+}
+
+Advertising_costs_growfn <- function(index){
+  grow_live$data$`Advertising costs`[index] <-grow_live$data$`Advertising costs`[index - 1] * 
+    (1 + grow_live$data$`Composite costs multiplier`[index])
+}
+Sales_agents_growfn <- function(index){
+  grow_live$data$`Sales agents`[index] <-grow_live$data$`Sales agents`[index - 1] * 
+    (1 + grow_live$data$`Composite costs multiplier`[index])
+}
+Invisible_sales_processes_growfn <- function(index){
+  grow_live$data$`Invisible sales processes`[index] <-grow_live$data$`Invisible sales processes`[index - 1] * 
+    (1 + grow_live$data$`Composite costs multiplier`[index])
+}
+
+
 
 #21####################Subscrption costs
 Additional_subscription_costs_growfn <- function(index){
@@ -484,9 +520,10 @@ Cash_in_bank_growfn <- function(index){
 
 
 #31######################Burn
+###############PArtner Bonuses?????????????????
 
 Burn_growfn <- function(index){
-  grow_live$data$Burn[index] <- Partner_bonuses_growfn(index) + Sales_and_marketing_costs_growfn(index) + Additional_subscription_costs_growfn(index) + 
+  grow_live$data$Burn[index] <- grow_live$data$`Partner bonuses`[index] + Sales_and_marketing_costs_growfn(index) + Additional_subscription_costs_growfn(index) + 
     Total_R_and_D_costs_growfn(index) + BD_costs_growfn(index) + Discretionary_spending_growfn(index)
 }
 

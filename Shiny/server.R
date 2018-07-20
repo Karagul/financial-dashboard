@@ -64,14 +64,14 @@ server <- function(input, output, session) {
   #bottom page table
   observeEvent(input$newTable, {
     output$main_table <-renderGvis({
-      gvisTable(live$data[,c("Month","Revenue", "Revenue percent change", "Total clients", "Total monthly ARPA", 
+      gvisTable(live$data[,c("Month","Revenue", "Revenue percent change", "Total clients", "Total monthly ARPA",
                           "Churn percentage weighted by number of clients","Client growth after churn", "Avg Customer Lifetime (months)",
                           "Company head count", "Number of agents", "Labor costs", "Revenue per head", "Gross profit",
-                          "Gross margins", "Automation multiplier", "Number of partners", "Total partner pay", "Partner bonuses", 
-                          "Sales and marketing costs", "Additional subscription costs", "Total R and D costs", "BD costs", 
-                          "Discretionary spending", "Overhead","Overhead to opex", "Net profit", "Net margins", "CLTV", 
+                          "Gross margins", "Automation multiplier", "Number of partners", "Total partner pay", "Partner bonuses",
+                          "Sales and marketing costs", "Additional subscription costs", "Total R and D costs", "BD costs",
+                          "Discretionary spending", "Overhead","Overhead to opex", "Net profit", "Net margins", "CLTV",
                           "CAC", "CLTV to CAC ratio", "Funds raised", "Cash in bank")])
-    })
+      })
   }, ignoreNULL = TRUE)
   
   #Effects the slider for the client growth slider
@@ -263,25 +263,23 @@ server <- function(input, output, session) {
           if(input$Partners == "Custom"){
             live$data$`Number of partners`[row_after_curr_mon] <- live$data$`Custom number of partners`[row_after_curr_mon]
             Composite_costs_multiplier_fn(row_after_curr_mon, live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
-            Overhead_fn(row_after_curr_mon)
-            Overhead_to_opex_fn(row_after_curr_mon)
+            Company_head_count_fn(row_after_curr_mon)
+            Revenue_per_head_fn(row_after_curr_mon)
+            Total_partner_pay_fn(row_after_curr_mon)
             Net_profit_fn(row_after_curr_mon)
             Net_margins_fn(row_after_curr_mon)
             Cash_in_bank_fn(row_after_curr_mon)
-            Company_head_count_fn(row_after_curr_mon)
-            Revenue_per_head_fn(row_after_curr_mon)
           }
           else if(input$partbox == "Linear"){
             part_numeric = as.numeric(input$Partners)
             live$data$`Number of partners`[row_after_curr_mon] <- (live$data$`Number of partners`[row_after_curr_mon - 1] + part_numeric)
             Composite_costs_multiplier_fn(row_after_curr_mon, live$data$`Overhead to revenue ratio`[row_after_curr_mon])
-            Overhead_fn(row_after_curr_mon)
-            Overhead_to_opex_fn(row_after_curr_mon)
+            Company_head_count_fn(row_after_curr_mon)
+            Revenue_per_head_fn(row_after_curr_mon)
+            Total_partner_pay_fn(row_after_curr_mon)
             Net_profit_fn(row_after_curr_mon)
             Net_margins_fn(row_after_curr_mon)
             Cash_in_bank_fn(row_after_curr_mon)
-            Company_head_count_fn(row_after_curr_mon)
-            Revenue_per_head_fn(row_after_curr_mon)
           }
           else if(input$partbox == "Exponential"){
             part_per_numeric = as.numeric(gsub("[\\%,]", "", input$Partners))
@@ -289,13 +287,12 @@ server <- function(input, output, session) {
             live$data$`Number of partners`[row_after_curr_mon] <-
               round((live$data$`Number of partners`[row_after_curr_mon - 1] * (1 + part_per_numeric)), 0)
             Composite_costs_multiplier_fn(row_after_curr_mon, live$data$`Overhead to revenue ratio`[row_after_curr_mon])
-            Overhead_fn(row_after_curr_mon)
-            Overhead_to_opex_fn(row_after_curr_mon)
+            Company_head_count_fn(row_after_curr_mon)
+            Revenue_per_head_fn(row_after_curr_mon)
+            Total_partner_pay_fn(row_after_curr_mon)
             Net_profit_fn(row_after_curr_mon)
             Net_margins_fn(row_after_curr_mon)
             Cash_in_bank_fn(row_after_curr_mon)
-            Company_head_count_fn(row_after_curr_mon)
-            Revenue_per_head_fn(row_after_curr_mon)
           }
           row_after_curr_mon = row_after_curr_mon + 1
         }
@@ -312,11 +309,18 @@ server <- function(input, output, session) {
         while(row_after_curr_mon <= nrow(MRT$data)){
           if(input$auto == "Custom"){
             live$data$`Automation multiplier`[row_after_curr_mon] <- live$data$`Custom automation multiplier`[row_after_curr_mon]
-            live$data$`Reduction in agent task completion times relative to price benchmark`[row_after_curr_mon] <- 1 / 
+            live$data$`Reduction in agent task completion times relative to price benchmark`[row_after_curr_mon] <- 
               live$data$`Automation multiplier`[row_after_curr_mon]
+            Composite_costs_multiplier_fn(row_after_curr_mon, live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
+            Company_head_count_fn(row_after_curr_mon)
             Actual_labor_costs_fn(row_after_curr_mon)
+            Revenue_per_head_fn(row_after_curr_mon)
             Overhead_to_opex_fn(row_after_curr_mon)
             Gross_margins_fn(row_after_curr_mon)
+            Net_profit_fn(row_after_curr_mon)
+            Net_margins_fn(row_after_curr_mon)
+            Cash_in_bank_fn(row_after_curr_mon)
+            
           }
           else {
             auto_numeric = as.numeric(gsub("[\\%,]", "", input$auto))
@@ -325,9 +329,15 @@ server <- function(input, output, session) {
               (1 + auto_numeric)
             live$data$`Reduction in agent task completion times relative to price benchmark`[row_after_curr_mon] <- 1 / 
               live$data$`Automation multiplier`[row_after_curr_mon]
+            Composite_costs_multiplier_fn(row_after_curr_mon, live$data$`Overhead to revenue ratio`[row_after_curr_mon])
+            Company_head_count_fn(row_after_curr_mon)
             Actual_labor_costs_fn(row_after_curr_mon)
+            Revenue_per_head_fn(row_after_curr_mon)
             Overhead_to_opex_fn(row_after_curr_mon)
             Gross_margins_fn(row_after_curr_mon)
+            Net_profit_fn(row_after_curr_mon)
+            Net_margins_fn(row_after_curr_mon)
+            Cash_in_bank_fn(row_after_curr_mon)
           }
           row_after_curr_mon = row_after_curr_mon + 1
         }
@@ -640,26 +650,24 @@ server <- function(input, output, session) {
             grow_live$data$`Number of partners`[row_after_curr_mon] <- grow_live$data$`Custom number of partners`[row_after_curr_mon]
             Composite_costs_multiplier_growfn(row_after_curr_mon, 
                                               grow_live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
-            Overhead_growfn(row_after_curr_mon)
-            Overhead_to_opex_growfn(row_after_curr_mon)
+            Company_head_count_growfn(row_after_curr_mon)
+            Revenue_per_head_growfn(row_after_curr_mon)
+            Total_partner_pay_growfn(row_after_curr_mon)
             Net_profit_growfn(row_after_curr_mon)
             Net_margins_growfn(row_after_curr_mon)
             Cash_in_bank_growfn(row_after_curr_mon)
-            Company_head_count_growfn(row_after_curr_mon)
-            Revenue_per_head_growfn(row_after_curr_mon)
           }
           else if(input$grow_partbox == "Linear"){
             part_numeric = as.numeric(input$grow_Partners)
             grow_live$data$`Number of partners`[row_after_curr_mon] <- (grow_live$data$`Number of partners`[row_after_curr_mon - 1] + 
                                                                           part_numeric)
             Composite_costs_multiplier_growfn(row_after_curr_mon, grow_live$data$`Overhead to revenue ratio`[row_after_curr_mon])
-            Overhead_growfn(row_after_curr_mon)
-            Overhead_to_opex_growfn(row_after_curr_mon)
+            Company_head_count_growfn(row_after_curr_mon)
+            Revenue_per_head_growfn(row_after_curr_mon)
+            Total_partner_pay_growfn(row_after_curr_mon)
             Net_profit_growfn(row_after_curr_mon)
             Net_margins_growfn(row_after_curr_mon)
             Cash_in_bank_growfn(row_after_curr_mon)
-            Company_head_count_growfn(row_after_curr_mon)
-            Revenue_per_head_growfn(row_after_curr_mon)
           }
           else if(input$grow_partbox == "Exponential"){
             part_per_numeric = as.numeric(gsub("[\\%,]", "", input$grow_Partners))
@@ -667,13 +675,12 @@ server <- function(input, output, session) {
             grow_live$data$`Number of partners`[row_after_curr_mon] <-
               round((grow_live$data$`Number of partners`[row_after_curr_mon - 1] * (1 + part_per_numeric)), 0)
             Composite_costs_multiplier_growfn(row_after_curr_mon, grow_live$data$`Overhead to revenue ratio`[row_after_curr_mon])
-            Overhead_growfn(row_after_curr_mon)
-            Overhead_to_opex_growfn(row_after_curr_mon)
+            Company_head_count_growfn(row_after_curr_mon)
+            Revenue_per_head_growfn(row_after_curr_mon)
+            Total_partner_pay_growfn(row_after_curr_mon)
             Net_profit_growfn(row_after_curr_mon)
             Net_margins_growfn(row_after_curr_mon)
             Cash_in_bank_growfn(row_after_curr_mon)
-            Company_head_count_growfn(row_after_curr_mon)
-            Revenue_per_head_growfn(row_after_curr_mon)
           }
           row_after_curr_mon = row_after_curr_mon + 1
         }
@@ -690,11 +697,17 @@ server <- function(input, output, session) {
         while(row_after_curr_mon <= nrow(MRT$data)){
           if(input$grow_auto == "Custom"){
             grow_live$data$`Automation multiplier`[row_after_curr_mon] <- grow_live$data$`Custom automation multiplier`[row_after_curr_mon]
-            grow_live$data$`Reduction in agent task completion times relative to price benchmark`[row_after_curr_mon] <- 1 / 
+            grow_live$data$`Reduction in agent task completion times relative to price benchmark`[row_after_curr_mon] <- 
               grow_live$data$`Automation multiplier`[row_after_curr_mon]
+            Composite_costs_multiplier_growfn(row_after_curr_mon, grow_live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
+            Company_head_count_growfn(row_after_curr_mon)
             Actual_labor_costs_growfn(row_after_curr_mon)
+            Revenue_per_head_growfn(row_after_curr_mon)
             Overhead_to_opex_growfn(row_after_curr_mon)
             Gross_margins_growfn(row_after_curr_mon)
+            Net_profit_growfn(row_after_curr_mon)
+            Net_margins_growfn(row_after_curr_mon)
+            Cash_in_bank_growfn(row_after_curr_mon)
           }
           else {
             auto_numeric = as.numeric(gsub("[\\%,]", "", input$grow_auto))
@@ -703,9 +716,15 @@ server <- function(input, output, session) {
               (1 + auto_numeric)
             grow_live$data$`Reduction in agent task completion times relative to price benchmark`[row_after_curr_mon] <- 1 / 
               grow_live$data$`Automation multiplier`[row_after_curr_mon]
+            Composite_costs_multiplier_growfn(row_after_curr_mon, grow_live$data$`Overhead to revenue ratio`[row_after_curr_mon])
+            Company_head_count_growfn(row_after_curr_mon)
             Actual_labor_costs_growfn(row_after_curr_mon)
+            Revenue_per_head_growfn(row_after_curr_mon)
             Overhead_to_opex_growfn(row_after_curr_mon)
             Gross_margins_growfn(row_after_curr_mon)
+            Net_profit_growfn(row_after_curr_mon)
+            Net_margins_growfn(row_after_curr_mon)
+            Cash_in_bank_growfn(row_after_curr_mon)
           }
           row_after_curr_mon = row_after_curr_mon + 1
         }
@@ -1071,26 +1090,24 @@ server <- function(input, output, session) {
             part_live$data$`Number of partners`[row_after_curr_mon] <- part_live$data$`Custom number of partners`[row_after_curr_mon]
             Composite_costs_multiplier_partfn(row_after_curr_mon, 
                                               part_live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
-            Overhead_partfn(row_after_curr_mon)
-            Overhead_to_opex_partfn(row_after_curr_mon)
+            Company_head_count_partfn(row_after_curr_mon)
+            Revenue_per_head_partfn(row_after_curr_mon)
+            Total_partner_pay_partfn(row_after_curr_mon)
             Net_profit_partfn(row_after_curr_mon)
             Net_margins_partfn(row_after_curr_mon)
             Cash_in_bank_partfn(row_after_curr_mon)
-            Company_head_count_partfn(row_after_curr_mon)
-            Revenue_per_head_partfn(row_after_curr_mon)
           }
           else if(input$part_partbox == "Linear"){
             part_numeric = as.numeric(input$part_Partners)
             part_live$data$`Number of partners`[row_after_curr_mon] <- (part_live$data$`Number of partners`[row_after_curr_mon - 1] + 
                                                                           part_numeric)
             Composite_costs_multiplier_partfn(row_after_curr_mon, part_live$data$`Overhead to revenue ratio`[row_after_curr_mon])
-            Overhead_partfn(row_after_curr_mon)
-            Overhead_to_opex_partfn(row_after_curr_mon)
+            Company_head_count_partfn(row_after_curr_mon)
+            Revenue_per_head_partfn(row_after_curr_mon)
+            Total_partner_pay_partfn(row_after_curr_mon)
             Net_profit_partfn(row_after_curr_mon)
             Net_margins_partfn(row_after_curr_mon)
             Cash_in_bank_partfn(row_after_curr_mon)
-            Company_head_count_partfn(row_after_curr_mon)
-            Revenue_per_head_partfn(row_after_curr_mon)
           }
           else if(input$part_partbox == "Exponential"){
             part_per_numeric = as.numeric(gsub("[\\%,]", "", input$part_Partners))
@@ -1098,13 +1115,12 @@ server <- function(input, output, session) {
             part_live$data$`Number of partners`[row_after_curr_mon] <-
               round((part_live$data$`Number of partners`[row_after_curr_mon - 1] * (1 + part_per_numeric)), 0)
             Composite_costs_multiplier_partfn(row_after_curr_mon, part_live$data$`Overhead to revenue ratio`[row_after_curr_mon])
-            Overhead_partfn(row_after_curr_mon)
-            Overhead_to_opex_partfn(row_after_curr_mon)
+            Company_head_count_partfn(row_after_curr_mon)
+            Revenue_per_head_partfn(row_after_curr_mon)
+            Total_partner_pay_partfn(row_after_curr_mon)
             Net_profit_partfn(row_after_curr_mon)
             Net_margins_partfn(row_after_curr_mon)
             Cash_in_bank_partfn(row_after_curr_mon)
-            Company_head_count_partfn(row_after_curr_mon)
-            Revenue_per_head_partfn(row_after_curr_mon)
           }
           row_after_curr_mon = row_after_curr_mon + 1
         }
@@ -1121,11 +1137,17 @@ server <- function(input, output, session) {
         while(row_after_curr_mon <= nrow(MRT$data)){
           if(input$part_auto == "Custom"){
             part_live$data$`Automation multiplier`[row_after_curr_mon] <- part_live$data$`Custom automation multiplier`[row_after_curr_mon]
-            part_live$data$`Reduction in agent task completion times relative to price benchmark`[row_after_curr_mon] <- 1 / 
+            part_live$data$`Reduction in agent task completion times relative to price benchmark`[row_after_curr_mon] <- 
               part_live$data$`Automation multiplier`[row_after_curr_mon]
+            Composite_costs_multiplier_partfn(row_after_curr_mon, part_live$data$`Overhead to revenue growth ratio`[row_after_curr_mon])
+            Company_head_count_partfn(row_after_curr_mon)
             Actual_labor_costs_partfn(row_after_curr_mon)
+            Revenue_per_head_partfn(row_after_curr_mon)
             Overhead_to_opex_partfn(row_after_curr_mon)
             Gross_margins_partfn(row_after_curr_mon)
+            Net_profit_partfn(row_after_curr_mon)
+            Net_margins_partfn(row_after_curr_mon)
+            Cash_in_bank_partfn(row_after_curr_mon)
           }
           else {
             auto_numeric = as.numeric(gsub("[\\%,]", "", input$part_auto))
@@ -1134,9 +1156,15 @@ server <- function(input, output, session) {
               (1 + auto_numeric)
             part_live$data$`Reduction in agent task completion times relative to price benchmark`[row_after_curr_mon] <- 1 / 
               part_live$data$`Automation multiplier`[row_after_curr_mon]
+            Composite_costs_multiplier_partfn(row_after_curr_mon, part_live$data$`Overhead to revenue ratio`[row_after_curr_mon])
+            Company_head_count_partfn(row_after_curr_mon)
             Actual_labor_costs_partfn(row_after_curr_mon)
+            Revenue_per_head_partfn(row_after_curr_mon)
             Overhead_to_opex_partfn(row_after_curr_mon)
             Gross_margins_partfn(row_after_curr_mon)
+            Net_profit_partfn(row_after_curr_mon)
+            Net_margins_partfn(row_after_curr_mon)
+            Cash_in_bank_partfn(row_after_curr_mon)
           }
           row_after_curr_mon = row_after_curr_mon + 1
         }
@@ -1246,22 +1274,391 @@ server <- function(input, output, session) {
   
   ########################################Functional mapping#######################################################
   output$funcmap <-renderGvis({
-    df=data.frame(From = c('Revenue',
+    df=data.frame(From = c(#'Avg_customer_lifetime_months',
+                           'Total_monthly_ARPA',
+                           'Total_monthly_ARPA',
+                           'Revenue_percent_change',
+                           'Revenue_percent_change',
+                           'Month_over_month_revenue',
+                           'Revenue',
+                           'Revenue',
+                           'Revenue',
+                           'Enterprise Revenue',
+                           'Enterprise Revenue',
+                           'Enterprise Revenue',
                            'Enterprise Revenue',
                            'Small Business Revenue',
-                           'Personal Revenue'),
-                  To =   c('Enterprise Revenue',
-                             'Total enterprise monthly operator fees','Total enterprise monthly assistant fees',
-                             'Total enterprise monthly strategist specialist fees',
                            'Small Business Revenue',
-                             'Total small business monthly operator fees', 'Total small business monthly assistant fees',
-                             'Total small business monthly strategist specialist fees',
+                           'Small Business Revenue',
+                           'Small Business Revenue',
                            'Personal Revenue',
-                             'Total personal monthly operator fees', 'Total personal monthly assistant fees',
-                             'Total personal monthly strategist specialist fees'),
-                  Weight = c(3,3,3,3,3,3,3,3,3,3,3,3))
+                           'Personal Revenue',
+                           'Personal Revenue',
+                           'Personal Revenue',
+                           'Total enterprise monthly operator fees',
+                           'Total enterprise monthly assistant fees',
+                           'Total enterprise monthly specialist fees',
+                           'Total enterprise monthly strategist fees',
+                           'Total small business monthly operator fees', 
+                           'Total small business monthly assistant fees',
+                           'Total small business monthly specialist fees',
+                           'Total small business monthly strategist fees',
+                           'Total personal monthly operator fees', 
+                           'Total personal monthly assistant fees',
+                           'Total personal monthly specialist fees',
+                           'Total personal monthly strategist fees',
+                           'Enterprise_monthly_strategist_hrs',
+                           'Enterprise clients',
+                           'Enterprise clients',
+                           'Enterprise_monthly_strategist_hrs',
+                           'Enterprise_monthly_specialist_hrs',
+                           'Enterprise clients',
+                           'Enterprise clients',
+                           'Enterprise_monthly_specialist_hrs',
+                           'Enterprise_monthly_assistant_hrs',
+                           'Enterprise clients',
+                           'Enterprise clients',
+                           'Enterprise_monthly_assistant_hrs',
+                           'Enterprise_monthly_operator_hrs',
+                           'Enterprise clients',
+                           'Enterprise clients',
+                           'Enterprise_monthly_operator_hrs',
+                           'Small Business monthly_strategist_hrs',
+                           'Small Business clients',
+                           'Small Business clients',
+                           'Small Business monthly_strategist_hrs',
+                           'Small Business monthly_specialist_hrs',
+                           'Small Business clients',
+                           'Small Business clients',
+                           'Small Business monthly_specialist_hrs',
+                           'Small Business monthly_assistant_hrs',
+                           'Small Business clients',
+                           'Small Business clients',
+                           'Small Business monthly_assistant_hrs',
+                           'Small Business monthly_operator_hrs',
+                           'Small Business clients',
+                           'Small Business clients',
+                           'Personal monthly_operator_hrs',
+                           'Personal monthly_strategist_hrs',
+                           'Personal clients',
+                           'Personal clients',
+                           'Personal monthly_strategist_hrs',
+                           'Personal monthly_specialist_hrs',
+                           'Personal clients',
+                           'Personal clients',
+                           'Personal monthly_specialist_hrs',
+                           'Personal monthly_assistant_hrs',
+                           'Personal clients',
+                           'Personal clients',
+                           'Personal monthly_assistant_hrs',
+                           'Personal monthly_operator_hrs',
+                           'Personal clients',
+                           'Personal clients',
+                           'Personal monthly_operator_hrs',
+                           'Total_clients',
+                           'Total_clients',
+                           'Avg_customer_lifetime_months',
+                           'CLTV',
+                           'CLTV',
+                           'CLTV',
+                           'CLTV_to_CAC_ratio',
+                           'CLTV_to_CAC_ratio',
+                           'Company_head_count',
+                           'Company_head_count',
+                           'Number of Agents',
+                              'Total_agents_not_including_set_managers',
+                              'Total_agents_not_including_set_managers',
+                              'Total_agents_not_including_set_managers',
+                              'Total_agents_not_including_set_managers',
+                                'Number_of_operators_invisible_decides_to_employ_this_month',
+                                'Number_of_operators_invisible_decides_to_employ_this_month',
+                                'Number_of_operators_invisible_decides_to_employ_this_month',
+                                'Non_billable_operator_RRR_and_sentry_hrs',
+                                'Non_billable_operator_RRR_and_sentry_hrs',
+                                'Actual_client_hrs_operator_sentry_and_ten_dollar_per_hr_RRR_hrs_worked',
+                                'Actual_client_hrs_operator_sentry_and_ten_dollar_per_hr_RRR_hrs_worked',
+                                  'Billable_operator_sentry_and_10_dollar_per_hr_RRR_hrs',
+                                  'Billable_operator_sentry_and_10_dollar_per_hr_RRR_hrs',
+                                  'Billable_operator_sentry_and_10_dollar_per_hr_RRR_hrs',
+                                'Number_of_RRRs_invisible_decides_to_employ_this_month',
+                                'Number_of_RRRs_invisible_decides_to_employ_this_month',
+                                  'Actual_client_hrs_RRRs_worked',
+                                  'Actual_client_hrs_RRRs_worked',
+                                    'Billable_RRR_hrs',
+                                    'Billable_RRR_hrs',
+                                    'Billable_RRR_hrs',
+                                'Number_of_specialists_invisible_decides_to_employ_this_month',
+                                'Number_of_specialists_invisible_decides_to_employ_this_month',
+                                  'Actual_client_hrs_specialists_worked',
+                                  'Actual_client_hrs_specialists_worked',
+                                    'Billable_specialist_hrs',
+                                    'Billable_specialist_hrs',
+                                    'Billable_specialist_hrs',
+                                'Number_of_strategists_invisible_decides_to_employ_this_month',
+                                'Number_of_strategists_invisible_decides_to_employ_this_month',
+                                  'Actual_client_hrs_strategists_worked',
+                                  'Actual_client_hrs_strategists_worked',
+                                    'Billable_strategist_hrs',
+                                    'Billable_strategist_hrs',
+                                    'Billable_strategist_hrs',
+                           'Actual_labor_costs',
+                           'Actual_labor_costs',
+                           'Actual_labor_costs',
+                           'Actual_labor_costs',
+                              'Expected_operator_labor_costs',
+                              'Expected_operator_labor_costs',
+                              'Expected_operator_labor_costs',
+                              'Expected_RRR_labor_costs_for_assistants',
+                              'Expected_RRR_labor_costs_for_assistants',
+                              'Expected_specialist_labor_costs',
+                              'Expected_specialist_labor_costs',
+                              'Expected_strategist_labor_costs',
+                              'Expected_strategist_labor_costs',
+                           'Revenue_per_head',
+                           'Revenue_per_head',
+                           'Revenue_per_head',
+                           'Gross_profit',
+                           'Gross_profit',
+                           'Gross_margins',
+                           'Gross_margins',
+                           'Total_partner_pay',
+                           'Total_partner_pay',
+                              'Avg_partner_salary',
+                              'Avg_partner_salary',
+                           'Sales_and_marketing_costs',
+                           'Sales_and_marketing_costs',
+                           'Sales_and_marketing_costs',
+                           'Sales_and_marketing_costs',
+                           'Sales_and_marketing_costs',
+                           'Commissions',
+                           'Commissions',
+                           'Growth_software_costs',
+                           'Advertising_costs',
+                           'Sales_agents',
+                           'Invisible_sales_processes',
+                           'Additional_subscription_costs',
+                           'Total_R_and_D_costs',
+                           'BD_costs',
+                           'Discretionary_spending',
+                           'Overhead',
+                           'Overhead',
+                           'Overhead',
+                           'Overhead',
+                           'Overhead',
+                           'Overhead_to_opex',
+                           'Overhead_to_opex',
+                           'Opex',
+                           'Opex',
+                           'Net_profit',
+                           'Net_profit',
+                           'Net_profit',
+                           'Net_margins',
+                           'Net_margins',
+                           'Cash_in_bank',
+                           'Cash_in_bank',
+                           'Burn',
+                           'Burn',
+                           'Burn',
+                           'Burn',
+                           'Burn',
+                           'Burn'
+                           ),
+                  To =   c(#'Churn',
+                           'Revenue',
+                           'Total_clients',
+                           'Month_over_month_revenue',
+                           'Revenue',
+                           'Revenue',
+                           'Enterprise Revenue',
+                           'Small Business Revenue',
+                           'Personal Revenue',
+                             'Total enterprise monthly operator fees',
+                             'Total enterprise monthly assistant fees',
+                             'Total enterprise monthly specialist fees',
+                             'Total enterprise monthly strategist fees',
+                             'Total small business monthly operator fees', 
+                             'Total small business monthly assistant fees',
+                             'Total small business monthly specialist fees',
+                             'Total small business monthly strategist fees',
+                             'Total personal monthly operator fees', 
+                             'Total personal monthly assistant fees',
+                             'Total personal monthly specialist fees',
+                             'Total personal monthly strategist fees',
+                                'Enterprise_monthly_operator_hrs',
+                                'Enterprise_monthly_assistant_hrs',
+                                'Enterprise_monthly_specialist_hrs',
+                                'Enterprise_monthly_strategist_hrs',
+                                'Small Business monthly_operator_hrs',
+                                'Small Business monthly_assistant_hrs',
+                                'Small Business monthly_specialist_hrs',
+                                'Small Business monthly_strategist_hrs',
+                                'Personal monthly_operator_hrs',
+                                'Personal monthly_assistant_hrs',
+                                'Personal monthly_specialist_hrs',
+                                'Personal monthly_strategist_hrs',
+                                  'Enterprise clients',
+                                    'Percent enterprise clients',
+                                    'Total_clients',
+                                  'Avg enterprise monthly strategist hrs',
+                                  'Enterprise clients',
+                                     'Percent enterprise clients',
+                                     'Total_clients',
+                                  'Avg enterprise monthly specialist hrs',
+                                  'Enterprise clients',
+                                    'Percent enterprise clients',
+                                    'Total_clients',
+                                  'Avg enterprise monthly assistant hrs',
+                                  'Enterprise clients',
+                                    'Percent enterprise clients',
+                                    'Total_clients',
+                                  'Avg enterprise monthly operator hrs',
+                                  'Small Business clients',
+                                    'Percent Small Business clients',
+                                    'Total_clients',
+                                 'Avg Small Business monthly strategist hrs',
+                                 'Small Business clients',
+                                    'Percent Small Business clients',
+                                    'Total_clients',
+                                 'Avg Small Business monthly specialist hrs',
+                                 'Small Business clients',
+                                    'Percent Small Business clients',
+                                    'Total_clients',
+                                 'Avg Small Business monthly assistant hrs',
+                                 'Small Business clients',
+                                    'Percent Small Business clients',
+                                    'Total_clients',
+                                 'Avg Small Business monthly operator hrs',
+                                 'Personal clients',
+                                    'Percent Personal clients',
+                                    'Total_clients',
+                                 'Avg Personal monthly strategist hrs',
+                                 'Personal clients',
+                                    'Percent Personal clients',
+                                    'Total_clients',
+                                 'Avg Personal monthly specialist hrs',
+                                 'Personal clients',
+                                    'Percent Personal clients',
+                                    'Total_clients',
+                                 'Avg Personal monthly assistant hrs',
+                                 'Personal clients',
+                                    'Percent Personal clients',
+                                    'Total_clients',
+                                 'Avg Personal monthly operator hrs',
+                                    'Churn',
+                                    'Client Growth',
+                           'Churn',
+                           'Total_monthly_ARPA',
+                           'Avg_customer_lifetime_months',
+                           'CAC',
+                           'CLTV',
+                           'CAC',
+                           'Number of Partners',
+                           'Number of Agents',
+                           'Total_agents_not_including_set_managers',
+                              'Number_of_operators_invisible_decides_to_employ_this_month',
+                              'Number_of_RRRs_invisible_decides_to_employ_this_month',
+                              'Number_of_specialists_invisible_decides_to_employ_this_month',
+                              'Number_of_strategists_invisible_decides_to_employ_this_month',
+                                'Actual_client_hrs_operator_sentry_and_ten_dollar_per_hr_RRR_hrs_worked',
+                                'Non_billable_operator_RRR_and_sentry_hrs',
+                                'Avg hrs per week per operator',
+                                  'Billable_operator_sentry_and_10_dollar_per_hr_RRR_hrs',
+                                  'Percent of operator sentry and RRR hrs that are NOT client billable',
+                                  'Billable_operator_sentry_and_10_dollar_per_hr_RRR_hrs',
+                                  'Reduction in agent task completion times relative to price benchmark',
+                                    'Enterprise_monthly_operator_hrs',
+                                    'Small Business monthly_operator_hrs',
+                                    'Personal monthly_operator_hrs',
+                                'Actual_client_hrs_RRRs_worked',
+                                'Avg hrs per week per RRR',
+                                  'Billable_RRR_hrs',
+                                  'Reduction in agent task completion times relative to price benchmark',
+                                    'Enterprise_monthly_operator_hrs',
+                                    'Small Business monthly_operator_hrs',
+                                    'Personal monthly_operator_hrs',
+                                'Actual_client_hrs_specialists_worked',
+                                'Avg hrs per week per specialists',
+                                  'Billable_specialist_hrs',
+                                  'Reduction in agent task completion times relative to price benchmark',
+                                    'Enterprise_monthly_operator_hrs',
+                                    'Small Business monthly_operator_hrs',
+                                    'Personal monthly_operator_hrs',
+                                'Actual_client_hrs_strategists_worked',
+                                'Avg hrs per week per strategists',
+                                  'Billable_strategist_hrs',
+                                  'Reduction in agent task completion times relative to price benchmark',
+                                    'Enterprise_monthly_operator_hrs',
+                                    'Small Business monthly_operator_hrs',
+                                    'Personal monthly_operator_hrs',
+                           'Expected_operator_labor_costs',
+                           'Expected_RRR_labor_costs_for_assistants',
+                           'Expected_specialist_labor_costs',
+                           'Expected_strategist_labor_costs',
+                              'Actual_client_hrs_operator_sentry_and_ten_dollar_per_hr_RRR_hrs_worked',
+                              'Non_billable_operator_RRR_and_sentry_hrs',
+                              'Avg rate for operators sentries and RRRs working for clients at 10 dollars per hr',
+                              'Actual_client_hrs_RRRs_worked',
+                              'Avg RRR rate working for clients at 20 dollars per hr',
+                              'Actual_client_hrs_specialists_worked',
+                              'Avg specialist rate',
+                              'Actual_client_hrs_strategists_worked',
+                              'Avg strategist rate',
+                           'Revenue',
+                           'Number of Partners',
+                           'Number of Agents',
+                           'Revenue',
+                           'Actual_labor_costs',
+                           'Revenue',
+                           'Gross_profit',
+                           'Number of Partners',
+                           'Avg_partner_salary',
+                              'Avg salary cap per partner',
+                              'Avg dollars shy of partner salary cap',
+                           'Commissions',
+                           'Growth_software_costs',
+                           'Advertising_costs',
+                           'Sales_agents',
+                           'Invisible_sales_processes',
+                              'Revenue',
+                              'Percent Commission',
+                              'Composite costs multiplier',
+                              'Composite costs multiplier',
+                              'Composite costs multiplier',
+                              'Composite costs multiplier',
+                              'Composite costs multiplier',
+                              'Composite costs multiplier',
+                              'Composite costs multiplier',
+                              'Composite costs multiplier',
+                           'Sales_and_marketing_costs',
+                           'Additional_subscription_costs',
+                           'Total_R_and_D_costs',
+                           'BD_costs',
+                           'Discretionary_spending',
+                           'Overhead',
+                           'Opex',
+                              'Overhead',
+                              'Actual_labor_costs',
+                           'Gross_profit',
+                           'Total_partner_pay',
+                           'Burn',
+                           'Revenue',
+                           'Net_profit',
+                           'Net_profit',
+                           'Funds raised',
+                           'Partner bonuses',
+                           'Sales_and_marketing_costs',
+                           'Additional_subscription_costs',
+                           'Total_R_and_D_costs',
+                           'BD_costs',
+                           'Discretionary_spending'
+                           
+                  ),
+                  Weight = c(3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,
+                             3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,
+                             3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,
+                             3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3))
     gvisSankey(df, from = "From", to = "To", weight = "Weight", 
-               options=list(
+               options=list(width = 1800, height = 690,
                  sankey="{link: {colorMode: 'gradient', color: { fill: '8497e5' } },
                  node: { color: { fill: 'b8e986' },
                  label: { color: 'Grey' } }}")

@@ -295,6 +295,16 @@ Number_of_RRRs_invisible_decides_to_employ_this_month_partfn <- function(index){
     (part_live$data$`Avg hrs per week per RRR`[index] * 4.35)
 }
 
+Actual_client_hrs_RRRs_worked_partfn <- function(index){
+  part_live$data$`Actual client hrs RRRs worked`[index] <- Billable_RRR_hrs_partfn(index) * 
+    part_live$data$`Reduction in agent task completion times relative to price benchmark`[index]
+}
+
+Billable_RRR_hrs_partfn <- function(index) {
+  part_live$data$`Billable RRR hrs`[index] <- Enterprise_monthly_assistant_hrs_partfn(index) + Small_business_monthly_assistant_hrs_partfn(index) + 
+    Personal_monthly_assistant_hrs_partfn(index)
+}
+
 ############Number of specialists invisible decides to employ this month
 Number_of_specialists_invisible_decides_to_employ_this_month_partfn <- function(index){
   part_live$data$`Number of specialists invisible decides to employ this month`[index] <-
@@ -332,8 +342,8 @@ Billable_strategist_hrs_partfn <- function(index){
 #13##############Actual Labor Costs###############
 Actual_labor_costs_partfn <- function(index){
   part_live$data$`Actual labor costs`[index] <- Expected_operator_labor_costs_partfn(index) + 
-    Expected_RRR_labor_costs_for_assistants_partfn(index) + Expected_specialist_labor_costs_partfn(index)
-  + Expected_strategist_labor_costs_partfn(index)
+    Expected_RRR_labor_costs_for_assistants_partfn(index) + Expected_specialist_labor_costs_partfn(index) + 
+    Expected_strategist_labor_costs_partfn(index)
 }
 ###############Expected operator labor costs
 Expected_operator_labor_costs_partfn <- function(index){
@@ -345,29 +355,19 @@ Expected_operator_labor_costs_partfn <- function(index){
 
 ################Expected RRR labor costs for assistants
 Expected_RRR_labor_costs_for_assistants_partfn <- function(index){
-  part_live$data$`Expected RRR labor costs for assistants`[index] <- Actual_client_hours_RRRs_worked_partfn(index) * 
+  part_live$data$`Expected RRR labor costs for assistants`[index] <- Actual_client_hrs_RRRs_worked_partfn(index) * 
     part_live$data$`Avg RRR rate working for clients at 20 dollars per hr`[index]
-}
-
-Actual_client_hrs_RRRs_worked_partfn <- function(index){
-  part_live$data$`Actual client hrs RRRs worked`[index] <- Billable_RRR_hrs_partfn(index) * 
-    part_live$data$`Reduction in agent task completion times relative to price benchmark`[index]
-}
-
-Billable_RRR_hrs_partfn <- function(index) {
-  part_live$data$`Billable RRR hrs`[index] <- Enterprise_monthly_assistant_hrs_partfn(index) + Small_business_monthly_assistant_hrs_partfn(index) + 
-    Personal_monthly_assistant_hrs_partfn(index)
 }
 
 ###################Expected specialist labor costs
 Expected_specialist_labor_costs_partfn <- function(index){
-  part_live$data$`Expected_specialist_labor_costs`[index] <- ((Actual_client_hrs_specialists_worked_partfn(index) *
+  part_live$data$`Expected specialist labor costs`[index] <- ((Actual_client_hrs_specialists_worked_partfn(index) *
                                                             part_live$data$`Avg specialist rate`[index]))
 }
 
 ###################Expected strategist labor costs
 Expected_strategist_labor_costs_partfn <- function(index){
-  part_live$data$`Expected_strategist_labor_costs`[index] <- ((Actual_client_hrs_strategists_worked_partfn(index) *
+  part_live$data$`Expected strategist labor costs`[index] <- ((Actual_client_hrs_strategists_worked_partfn(index) *
                                                             part_live$data$`Avg strategist rate`[index]))
 }
 
@@ -390,33 +390,69 @@ Gross_margins_partfn <- function(index){
 }
 
 #18######################Total Partner pay########## used in client growth slider
+# Total_partner_pay_partfn <- function(index){
+#   part_live$data$`Total partner pay`[index] <- part_live$data$`Number of partners`[index] * Avg_partner_salary_partfn(index)
+# }
+# 
+# Avg_partner_salary_partfn <- function(index){
+#   part_live$data$`Avg partner salary`[index] <-  part_live$data$`Avg salary cap per partner`[index] + Avg_dollars_shy_of_partner_salary_cap_partfn(index)
+# }
+# 
+# Avg_dollars_shy_of_partner_salary_cap_partfn <- function(index){
+#   if((Gross_margins_split_pre_partner_pay_partfn(index) - part_live$data$`Avg salary cap per partner`[index]) > 0){
+#     part_live$data$`Avg dollars shy of partner salary cap`[index] = 0
+#   }
+#   else {
+#   part_live$data$`Avg dollars shy of partner salary cap`[index] <- Gross_margins_split_pre_partner_pay_partfn(index) -
+#     part_live$data$`Avg salary cap per partner`[index]
+#   }
+# }
+# 
+# Gross_margins_split_pre_partner_pay_partfn <- function(index){
+#   part_live$data$`Gross margins split pre partner pay`[index] <- Gross_profit_partfn(index) / part_live$data$`Number of partners`[index]
+# }
+
+###############Question???????????????????
 Total_partner_pay_partfn <- function(index){
   part_live$data$`Total partner pay`[index] <- part_live$data$`Number of partners`[index] * Avg_partner_salary_partfn(index)
 }
 
 Avg_partner_salary_partfn <- function(index){
-  part_live$data$`Avg partner salary`[index] <-  part_live$data$`Avg salary cap per partner`[index] + Avg_dollars_shy_of_partner_salary_cap_partfn(index)
+  part_live$data$`Avg partner salary`[index] <-  part_live$data$`Avg salary cap per partner`[index] + 
+    part_live$data$`Avg dollars shy of partner salary cap`[index]
 }
 
-Avg_dollars_shy_of_partner_salary_cap_partfn <- function(index){
-  if(Gross_margins_split_pre_partner_pay_partfn(index) - part_live$data$`Avg salary cap per partner`[index] > 0){
-    part_live$data$`Avg dollars shy of partner salary cap`[index] = 0
-  }
-  else {
-    part_live$data$`Avg dollars shy of partner salary cap`[index] <- Gross_margins_split_pre_partner_pay_partfn(index) -
-      part_live$data$`Avg salary cap per partner`[index]
-  }
-}
 
-Gross_margins_split_pre_partner_pay_partfn <- function(index){
-  part_live$data$`Gross margins split pre partner pay`[index] <- Gross_profit_partfn(index) / part_live$data$`Number of partners`[index]
-}
 
-################FIXX##########
 #20#####################Sales and marketing costs
 Sales_and_marketing_costs_partfn <- function(index){
-  part_live$data$`Sales and marketing costs`[index] <- part_live$data$Revenue[index] * part_live$data$`Percent commission`[index]
+  part_live$data$`Sales and marketing costs`[index] <- Commissions_partfn(index) + Growth_software_costs_partfn(index) + Advertising_costs_partfn(index) + 
+    Sales_agents_partfn(index) + Invisible_sales_processes_partfn(index)
 }
+
+Commissions_partfn <- function(index){
+  part_live$data$`Commissions`[index] <- part_live$data$Revenue[index] * part_live$data$`Percent commission`[index]
+}
+
+Growth_software_costs_partfn <- function(index){
+  part_live$data$`Growth software`[index] <-part_live$data$`Growth software`[index - 1] * 
+    (1 + part_live$data$`Composite costs multiplier`[index])
+}
+
+Advertising_costs_partfn <- function(index){
+  part_live$data$`Advertising costs`[index] <-part_live$data$`Advertising costs`[index - 1] * 
+    (1 + part_live$data$`Composite costs multiplier`[index])
+}
+Sales_agents_partfn <- function(index){
+  part_live$data$`Sales agents`[index] <-part_live$data$`Sales agents`[index - 1] * 
+    (1 + part_live$data$`Composite costs multiplier`[index])
+}
+Invisible_sales_processes_partfn <- function(index){
+  part_live$data$`Invisible sales processes`[index] <-part_live$data$`Invisible sales processes`[index - 1] * 
+    (1 + part_live$data$`Composite costs multiplier`[index])
+}
+
+
 
 #21####################Subscrption costs
 Additional_subscription_costs_partfn <- function(index){
@@ -484,9 +520,10 @@ Cash_in_bank_partfn <- function(index){
 
 
 #31######################Burn
+###############PArtner Bonuses?????????????????
 
 Burn_partfn <- function(index){
-  part_live$data$Burn[index] <- Partner_bonuses_partfn(index) + Sales_and_marketing_costs_partfn(index) + Additional_subscription_costs_partfn(index) + 
+  part_live$data$Burn[index] <- part_live$data$`Partner bonuses`[index] + Sales_and_marketing_costs_partfn(index) + Additional_subscription_costs_partfn(index) + 
     Total_R_and_D_costs_partfn(index) + BD_costs_partfn(index) + Discretionary_spending_partfn(index)
 }
 
@@ -500,6 +537,7 @@ Composite_costs_multiplier_partfn <- function(index, percent){
   part_live$data$`Overhead to revenue ratio`[index] <- percent
   part_live$data$`Composite costs multiplier`[index] <- Revenue_percent_change_partfn(index) * percent
 }
+
 
 
 
