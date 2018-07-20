@@ -6,6 +6,7 @@ library(shinyWidgets)
 
 
 curr_date <- format(Sys.Date(), "%b '%y")
+#end_date <-
 
 # Define server function required to create the scatterplot
 server <- function(input, output, session) {
@@ -36,7 +37,6 @@ server <- function(input, output, session) {
   },ignoreInit = TRUE)  
   
   
-  
   ################################################################################################################################### 
   
   
@@ -62,15 +62,18 @@ server <- function(input, output, session) {
   
   ###########################################General PAGE#########################################################################
   #bottom page table
+  output$montext <- renderText({live$data$Month[input$moSlider[1]]})
+  output$montext2 <- renderText({live$data$Month[input$moSlider[2]]})
+  
   observeEvent(input$newTable, {
     output$main_table <-renderGvis({
-      gvisTable(live$data[,c("Month","Revenue", "Revenue percent change", "Total clients", "Total monthly ARPA",
-                          "Churn percentage weighted by number of clients","Client growth after churn", "Avg Customer Lifetime (months)",
+      gvisTable(live$data[,c("Month","Revenue", "Revenue percent change", "Total clients", "Churn percentage weighted by number of clients",
+                          "Hrs client demand","Client growth after churn","Total monthly ARPA", "Avg Customer Lifetime (months)","CLTV",
                           "Company head count", "Number of agents", "Labor costs", "Revenue per head", "Gross profit",
                           "Gross margins", "Automation multiplier", "Number of partners", "Total partner pay", "Partner bonuses",
                           "Sales and marketing costs", "Additional subscription costs", "Total R and D costs", "BD costs",
-                          "Discretionary spending", "Overhead","Overhead to opex", "Net profit", "Net margins", "CLTV",
-                          "CAC", "CLTV to CAC ratio", "Funds raised", "Cash in bank")])
+                          "Discretionary spending", "Overhead", "Opex","Overhead to opex", "Operating profit", "CAC", "CLTV to CAC ratio", 
+                          "Net profit", "Net margins", "Funds raised", "Cash in bank")], options = list(frozenColumns = 1))
       })
   }, ignoreNULL = TRUE)
   
@@ -428,6 +431,9 @@ server <- function(input, output, session) {
   
   
   ############################################Growth Page############################################################################
+  output$grow_montext <- renderText({live$data$Month[input$grow_moSlider[1]]})
+  output$grow_montext2 <- renderText({live$data$Month[input$grow_moSlider[2]]})
+  
   observeEvent(input$grow_reload, {
     MRT$data <- gs_read( gs_key("1K4hHyfnJhuWijJpDT6KRZtI1bLHlukTb4svKT4HKVeA"), ws = "Shiny sheet")
     grow_live$data <- MRT$data
@@ -446,13 +452,13 @@ server <- function(input, output, session) {
   
   observeEvent(input$grow_newTable, {
     output$grow_main_table <-renderGvis({
-      gvisTable(grow_live$data[,c("Month","Revenue", "Revenue percent change", "Total clients", "Total monthly ARPA", 
-                             "Churn percentage weighted by number of clients","Client growth after churn", "Avg Customer Lifetime (months)",
+      gvisTable(grow_live$data[,c("Month","Revenue", "Revenue percent change", "Total clients", "Churn percentage weighted by number of clients",
+                             "Hrs client demand","Client growth after churn","Total monthly ARPA", "Avg Customer Lifetime (months)","CLTV",
                              "Company head count", "Number of agents", "Labor costs", "Revenue per head", "Gross profit",
-                             "Gross margins", "Automation multiplier", "Number of partners", "Total partner pay", "Partner bonuses", 
-                             "Sales and marketing costs", "Additional subscription costs", "Total R and D costs", "BD costs", 
-                             "Discretionary spending", "Overhead","Overhead to opex", "Net profit", "Net margins", "CLTV", 
-                             "CAC", "CLTV to CAC ratio", "Funds raised", "Cash in bank")])
+                             "Gross margins", "Automation multiplier", "Number of partners", "Total partner pay", "Partner bonuses",
+                             "Sales and marketing costs", "Additional subscription costs", "Total R and D costs", "BD costs",
+                             "Discretionary spending", "Overhead", "Opex","Overhead to opex", "Operating profit", "CAC", "CLTV to CAC ratio", 
+                             "Net profit", "Net margins", "Funds raised", "Cash in bank")], options = list(frozenColumns = 1))
     })
   }, ignoreNULL = TRUE)
   
@@ -811,25 +817,16 @@ server <- function(input, output, session) {
   output$grow_bubble <- renderGvis({
     df=data.frame(
         Name = c("Enterprise_Clients", "Small_Business_Clients", "Personal_Clients"),
-        Client_Percentage = c((100 / (input$grow_moSlider[2] - input$grow_moSlider[1])) * 
-                                sum(grow_live$data$`Percent enterprise clients`[input$grow_moSlider[1]:input$grow_moSlider[2]]), 
-                              (100 / (input$grow_moSlider[2] - input$grow_moSlider[1])) * 
-                                sum(grow_live$data$`Percent small business clients`[input$grow_moSlider[1]:input$grow_moSlider[2]]), 
-                              (100 / (input$grow_moSlider[2] - input$grow_moSlider[1])) * 
-                                sum(grow_live$data$`Percent personal clients`[input$grow_moSlider[1]:input$grow_moSlider[2]])),
+        Client_Percentage = c((100 * grow_live$data$`Percent enterprise clients`[input$grow_moSlider[2]]), 
+                              (100 * grow_live$data$`Percent small business clients`[input$grow_moSlider[2]]), 
+                              (100 * grow_live$data$`Percent personal clients`[input$grow_moSlider[2]])),
         Client_Percentage_Weighted_by_Dollar_Value = 
-          c((100 / (input$grow_moSlider[2] - input$grow_moSlider[1])) * 
-              sum(grow_live$data$`Percent enterprise clients weighted by dollar value`[input$grow_moSlider[1]:input$grow_moSlider[2]]), 
-            (100 / (input$grow_moSlider[2] - input$grow_moSlider[1])) * 
-              sum(grow_live$data$`Percent small business clients weighted by dollar value`[input$grow_moSlider[1]:input$grow_moSlider[2]]),
-            (100 / (input$grow_moSlider[2] - input$grow_moSlider[1])) * 
-              sum(grow_live$data$`Percent personal clients weighted by dollar value`[input$grow_moSlider[1]:input$grow_moSlider[2]])),
-        Revenue = c((1 / (input$grow_moSlider[2] - input$grow_moSlider[1])) * 
-                      sum(grow_live$data$`Enterprise revenue`[input$grow_moSlider[1]:input$grow_moSlider[2]]), 
-                    (1 / (input$grow_moSlider[2] - input$grow_moSlider[1])) * 
-                      sum(grow_live$data$`Small business revenue`[input$grow_moSlider[1]:input$grow_moSlider[2]]),
-                    (1 / (input$grow_moSlider[2] - input$grow_moSlider[1])) * 
-                      sum(grow_live$data$`Personal revenue`[input$grow_moSlider[1]:input$grow_moSlider[2]])))
+          c((100 * grow_live$data$`Percent enterprise clients weighted by dollar value`[input$grow_moSlider[2]]), 
+            (100 * grow_live$data$`Percent small business clients weighted by dollar value`[input$grow_moSlider[2]]),
+            (100 * grow_live$data$`Percent personal clients weighted by dollar value`[input$grow_moSlider[2]])),
+        Revenue = c((grow_live$data$`Enterprise revenue`[input$grow_moSlider[2]]), 
+                    (grow_live$data$`Small business revenue`[input$grow_moSlider[2]]),
+                    (grow_live$data$`Personal revenue`[input$grow_moSlider[2]])))
     
     gvisBubbleChart(df,  idvar = "Name", 
                     xvar = "Client_Percentage_Weighted_by_Dollar_Value", 
@@ -870,6 +867,9 @@ server <- function(input, output, session) {
   
   
   ######################################Costs PAGE##################################################################################
+  output$part_montext <- renderText({live$data$Month[input$part_moSlider[1]]})
+  output$part_montext2 <- renderText({live$data$Month[input$part_moSlider[2]]})
+  
   observeEvent(input$part_reload, {
     MRT$data <- gs_read( gs_key("1K4hHyfnJhuWijJpDT6KRZtI1bLHlukTb4svKT4HKVeA"), ws = "Shiny sheet")
     part_live$data <- MRT$data
@@ -887,13 +887,13 @@ server <- function(input, output, session) {
   #bottom page table
   observeEvent(input$part_newTable, {
     output$part_main_table <-renderGvis({
-      gvisTable(part_live$data[,c("Month","Revenue", "Revenue percent change", "Total clients", "Total monthly ARPA", 
-                             "Churn percentage weighted by number of clients","Client growth after churn", "Avg Customer Lifetime (months)",
+      gvisTable(part_live$data[,c("Month","Revenue", "Revenue percent change", "Total clients", "Churn percentage weighted by number of clients",
+                             "Hrs client demand","Client growth after churn","Total monthly ARPA", "Avg Customer Lifetime (months)","CLTV",
                              "Company head count", "Number of agents", "Labor costs", "Revenue per head", "Gross profit",
-                             "Gross margins", "Automation multiplier", "Number of partners", "Total partner pay", "Partner bonuses", 
-                             "Sales and marketing costs", "Additional subscription costs", "Total R and D costs", "BD costs", 
-                             "Discretionary spending", "Overhead","Overhead to opex", "Net profit", "Net margins", "CLTV", 
-                             "CAC", "CLTV to CAC ratio", "Funds raised", "Cash in bank")])
+                             "Gross margins", "Automation multiplier", "Number of partners", "Total partner pay", "Partner bonuses",
+                             "Sales and marketing costs", "Additional subscription costs", "Total R and D costs", "BD costs",
+                             "Discretionary spending", "Overhead", "Opex","Overhead to opex", "Operating profit", "CAC", "CLTV to CAC ratio", 
+                             "Net profit", "Net margins", "Funds raised", "Cash in bank")], options = list(frozenColumns = 1))
     })
   }, ignoreNULL = TRUE)
   
@@ -1658,7 +1658,7 @@ server <- function(input, output, session) {
                              3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,
                              3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3))
     gvisSankey(df, from = "From", to = "To", weight = "Weight", 
-               options=list(width = 1800, height = 690,
+               options=list(width = 1800, height = 1000,
                  sankey="{link: {colorMode: 'gradient', color: { fill: '8497e5' } },
                  node: { color: { fill: 'b8e986' },
                  label: { color: 'Grey' } }}")
@@ -1667,7 +1667,7 @@ server <- function(input, output, session) {
   #######################################Table##############################################
   
   output$table <-renderGvis({
-    gvisTable(MRT$data)
+    gvisTable(MRT$data, options = list(frozenColumns = 1))
   })
 }
   

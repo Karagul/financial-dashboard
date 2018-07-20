@@ -390,37 +390,37 @@ Gross_margins_partfn <- function(index){
 }
 
 #18######################Total Partner pay########## used in client growth slider
-# Total_partner_pay_partfn <- function(index){
-#   part_live$data$`Total partner pay`[index] <- part_live$data$`Number of partners`[index] * Avg_partner_salary_partfn(index)
-# }
-# 
-# Avg_partner_salary_partfn <- function(index){
-#   part_live$data$`Avg partner salary`[index] <-  part_live$data$`Avg salary cap per partner`[index] + Avg_dollars_shy_of_partner_salary_cap_partfn(index)
-# }
-# 
-# Avg_dollars_shy_of_partner_salary_cap_partfn <- function(index){
-#   if((Gross_margins_split_pre_partner_pay_partfn(index) - part_live$data$`Avg salary cap per partner`[index]) > 0){
-#     part_live$data$`Avg dollars shy of partner salary cap`[index] = 0
-#   }
-#   else {
-#   part_live$data$`Avg dollars shy of partner salary cap`[index] <- Gross_margins_split_pre_partner_pay_partfn(index) -
-#     part_live$data$`Avg salary cap per partner`[index]
-#   }
-# }
-# 
-# Gross_margins_split_pre_partner_pay_partfn <- function(index){
-#   part_live$data$`Gross margins split pre partner pay`[index] <- Gross_profit_partfn(index) / part_live$data$`Number of partners`[index]
-# }
-
-###############Question???????????????????
 Total_partner_pay_partfn <- function(index){
   part_live$data$`Total partner pay`[index] <- part_live$data$`Number of partners`[index] * Avg_partner_salary_partfn(index)
 }
 
 Avg_partner_salary_partfn <- function(index){
-  part_live$data$`Avg partner salary`[index] <-  part_live$data$`Avg salary cap per partner`[index] + 
-    part_live$data$`Avg dollars shy of partner salary cap`[index]
+  part_live$data$`Avg partner salary`[index] <-  part_live$data$`Avg salary cap per partner`[index] + Avg_dollars_shy_of_partner_salary_cap_partfn(index)
 }
+
+Avg_dollars_shy_of_partner_salary_cap_partfn <- function(index){
+  if((Gross_margins_split_pre_partner_pay_partfn(index) - part_live$data$`Avg salary cap per partner`[index]) > 0){
+    part_live$data$`Avg dollars shy of partner salary cap`[index] = 0
+  }
+  else {
+  part_live$data$`Avg dollars shy of partner salary cap`[index] <- Gross_margins_split_pre_partner_pay_partfn(index) -
+    part_live$data$`Avg salary cap per partner`[index]
+  }
+}
+
+Gross_margins_split_pre_partner_pay_partfn <- function(index){
+  part_live$data$`Gross margins split pre partner pay`[index] <- Gross_profit_partfn(index) / part_live$data$`Number of partners`[index]
+}
+
+###############Question???????????????????
+# Total_partner_pay_partfn <- function(index){
+#   part_live$data$`Total partner pay`[index] <- part_live$data$`Number of partners`[index] * Avg_partner_salary_partfn(index)
+# }
+# 
+# Avg_partner_salary_partfn <- function(index){
+#   part_live$data$`Avg partner salary`[index] <-  part_live$data$`Avg salary cap per partner`[index] + 
+#     part_live$data$`Avg dollars shy of partner salary cap`[index]
+# }
 
 
 

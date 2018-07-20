@@ -3,6 +3,7 @@ library(googleVis)
 library(googlesheets)
 library(shinythemes)
 library(shinyWidgets)
+#load("InvLogo.png")
 curr_date <-format(Sys.Date(), "%b '%y")
 
 #This is for the color of slide bar.
@@ -15,9 +16,9 @@ border-color: #36454f;
 } "
 
 # Define UI for application
-ui <- fluidPage(theme = shinytheme("flatly"),
+ui <- fluidPage(theme = shinytheme("cosmo"),
     #top bar
-    navbarPage(a("Invisible Technologies", href="https://inv.tech", target="_blank", color = "White"),
+    navbarPage(a(img(src="InvLogo.png", height = 30, width = 35, style="float:left"),"Invisible Technologies", href="https://inv.tech", target="_blank", color = "White"), windowTitle = "The Model",
 
      
      #############################################Growth page###########################################################################  
@@ -34,17 +35,44 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                               ))
                               ),
                               tags$style(mycss),
-                              
                               h3("Current Date: ", curr_date),
+                              fluidRow(
+                                column(6,
+                                       fluidRow(
+                                         column(4,
+                                                h6(strong("Start:"))
+                                         ),
+                                         
+                                         column(4,
+                                                h6(textOutput(outputId = "grow_montext"))
+                                         ),
+                                         column(4,
+                                                h6(""))
+                                       )
+                                ),
+                                column(6,
+                                       fluidRow(
+                                         column(4,
+                                                h6(strong("End:"))
+                                         ),
+                                         column(4,
+                                                h6(textOutput(outputId = "grow_montext2"))
+                                         ),
+                                         column(4,
+                                                h6(""))
+                                       )
+                                )
+                              ),
                               #slider bar for months
                               sliderInput(inputId = "grow_moSlider",
                                           label = "Month Range:",
                                           step = 1,
                                           min = 1,
                                           max = 72,
-                                          value=c(9,27),
+                                          value=c(1,27),
                                           animate = TRUE
                               ),
+                             
                               #slider for Client Growth
                               sliderTextInput(
                                 inputId = "grow_growslide",
@@ -150,6 +178,33 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                               ),
                               tags$style(mycss),
                               h3("Current Date: ", curr_date),
+                              fluidRow(
+                                column(6,
+                                       fluidRow(
+                                         column(4,
+                                                h6(strong("Start:"))
+                                         ),
+                                         
+                                         column(4,
+                                                h6(textOutput(outputId = "part_montext"))
+                                         ),
+                                         column(4,
+                                                h6(""))
+                                       )
+                                ),
+                                column(6,
+                                       fluidRow(
+                                         column(4,
+                                                h6(strong("End:"))
+                                         ),
+                                         column(4,
+                                                h6(textOutput(outputId = "part_montext2"))
+                                         ),
+                                         column(4,
+                                                h6(""))
+                                       )
+                                )
+                              ),
                               #first slider bar for months
                               sliderInput(inputId = "part_moSlider",
                                           label = "Month Range:",
@@ -263,6 +318,33 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                                          tags$style(mycss),
                                          
                                          h3("Current Date: ", curr_date),
+                                         fluidRow(
+                                           column(6,
+                                                  fluidRow(
+                                                    column(4,
+                                                           h6(strong("Start:"))
+                                                    ),
+                                                    
+                                                    column(4,
+                                                           h6(textOutput(outputId = "montext"))
+                                                    ),
+                                                    column(4,
+                                                           h6(""))
+                                                  )
+                                           ),
+                                           column(6,
+                                                  fluidRow(
+                                                    column(4,
+                                                           h6(strong("End:"))
+                                                    ),
+                                                    column(4,
+                                                           h6(textOutput(outputId = "montext2"))
+                                                    ),
+                                                    column(4,
+                                                           h6(""))
+                                                  )
+                                           )
+                                         ),
                                          #first slider bar for months
                                          sliderInput(inputId = "moSlider",
                                                      label = "Month Range:",
@@ -376,8 +458,8 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                    frameborder="0" allow="autoplay; encrypted-media" 
                    allowfullscreen></iframe>')
               )
-                         )
+            )
 
-                )
+          )
 
 
