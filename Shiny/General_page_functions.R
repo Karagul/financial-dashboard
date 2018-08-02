@@ -435,7 +435,7 @@ Commissions_fn <- function(index){
 }
 
 Growth_software_costs_fn <- function(index){
-  live$data$`Growth software`[index] <-live$data$`Growth software`[index - 1] * 
+  live$data$`Growth software`[index] <- live$data$`Growth software`[index - 1] * 
     (1 + live$data$`Composite costs multiplier`[index])
 }
 
@@ -456,8 +456,27 @@ Invisible_sales_processes_fn <- function(index){
 
 #21####################Subscrption costs
 Additional_subscription_costs_fn <- function(index){
-  live$data$`Additional subscription costs`[index] <- live$data$`Additional subscription costs`[index - 1] * 
+  live$data$`Additional subscription costs`[index] <- Engineering_software_fn(index) + Operations_software_fn(index) + 
+    Development_software_fn(index) + Finance_software_fn(index)
+}
+
+Engineering_software_fn <- function(index){
+  live$data$`Engineering software`[index] <- live$data$`Engineering software`[index - 1] * 
     (1 + live$data$`Composite costs multiplier`[index])
+}
+
+Operations_software_fn <- function(index){
+  live$data$`Operations software`[index] <- live$data$`Operations software`[index - 1] * 
+    (1 + live$data$`Composite costs multiplier`[index])
+}
+
+Development_software_fn <- function(index){
+  live$data$`Development software`[index] <- live$data$`Development software`[index - 1] * 
+    (1 + live$data$`Composite costs multiplier`[index])
+}
+
+Finance_software_fn <- function(index){
+  live$data$`Finance software`[index] <- live$data$`Finance software`[index]
 }
 
 
@@ -507,7 +526,7 @@ Net_profit_fn <- function(index) {
 #28####################Net Margins
 
 Net_margins_fn <- function(index) {
-  live$data$`Net margins`[index] <- live$data$`Net profit`[index] / live$data$Revenue[index]
+  live$data$`Net margins`[index] <- Net_profit_fn(index) / live$data$Revenue[index]
 }
 
 #29#####################
@@ -523,8 +542,7 @@ Cash_in_bank_fn <- function(index){
 ###############PArtner Bonuses?????????????????
 
 Burn_fn <- function(index){
-  live$data$Burn[index] <- live$data$`Partner bonuses`[index] + Sales_and_marketing_costs_fn(index) + Additional_subscription_costs_fn(index) + 
-    Total_R_and_D_costs_fn(index) + BD_costs_fn(index) + Discretionary_spending_fn(index)
+  live$data$Burn[index] <- live$data$`Partner bonuses`[index] + live$data$Overhead[index]
 }
 
 

@@ -12,18 +12,22 @@ server <- function(input, output, session) {
   source('General_page_functions.R', local = TRUE)
   source("Growth_page_functions.R", local = TRUE)
   source("Part_page_functions.R", local = TRUE)
+  source("Partner_pay_functions.R", local = TRUE)
   
   
   #reload data button. This creates MRT$data which is the data frame with the main data we use from google speadsheets. 
   MRT <- reactiveValues()
   live <- reactiveValues()
-  grow_live <-reactiveValues()
-  part_live <-reactiveValues()
+  grow_live <- reactiveValues()
+  part_live <- reactiveValues()
+  pp_live <- reactiveValues()
   observeEvent(input$reload, {
     MRT$data <- gs_read( gs_key("14AmPkfN5b51fSBsT223khVg_gH9-lzl2WAtyWp9zEkc"), ws = "Shiny sheet")
     live$data <- MRT$data
     grow_live$data <- MRT$data
     part_live$data <- MRT$data
+    pp_live$data <- MRT$data
+    rows <- nrow(MRT$data)
   }, ignoreNULL=FALSE)
   output$clics <- renderText(input$reload)
   
@@ -67,8 +71,9 @@ server <- function(input, output, session) {
   
   observeEvent(input$newTable, {
     output$main_table <-renderGvis({
-      gvisTable(live$data[,c("Month","Revenue", "Revenue percent change", "Total clients", "Churn percentage weighted by number of clients",
-                          "Hrs client demand","Client growth after churn","Total monthly ARPA", "Avg Customer Lifetime (months)","CLTV",
+      gvisTable(live$data[,c("Month","Client growth percentage","Revenue", "Revenue percent change", "Total clients", 
+                             "Churn percentage weighted by number of clients",
+                          "Hrs client demand","Client growth after churn","Total monthly ARPA", "Avg customer lifetime in months","CLTV",
                           "Company head count", "Number of agents", "Labor costs", "Revenue per head", "Gross profit",
                           "Gross margins", "Automation multiplier", "Number of partners", "Total partner pay", "Partner bonuses",
                           "Sales and marketing costs", "Additional subscription costs", "Total R and D costs", "BD costs",
@@ -76,6 +81,32 @@ server <- function(input, output, session) {
                           "Net profit", "Net margins", "Funds raised", "Cash in bank")], options = list(frozenColumns = 1))
       })
   }, ignoreNULL = TRUE)
+  
+  observeEvent(input$diff_types,{
+    if(input$diff_types == "Conservative"){
+      updateSliderTextInput(session, inputId = "growslide", selected = isolate("10%"))
+      updateSliderTextInput(session, inputId = "mCost", selected = isolate("20%"))
+      updateSliderTextInput(session, inputId = "churn", selected = isolate("5%"))
+      updateSliderTextInput(session, inputId = "Partners", selected = isolate(1))
+      updateSliderTextInput(session, inputId = "auto", selected = isolate("1%"))
+    }
+    else if(input$diff_types == "Moderate"){
+      updateSliderTextInput(session, inputId = "growslide", selected = isolate("20%"))
+      updateSliderTextInput(session, inputId = "mCost", selected = isolate("15%"))
+      updateSliderTextInput(session, inputId = "churn", selected = isolate("7%"))
+      updateSliderTextInput(session, inputId = "Partners", selected = isolate(2))
+      updateSliderTextInput(session, inputId = "auto", selected = isolate("1.5%"))
+    }
+    else{
+      updateSliderTextInput(session, inputId = "growslide", selected = isolate("40%"))
+      updateSliderTextInput(session, inputId = "mCost", selected = isolate("20%"))
+      updateSliderTextInput(session, inputId = "churn", selected = isolate("10%"))
+      updateSliderTextInput(session, inputId = "Partners", selected = isolate(4))
+      updateSliderTextInput(session, inputId = "auto", selected = isolate("3%"))
+    }
+  }, ignoreInit = TRUE)
+  
+  
   
   #Effects the slider for the client growth slider
   
@@ -87,49 +118,50 @@ server <- function(input, output, session) {
         while(row_after_curr_mon <= nrow(MRT$data)){
           if(input$growslide == "Custom"){
             live$data$`Client growth percentage`[row_after_curr_mon] <- live$data$`Custom client growth`[row_after_curr_mon]
-            Composite_costs_multiplier_fn(row_after_curr_mon, live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
             Revenue_fn(row_after_curr_mon)
             Company_head_count_fn(row_after_curr_mon)
             Revenue_percent_change_fn(row_after_curr_mon)
+            Composite_costs_multiplier_fn(row_after_curr_mon, live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
             Total_monthly_ARPA_fn(row_after_curr_mon)
             Client_growth_after_churn_fn(row_after_curr_mon)
-            CLTV_fn(row_after_curr_mon)
             CLTV_to_CAC_ratio_fn(row_after_curr_mon)
             Company_head_count_fn(row_after_curr_mon)
             Actual_labor_costs_fn(row_after_curr_mon)
             Revenue_per_head_fn(row_after_curr_mon)
             Gross_margins_fn(row_after_curr_mon)
             Total_partner_pay_fn(row_after_curr_mon)
-            Sales_and_marketing_costs_fn(row_after_curr_mon)
+            #Sales_and_marketing_costs_fn(row_after_curr_mon)
             
             Overhead_fn(row_after_curr_mon)
             Overhead_to_opex_fn(row_after_curr_mon)
-            Net_profit_fn(row_after_curr_mon)
             Net_margins_fn(row_after_curr_mon)
             Cash_in_bank_fn(row_after_curr_mon)
           }
           else {
-            growslide_numeric = as.numeric(gsub("[\\%,]", "", input$growslide))
-            growslide_numeric = growslide_numeric / 100
+            #growslide_numeric = as.numeric(gsub("[\\%,]", "", input$growslide))
+            #growslide_numeric = growslide_numeric / 100
+            #live$data$`Client growth percentage`[row_after_curr_mon] <- growslide_numeric
+            const_growslide_numeric = as.numeric(gsub("[\\%,]", "", input$growslide))
+            x = -((row_after_curr_mon - 12)^(as.numeric(input$n_num)))
+            growslide_numeric = (((100 * live$data$`Churn percentage weighted by number of clients`[row_after_curr_mon] * x) - 
+                                    (as.numeric(input$k_num)*const_growslide_numeric)) / (x - as.numeric(input$k_num))) / 100
             live$data$`Client growth percentage`[row_after_curr_mon] <- growslide_numeric
-            Composite_costs_multiplier_fn(row_after_curr_mon, live$data$`Overhead to revenue ratio`[row_after_curr_mon])
             Revenue_fn(row_after_curr_mon)
             Company_head_count_fn(row_after_curr_mon)
             Revenue_percent_change_fn(row_after_curr_mon)
+            Composite_costs_multiplier_fn(row_after_curr_mon, live$data$`Overhead to revenue ratio`[row_after_curr_mon])
             Total_monthly_ARPA_fn(row_after_curr_mon)
             Client_growth_after_churn_fn(row_after_curr_mon)
-            CLTV_fn(row_after_curr_mon)
             CLTV_to_CAC_ratio_fn(row_after_curr_mon)
             Company_head_count_fn(row_after_curr_mon)
             Actual_labor_costs_fn(row_after_curr_mon)
             Revenue_per_head_fn(row_after_curr_mon)
             Gross_margins_fn(row_after_curr_mon)
             Total_partner_pay_fn(row_after_curr_mon)
-            Sales_and_marketing_costs_fn(row_after_curr_mon)
+            #Sales_and_marketing_costs_fn(row_after_curr_mon)
             
             Overhead_fn(row_after_curr_mon)
             Overhead_to_opex_fn(row_after_curr_mon)
-            Net_profit_fn(row_after_curr_mon)
             Net_margins_fn(row_after_curr_mon)
             Cash_in_bank_fn(row_after_curr_mon)
           }
@@ -152,7 +184,6 @@ server <- function(input, output, session) {
             Composite_costs_multiplier_fn(row_after_curr_mon, live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
             Overhead_fn(row_after_curr_mon)
             Overhead_to_opex_fn(row_after_curr_mon)
-            Net_profit_fn(row_after_curr_mon)
             Net_margins_fn(row_after_curr_mon)
             Cash_in_bank_fn(row_after_curr_mon)
           }
@@ -162,7 +193,6 @@ server <- function(input, output, session) {
             Composite_costs_multiplier_fn(row_after_curr_mon, mCost_numeric)
             Overhead_fn(row_after_curr_mon)
             Overhead_to_opex_fn(row_after_curr_mon)
-            Net_profit_fn(row_after_curr_mon)
             Net_margins_fn(row_after_curr_mon)
             Cash_in_bank_fn(row_after_curr_mon)
           }
@@ -182,25 +212,29 @@ server <- function(input, output, session) {
           if(input$churn == "Custom"){
             live$data$`Churn percentage weighted by number of clients`[row_after_curr_mon] <-
               live$data$`Custom client churn`[row_after_curr_mon]
-            Composite_costs_multiplier_fn(row_after_curr_mon, live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
+            if(input$growslide != "Custom"){
+              const_growslide_numeric = as.numeric(gsub("[\\%,]", "", input$growslide))
+              x = -((row_after_curr_mon - 12)^(as.numeric(input$n_num)))
+              growslide_numeric = (((100 * live$data$`Churn percentage weighted by number of clients`[row_after_curr_mon] * x) - 
+                                      (as.numeric(input$k_num)*const_growslide_numeric)) / (x - as.numeric(input$k_num))) / 100
+              live$data$`Client growth percentage`[row_after_curr_mon] <- growslide_numeric
+            }
             Revenue_fn(row_after_curr_mon)
             Company_head_count_fn(row_after_curr_mon)
             Revenue_percent_change_fn(row_after_curr_mon)
+            Composite_costs_multiplier_fn(row_after_curr_mon, live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
             Total_monthly_ARPA_fn(row_after_curr_mon)
             Client_growth_after_churn_fn(row_after_curr_mon)
-            CLTV_fn(row_after_curr_mon)
             CLTV_to_CAC_ratio_fn(row_after_curr_mon)
             Company_head_count_fn(row_after_curr_mon)
             Actual_labor_costs_fn(row_after_curr_mon)
             Revenue_per_head_fn(row_after_curr_mon)
-            Gross_profit_fn(row_after_curr_mon)
             Gross_margins_fn(row_after_curr_mon)
             Total_partner_pay_fn(row_after_curr_mon)
-            Sales_and_marketing_costs_fn(row_after_curr_mon)
+            #Sales_and_marketing_costs_fn(row_after_curr_mon)
 
             Overhead_fn(row_after_curr_mon)
             Overhead_to_opex_fn(row_after_curr_mon)
-            Net_profit_fn(row_after_curr_mon)
             Net_margins_fn(row_after_curr_mon)
             Cash_in_bank_fn(row_after_curr_mon)
           }
@@ -208,25 +242,29 @@ server <- function(input, output, session) {
             churn_numeric = as.numeric(gsub("[\\%,]", "", input$churn))
             churn_numeric = churn_numeric / 100
             live$data$`Churn percentage weighted by number of clients`[row_after_curr_mon] <- churn_numeric
-            Composite_costs_multiplier_fn(row_after_curr_mon, live$data$`Overhead to revenue ratio`[row_after_curr_mon])
+            if(input$growslide != "Custom"){
+              const_growslide_numeric = as.numeric(gsub("[\\%,]", "", input$growslide))
+              x = -((row_after_curr_mon - 12)^(as.numeric(input$n_num)))
+              growslide_numeric = (((100 * live$data$`Churn percentage weighted by number of clients`[row_after_curr_mon] * x) - 
+                                      (as.numeric(input$k_num)*const_growslide_numeric)) / (x - as.numeric(input$k_num))) / 100
+              live$data$`Client growth percentage`[row_after_curr_mon] <- growslide_numeric
+            }
             Revenue_fn(row_after_curr_mon)
             Company_head_count_fn(row_after_curr_mon)
             Revenue_percent_change_fn(row_after_curr_mon)
+            Composite_costs_multiplier_fn(row_after_curr_mon, live$data$`Overhead to revenue ratio`[row_after_curr_mon])
             Total_monthly_ARPA_fn(row_after_curr_mon)
             Client_growth_after_churn_fn(row_after_curr_mon)
-            CLTV_fn(row_after_curr_mon)
             CLTV_to_CAC_ratio_fn(row_after_curr_mon)
             Company_head_count_fn(row_after_curr_mon)
             Actual_labor_costs_fn(row_after_curr_mon)
             Revenue_per_head_fn(row_after_curr_mon)
-            Gross_profit_fn(row_after_curr_mon)
             Gross_margins_fn(row_after_curr_mon)
             Total_partner_pay_fn(row_after_curr_mon)
-            Sales_and_marketing_costs_fn(row_after_curr_mon)
+            #Sales_and_marketing_costs_fn(row_after_curr_mon)
 
             Overhead_fn(row_after_curr_mon)
             Overhead_to_opex_fn(row_after_curr_mon)
-            Net_profit_fn(row_after_curr_mon)
             Net_margins_fn(row_after_curr_mon)
             Cash_in_bank_fn(row_after_curr_mon)
           }
@@ -246,22 +284,20 @@ server <- function(input, output, session) {
         while(row_after_curr_mon <= nrow(MRT$data)){
           if(input$Partners == "Custom"){
             live$data$`Number of partners`[row_after_curr_mon] <- live$data$`Custom number of partners`[row_after_curr_mon]
-            Composite_costs_multiplier_fn(row_after_curr_mon, live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
             Company_head_count_fn(row_after_curr_mon)
             Revenue_per_head_fn(row_after_curr_mon)
+            Composite_costs_multiplier_fn(row_after_curr_mon, live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
             Total_partner_pay_fn(row_after_curr_mon)
-            Net_profit_fn(row_after_curr_mon)
             Net_margins_fn(row_after_curr_mon)
             Cash_in_bank_fn(row_after_curr_mon)
           }
           else {
             part_numeric = as.numeric(input$Partners)
             live$data$`Number of partners`[row_after_curr_mon] <- (live$data$`Number of partners`[row_after_curr_mon - 1] + part_numeric)
-            Composite_costs_multiplier_fn(row_after_curr_mon, live$data$`Overhead to revenue ratio`[row_after_curr_mon])
             Company_head_count_fn(row_after_curr_mon)
             Revenue_per_head_fn(row_after_curr_mon)
+            Composite_costs_multiplier_fn(row_after_curr_mon, live$data$`Overhead to revenue ratio`[row_after_curr_mon])
             Total_partner_pay_fn(row_after_curr_mon)
-            Net_profit_fn(row_after_curr_mon)
             Net_margins_fn(row_after_curr_mon)
             Cash_in_bank_fn(row_after_curr_mon)
           }
@@ -282,13 +318,13 @@ server <- function(input, output, session) {
             live$data$`Automation multiplier`[row_after_curr_mon] <- live$data$`Custom automation multiplier`[row_after_curr_mon]
             live$data$`Reduction in agent task completion times relative to price benchmark`[row_after_curr_mon] <- 
               live$data$`Automation multiplier`[row_after_curr_mon]
-            Composite_costs_multiplier_fn(row_after_curr_mon, live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
             Company_head_count_fn(row_after_curr_mon)
             Actual_labor_costs_fn(row_after_curr_mon)
             Revenue_per_head_fn(row_after_curr_mon)
+            Composite_costs_multiplier_fn(row_after_curr_mon, live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
+            Overhead_fn(row_after_curr_mon)
             Overhead_to_opex_fn(row_after_curr_mon)
             Gross_margins_fn(row_after_curr_mon)
-            Net_profit_fn(row_after_curr_mon)
             Net_margins_fn(row_after_curr_mon)
             Cash_in_bank_fn(row_after_curr_mon)
             
@@ -300,13 +336,13 @@ server <- function(input, output, session) {
               (1 + auto_numeric)
             live$data$`Reduction in agent task completion times relative to price benchmark`[row_after_curr_mon] <- 1 / 
               live$data$`Automation multiplier`[row_after_curr_mon]
-            Composite_costs_multiplier_fn(row_after_curr_mon, live$data$`Overhead to revenue ratio`[row_after_curr_mon])
             Company_head_count_fn(row_after_curr_mon)
             Actual_labor_costs_fn(row_after_curr_mon)
             Revenue_per_head_fn(row_after_curr_mon)
+            Composite_costs_multiplier_fn(row_after_curr_mon, live$data$`Overhead to revenue ratio`[row_after_curr_mon])
+            Overhead_fn(row_after_curr_mon)
             Overhead_to_opex_fn(row_after_curr_mon)
             Gross_margins_fn(row_after_curr_mon)
-            Net_profit_fn(row_after_curr_mon)
             Net_margins_fn(row_after_curr_mon)
             Cash_in_bank_fn(row_after_curr_mon)
           }
@@ -337,8 +373,8 @@ server <- function(input, output, session) {
     gvisComboChart(df, xvar="Month",
                    yvar=c("CLTV","CAC"),
                    options=list(pointSize = 3, seriesType="line",
-                                series="[{type:'bars', color:'b8e986'}, 
-                                {type:'bars', color:'8497e5'}]",
+                                series="[{type:'bars', targetAxisIndex:0, color:'b8e986'}, 
+                                {type:'bars', targetAxisIndex:1, color:'8497e5'}]",
                                 vAxes="[{title:'Dollars($)'},{title:'Dollars($)'}]", 
                                 width = 800, height = 400, title = "CLTV and CAC", hAxis="{title:'Months'}"))
   })
@@ -419,16 +455,42 @@ server <- function(input, output, session) {
   
   observeEvent(input$grow_newTable, {
     output$grow_main_table <-renderGvis({
-      gvisTable(grow_live$data[,c("Month","Revenue", "Revenue percent change", "Total clients", "Churn percentage weighted by number of clients",
-                             "Hrs client demand","Client growth after churn","Total monthly ARPA", "Avg Customer Lifetime (months)","CLTV",
+      gvisTable(grow_live$data[,c("Month","Client growth percentage","Revenue", "Revenue percent change", "Total clients", 
+                                  "Churn percentage weighted by number of clients","Hrs client demand",
+                                  "Client growth after churn","Total monthly ARPA", "Avg customer lifetime in months","CLTV",
                              "Company head count", "Number of agents", "Labor costs", "Revenue per head", "Gross profit",
                              "Gross margins", "Automation multiplier", "Number of partners", "Total partner pay", "Partner bonuses",
                              "Sales and marketing costs", "Additional subscription costs", "Total R and D costs", "BD costs",
-                             "Discretionary spending", "Overhead", "Opex","Overhead to opex", "Operating profit", "CAC", "CLTV to CAC ratio", 
+                             "Discretionary spending", "Overhead", "Opex","Overhead to opex", "Operating profit", 
+                             "CAC", "CLTV to CAC ratio", 
                              "Net profit", "Net margins", "Funds raised", "Cash in bank")], options = list(frozenColumns = 1))
     })
   }, ignoreNULL = TRUE)
   
+  
+  observeEvent(input$grow_diff_types,{
+    if(input$grow_diff_types == "Conservative"){
+      updateSliderTextInput(session, inputId = "grow_growslide", selected = isolate("10%"))
+      updateSliderTextInput(session, inputId = "grow_mCost", selected = isolate("20%"))
+      updateSliderTextInput(session, inputId = "grow_churn", selected = isolate("5%"))
+      updateSliderTextInput(session, inputId = "grow_Partners", selected = isolate(1))
+      updateSliderTextInput(session, inputId = "grow_auto", selected = isolate("1%"))
+    }
+    else if(input$grow_diff_types == "Moderate"){
+      updateSliderTextInput(session, inputId = "grow_growslide", selected = isolate("20%"))
+      updateSliderTextInput(session, inputId = "grow_mCost", selected = isolate("15%"))
+      updateSliderTextInput(session, inputId = "grow_churn", selected = isolate("7%"))
+      updateSliderTextInput(session, inputId = "grow_Partners", selected = isolate(2))
+      updateSliderTextInput(session, inputId = "grow_auto", selected = isolate("1.5%"))
+    }
+    else{
+      updateSliderTextInput(session, inputId = "grow_growslide", selected = isolate("40%"))
+      updateSliderTextInput(session, inputId = "grow_mCost", selected = isolate("20%"))
+      updateSliderTextInput(session, inputId = "grow_churn", selected = isolate("10%"))
+      updateSliderTextInput(session, inputId = "grow_Partners", selected = isolate(4))
+      updateSliderTextInput(session, inputId = "grow_auto", selected = isolate("3%"))
+    }
+  }, ignoreInit = TRUE)
   
   #Effects the slider for the client growth slider
   
@@ -440,50 +502,53 @@ server <- function(input, output, session) {
         while(row_after_curr_mon <= nrow(MRT$data)){
           if(input$grow_growslide == "Custom"){
             grow_live$data$`Client growth percentage`[row_after_curr_mon] <- grow_live$data$`Custom client growth`[row_after_curr_mon]
-            Composite_costs_multiplier_growfn(row_after_curr_mon, 
-                                              grow_live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
+            
             Revenue_growfn(row_after_curr_mon)
             Company_head_count_growfn(row_after_curr_mon)
             Revenue_percent_change_growfn(row_after_curr_mon)
+            Composite_costs_multiplier_growfn(row_after_curr_mon, 
+                                              grow_live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
             Total_monthly_ARPA_growfn(row_after_curr_mon)
             Client_growth_after_churn_growfn(row_after_curr_mon)
-            CLTV_growfn(row_after_curr_mon)
             CLTV_to_CAC_ratio_growfn(row_after_curr_mon)
             Company_head_count_growfn(row_after_curr_mon)
             Actual_labor_costs_growfn(row_after_curr_mon)
             Revenue_per_head_growfn(row_after_curr_mon)
             Gross_margins_growfn(row_after_curr_mon)
             Total_partner_pay_growfn(row_after_curr_mon)
-            Sales_and_marketing_costs_growfn(row_after_curr_mon)
+            #Sales_and_marketing_costs_growfn(row_after_curr_mon)
             
             Overhead_growfn(row_after_curr_mon)
             Overhead_to_opex_growfn(row_after_curr_mon)
-            Net_profit_growfn(row_after_curr_mon)
             Net_margins_growfn(row_after_curr_mon)
             Cash_in_bank_growfn(row_after_curr_mon)
           }
           else {
-            growslide_numeric = as.numeric(gsub("[\\%,]", "", input$grow_growslide))
-            growslide_numeric = growslide_numeric / 100
+            #growslide_numeric = as.numeric(gsub("[\\%,]", "", input$grow_growslide))
+            #growslide_numeric = growslide_numeric / 100
+            #grow_live$data$`Client growth percentage`[row_after_curr_mon] <- growslide_numeric
+            #grow_live$data$`Churn percentage weighted by number of clients`[row_after_curr_mon] <- 
+            const_growslide_numeric = as.numeric(gsub("[\\%,]", "", input$grow_growslide))
+            x = -((row_after_curr_mon - 12)^(as.numeric(input$n_num)))
+            growslide_numeric = (((100 * grow_live$data$`Churn percentage weighted by number of clients`[row_after_curr_mon] * x) - 
+                                    (as.numeric(input$k_num)*const_growslide_numeric)) / (x - as.numeric(input$k_num))) / 100
             grow_live$data$`Client growth percentage`[row_after_curr_mon] <- growslide_numeric
-            Composite_costs_multiplier_growfn(row_after_curr_mon, grow_live$data$`Overhead to revenue ratio`[row_after_curr_mon])
             Revenue_growfn(row_after_curr_mon)
             Company_head_count_growfn(row_after_curr_mon)
             Revenue_percent_change_growfn(row_after_curr_mon)
+            Composite_costs_multiplier_growfn(row_after_curr_mon, grow_live$data$`Overhead to revenue ratio`[row_after_curr_mon])
             Total_monthly_ARPA_growfn(row_after_curr_mon)
             Client_growth_after_churn_growfn(row_after_curr_mon)
-            CLTV_growfn(row_after_curr_mon)
             CLTV_to_CAC_ratio_growfn(row_after_curr_mon)
             Company_head_count_growfn(row_after_curr_mon)
             Actual_labor_costs_growfn(row_after_curr_mon)
             Revenue_per_head_growfn(row_after_curr_mon)
             Gross_margins_growfn(row_after_curr_mon)
             Total_partner_pay_growfn(row_after_curr_mon)
-            Sales_and_marketing_costs_growfn(row_after_curr_mon)
+            #Sales_and_marketing_costs_growfn(row_after_curr_mon)
             
             Overhead_growfn(row_after_curr_mon)
             Overhead_to_opex_growfn(row_after_curr_mon)
-            Net_profit_growfn(row_after_curr_mon)
             Net_margins_growfn(row_after_curr_mon)
             Cash_in_bank_growfn(row_after_curr_mon)
           }
@@ -507,7 +572,6 @@ server <- function(input, output, session) {
                                               grow_live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
             Overhead_growfn(row_after_curr_mon)
             Overhead_to_opex_growfn(row_after_curr_mon)
-            Net_profit_growfn(row_after_curr_mon)
             Net_margins_growfn(row_after_curr_mon)
             Cash_in_bank_growfn(row_after_curr_mon)
           }
@@ -517,7 +581,6 @@ server <- function(input, output, session) {
             Composite_costs_multiplier_growfn(row_after_curr_mon, mCost_numeric)
             Overhead_growfn(row_after_curr_mon)
             Overhead_to_opex_growfn(row_after_curr_mon)
-            Net_profit_growfn(row_after_curr_mon)
             Net_margins_growfn(row_after_curr_mon)
             Cash_in_bank_growfn(row_after_curr_mon)
           }
@@ -537,26 +600,32 @@ server <- function(input, output, session) {
           if(input$grow_churn == "Custom"){
             grow_live$data$`Churn percentage weighted by number of clients`[row_after_curr_mon] <-
               grow_live$data$`Custom client churn`[row_after_curr_mon]
-            Composite_costs_multiplier_growfn(row_after_curr_mon, 
-                                              grow_live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
+            ########update growslider
+            if(input$grow_growslide != "Custom"){
+              const_growslide_numeric = as.numeric(gsub("[\\%,]", "", input$grow_growslide))
+              x = -((row_after_curr_mon - 12)^(as.numeric(input$n_num)))
+              growslide_numeric = (((100 * grow_live$data$`Churn percentage weighted by number of clients`[row_after_curr_mon] * x) - 
+                                      (as.numeric(input$k_num)*const_growslide_numeric)) / (x - as.numeric(input$k_num))) / 100
+              grow_live$data$`Client growth percentage`[row_after_curr_mon] <- growslide_numeric
+            }
+            ##############
             Revenue_growfn(row_after_curr_mon)
             Company_head_count_growfn(row_after_curr_mon)
             Revenue_percent_change_growfn(row_after_curr_mon)
+            Composite_costs_multiplier_growfn(row_after_curr_mon, 
+                                              grow_live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
             Total_monthly_ARPA_growfn(row_after_curr_mon)
             Client_growth_after_churn_growfn(row_after_curr_mon)
-            CLTV_growfn(row_after_curr_mon)
             CLTV_to_CAC_ratio_growfn(row_after_curr_mon)
             Company_head_count_growfn(row_after_curr_mon)
             Actual_labor_costs_growfn(row_after_curr_mon)
             Revenue_per_head_growfn(row_after_curr_mon)
-            Gross_profit_growfn(row_after_curr_mon)
             Gross_margins_growfn(row_after_curr_mon)
             Total_partner_pay_growfn(row_after_curr_mon)
-            Sales_and_marketing_costs_growfn(row_after_curr_mon)
+            #Sales_and_marketing_costs_growfn(row_after_curr_mon)
             
             Overhead_growfn(row_after_curr_mon)
             Overhead_to_opex_growfn(row_after_curr_mon)
-            Net_profit_growfn(row_after_curr_mon)
             Net_margins_growfn(row_after_curr_mon)
             Cash_in_bank_growfn(row_after_curr_mon)
           }
@@ -564,25 +633,31 @@ server <- function(input, output, session) {
             churn_numeric = as.numeric(gsub("[\\%,]", "", input$grow_churn))
             churn_numeric = churn_numeric / 100
             grow_live$data$`Churn percentage weighted by number of clients`[row_after_curr_mon] <- churn_numeric
-            Composite_costs_multiplier_growfn(row_after_curr_mon, grow_live$data$`Overhead to revenue ratio`[row_after_curr_mon])
+            #####update growslider
+            if(input$grow_growslide != "Custom"){
+              const_growslide_numeric = as.numeric(gsub("[\\%,]", "", input$grow_growslide))
+              x = -((row_after_curr_mon - 12)^(as.numeric(input$n_num)))
+              growslide_numeric = (((100 * grow_live$data$`Churn percentage weighted by number of clients`[row_after_curr_mon] * x) - 
+                                     (as.numeric(input$k_num)*const_growslide_numeric)) / (x - as.numeric(input$k_num))) / 100
+              grow_live$data$`Client growth percentage`[row_after_curr_mon] <- growslide_numeric
+            }
+            ######
             Revenue_growfn(row_after_curr_mon)
             Company_head_count_growfn(row_after_curr_mon)
             Revenue_percent_change_growfn(row_after_curr_mon)
+            Composite_costs_multiplier_growfn(row_after_curr_mon, grow_live$data$`Overhead to revenue ratio`[row_after_curr_mon])
             Total_monthly_ARPA_growfn(row_after_curr_mon)
             Client_growth_after_churn_growfn(row_after_curr_mon)
-            CLTV_growfn(row_after_curr_mon)
             CLTV_to_CAC_ratio_growfn(row_after_curr_mon)
             Company_head_count_growfn(row_after_curr_mon)
             Actual_labor_costs_growfn(row_after_curr_mon)
             Revenue_per_head_growfn(row_after_curr_mon)
-            Gross_profit_growfn(row_after_curr_mon)
             Gross_margins_growfn(row_after_curr_mon)
             Total_partner_pay_growfn(row_after_curr_mon)
-            Sales_and_marketing_costs_growfn(row_after_curr_mon)
+            #Sales_and_marketing_costs_growfn(row_after_curr_mon)
             
             Overhead_growfn(row_after_curr_mon)
             Overhead_to_opex_growfn(row_after_curr_mon)
-            Net_profit_growfn(row_after_curr_mon)
             Net_margins_growfn(row_after_curr_mon)
             Cash_in_bank_growfn(row_after_curr_mon)
           }
@@ -591,6 +666,8 @@ server <- function(input, output, session) {
       }
       i = i + 1
     }
+    #num <- as.numeric(gsub("[\\%,]", "", input$grow_growslide))
+    #updateSliderTextInput(session, inputId = "grow_growslide", selected = isolate("num"))
   }, ignoreInit = TRUE)
  
   
@@ -602,12 +679,12 @@ server <- function(input, output, session) {
         while(row_after_curr_mon <= nrow(MRT$data)){
           if(input$grow_Partners == "Custom"){
             grow_live$data$`Number of partners`[row_after_curr_mon] <- grow_live$data$`Custom number of partners`[row_after_curr_mon]
-            Composite_costs_multiplier_growfn(row_after_curr_mon, 
-                                              grow_live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
+            
             Company_head_count_growfn(row_after_curr_mon)
             Revenue_per_head_growfn(row_after_curr_mon)
+            Composite_costs_multiplier_growfn(row_after_curr_mon, 
+                                              grow_live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
             Total_partner_pay_growfn(row_after_curr_mon)
-            Net_profit_growfn(row_after_curr_mon)
             Net_margins_growfn(row_after_curr_mon)
             Cash_in_bank_growfn(row_after_curr_mon)
           }
@@ -615,11 +692,10 @@ server <- function(input, output, session) {
             part_numeric = as.numeric(input$grow_Partners)
             grow_live$data$`Number of partners`[row_after_curr_mon] <- (grow_live$data$`Number of partners`[row_after_curr_mon - 1] + 
                                                                           part_numeric)
-            Composite_costs_multiplier_growfn(row_after_curr_mon, grow_live$data$`Overhead to revenue ratio`[row_after_curr_mon])
             Company_head_count_growfn(row_after_curr_mon)
             Revenue_per_head_growfn(row_after_curr_mon)
+            Composite_costs_multiplier_growfn(row_after_curr_mon, grow_live$data$`Overhead to revenue ratio`[row_after_curr_mon])
             Total_partner_pay_growfn(row_after_curr_mon)
-            Net_profit_growfn(row_after_curr_mon)
             Net_margins_growfn(row_after_curr_mon)
             Cash_in_bank_growfn(row_after_curr_mon)
           }
@@ -640,13 +716,15 @@ server <- function(input, output, session) {
             grow_live$data$`Automation multiplier`[row_after_curr_mon] <- grow_live$data$`Custom automation multiplier`[row_after_curr_mon]
             grow_live$data$`Reduction in agent task completion times relative to price benchmark`[row_after_curr_mon] <- 
               grow_live$data$`Automation multiplier`[row_after_curr_mon]
-            Composite_costs_multiplier_growfn(row_after_curr_mon, grow_live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
+            
             Company_head_count_growfn(row_after_curr_mon)
             Actual_labor_costs_growfn(row_after_curr_mon)
             Revenue_per_head_growfn(row_after_curr_mon)
+            Composite_costs_multiplier_growfn(row_after_curr_mon, 
+                                              grow_live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
+            Overhead_growfn(row_after_curr_mon)
             Overhead_to_opex_growfn(row_after_curr_mon)
             Gross_margins_growfn(row_after_curr_mon)
-            Net_profit_growfn(row_after_curr_mon)
             Net_margins_growfn(row_after_curr_mon)
             Cash_in_bank_growfn(row_after_curr_mon)
           }
@@ -657,13 +735,14 @@ server <- function(input, output, session) {
               (1 + auto_numeric)
             grow_live$data$`Reduction in agent task completion times relative to price benchmark`[row_after_curr_mon] <- 1 / 
               grow_live$data$`Automation multiplier`[row_after_curr_mon]
-            Composite_costs_multiplier_growfn(row_after_curr_mon, grow_live$data$`Overhead to revenue ratio`[row_after_curr_mon])
+            
             Company_head_count_growfn(row_after_curr_mon)
             Actual_labor_costs_growfn(row_after_curr_mon)
             Revenue_per_head_growfn(row_after_curr_mon)
+            Composite_costs_multiplier_growfn(row_after_curr_mon, grow_live$data$`Overhead to revenue ratio`[row_after_curr_mon])
+            Overhead_growfn(row_after_curr_mon)
             Overhead_to_opex_growfn(row_after_curr_mon)
             Gross_margins_growfn(row_after_curr_mon)
-            Net_profit_growfn(row_after_curr_mon)
             Net_margins_growfn(row_after_curr_mon)
             Cash_in_bank_growfn(row_after_curr_mon)
           }
@@ -684,8 +763,8 @@ server <- function(input, output, session) {
     gvisColumnChart(df, xvar = "Month", 
                     yvar = c("Gross_Profit", "Net_Profit"),
                     options=list(bar="{groupWidth:'70%'}", width = "800", height = "400",
-                                 isStacked = TRUE, vAxis="{title:'Dollars($)'}",
-                                 hAxis="{title:'Months'}", title = "Profit",
+                                 isStacked = TRUE, vAxis="{title:'Dollars($)', textPosition: 'out'}",
+                                 hAxis="{title:'Months', textPosition: 'out'}", title = "Profit",
                                  series = "[{color:'8497e5'}, {color:'b8e986'}]"))
   })
   #gross/ net margins visual
@@ -820,15 +899,42 @@ server <- function(input, output, session) {
   #bottom page table
   observeEvent(input$part_newTable, {
     output$part_main_table <-renderGvis({
-      gvisTable(part_live$data[,c("Month","Revenue", "Revenue percent change", "Total clients", "Churn percentage weighted by number of clients",
-                             "Hrs client demand","Client growth after churn","Total monthly ARPA", "Avg Customer Lifetime (months)","CLTV",
+      gvisTable(part_live$data[,c("Month","Revenue", "Revenue percent change", "Total clients", 
+                                  "Churn percentage weighted by number of clients",
+                             "Hrs client demand","Client growth after churn","Total monthly ARPA", "Avg customer lifetime in months","CLTV",
                              "Company head count", "Number of agents", "Labor costs", "Revenue per head", "Gross profit",
                              "Gross margins", "Automation multiplier", "Number of partners", "Total partner pay", "Partner bonuses",
                              "Sales and marketing costs", "Additional subscription costs", "Total R and D costs", "BD costs",
-                             "Discretionary spending", "Overhead", "Opex","Overhead to opex", "Operating profit", "CAC", "CLTV to CAC ratio", 
+                             "Discretionary spending", "Overhead", "Opex","Overhead to opex", "Operating profit", 
+                             "CAC", "CLTV to CAC ratio", 
                              "Net profit", "Net margins", "Funds raised", "Cash in bank")], options = list(frozenColumns = 1))
     })
   }, ignoreNULL = TRUE)
+  
+  
+  observeEvent(input$part_diff_types,{
+    if(input$part_diff_types == "Conservative"){
+      updateSliderTextInput(session, inputId = "part_growslide", selected = isolate("10%"))
+      updateSliderTextInput(session, inputId = "part_mCost", selected = isolate("20%"))
+      updateSliderTextInput(session, inputId = "part_churn", selected = isolate("5%"))
+      updateSliderTextInput(session, inputId = "part_Partners", selected = isolate(1))
+      updateSliderTextInput(session, inputId = "part_auto", selected = isolate("1%"))
+    }
+    else if(input$part_diff_types == "Moderate"){
+      updateSliderTextInput(session, inputId = "part_growslide", selected = isolate("20%"))
+      updateSliderTextInput(session, inputId = "part_mCost", selected = isolate("15%"))
+      updateSliderTextInput(session, inputId = "part_churn", selected = isolate("7%"))
+      updateSliderTextInput(session, inputId = "part_Partners", selected = isolate(2))
+      updateSliderTextInput(session, inputId = "part_auto", selected = isolate("1.5%"))
+    }
+    else{
+      updateSliderTextInput(session, inputId = "part_growslide", selected = isolate("40%"))
+      updateSliderTextInput(session, inputId = "part_mCost", selected = isolate("20%"))
+      updateSliderTextInput(session, inputId = "part_churn", selected = isolate("10%"))
+      updateSliderTextInput(session, inputId = "part_Partners", selected = isolate(4))
+      updateSliderTextInput(session, inputId = "part_auto", selected = isolate("3%"))
+    }
+  }, ignoreInit = TRUE)
   
   
   #Effects the slider for the client growth slider
@@ -841,50 +947,52 @@ server <- function(input, output, session) {
         while(row_after_curr_mon <= nrow(MRT$data)){
           if(input$part_growslide == "Custom"){
             part_live$data$`Client growth percentage`[row_after_curr_mon] <- part_live$data$`Custom client growth`[row_after_curr_mon]
-            Composite_costs_multiplier_partfn(row_after_curr_mon, 
-                                              part_live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
+            
             Revenue_partfn(row_after_curr_mon)
             Company_head_count_partfn(row_after_curr_mon)
             Revenue_percent_change_partfn(row_after_curr_mon)
+            Composite_costs_multiplier_partfn(row_after_curr_mon, 
+                                              part_live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
             Total_monthly_ARPA_partfn(row_after_curr_mon)
             Client_growth_after_churn_partfn(row_after_curr_mon)
-            CLTV_partfn(row_after_curr_mon)
             CLTV_to_CAC_ratio_partfn(row_after_curr_mon)
             Company_head_count_partfn(row_after_curr_mon)
             Actual_labor_costs_partfn(row_after_curr_mon)
             Revenue_per_head_partfn(row_after_curr_mon)
             Gross_margins_partfn(row_after_curr_mon)
             Total_partner_pay_partfn(row_after_curr_mon)
-            Sales_and_marketing_costs_partfn(row_after_curr_mon)
+            #Sales_and_marketing_costs_partfn(row_after_curr_mon)
             
             Overhead_partfn(row_after_curr_mon)
             Overhead_to_opex_partfn(row_after_curr_mon)
-            Net_profit_partfn(row_after_curr_mon)
             Net_margins_partfn(row_after_curr_mon)
             Cash_in_bank_partfn(row_after_curr_mon)
           }
           else {
-            growslide_numeric = as.numeric(gsub("[\\%,]", "", input$part_growslide))
-            growslide_numeric = growslide_numeric / 100
+            #growslide_numeric = as.numeric(gsub("[\\%,]", "", input$part_growslide))
+            #growslide_numeric = growslide_numeric / 100
+            #part_live$data$`Client growth percentage`[row_after_curr_mon] <- growslide_numeric
+            const_growslide_numeric = as.numeric(gsub("[\\%,]", "", input$part_growslide))
+            x = -((row_after_curr_mon - 12)^(as.numeric(input$n_num)))
+            growslide_numeric = (((100 * part_live$data$`Churn percentage weighted by number of clients`[row_after_curr_mon] * x) - 
+                                    (as.numeric(input$k_num)*const_growslide_numeric)) / (x - as.numeric(input$k_num))) / 100
             part_live$data$`Client growth percentage`[row_after_curr_mon] <- growslide_numeric
-            Composite_costs_multiplier_partfn(row_after_curr_mon, part_live$data$`Overhead to revenue ratio`[row_after_curr_mon])
             Revenue_partfn(row_after_curr_mon)
             Company_head_count_partfn(row_after_curr_mon)
             Revenue_percent_change_partfn(row_after_curr_mon)
+            Composite_costs_multiplier_partfn(row_after_curr_mon, part_live$data$`Overhead to revenue ratio`[row_after_curr_mon])
             Total_monthly_ARPA_partfn(row_after_curr_mon)
             Client_growth_after_churn_partfn(row_after_curr_mon)
-            CLTV_partfn(row_after_curr_mon)
             CLTV_to_CAC_ratio_partfn(row_after_curr_mon)
             Company_head_count_partfn(row_after_curr_mon)
             Actual_labor_costs_partfn(row_after_curr_mon)
             Revenue_per_head_partfn(row_after_curr_mon)
             Gross_margins_partfn(row_after_curr_mon)
             Total_partner_pay_partfn(row_after_curr_mon)
-            Sales_and_marketing_costs_partfn(row_after_curr_mon)
+            #Sales_and_marketing_costs_partfn(row_after_curr_mon)
             
             Overhead_partfn(row_after_curr_mon)
             Overhead_to_opex_partfn(row_after_curr_mon)
-            Net_profit_partfn(row_after_curr_mon)
             Net_margins_partfn(row_after_curr_mon)
             Cash_in_bank_partfn(row_after_curr_mon)
           }
@@ -908,7 +1016,6 @@ server <- function(input, output, session) {
                                               part_live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
             Overhead_partfn(row_after_curr_mon)
             Overhead_to_opex_partfn(row_after_curr_mon)
-            Net_profit_partfn(row_after_curr_mon)
             Net_margins_partfn(row_after_curr_mon)
             Cash_in_bank_partfn(row_after_curr_mon)
           }
@@ -918,7 +1025,6 @@ server <- function(input, output, session) {
             Composite_costs_multiplier_partfn(row_after_curr_mon, mCost_numeric)
             Overhead_partfn(row_after_curr_mon)
             Overhead_to_opex_partfn(row_after_curr_mon)
-            Net_profit_partfn(row_after_curr_mon)
             Net_margins_partfn(row_after_curr_mon)
             Cash_in_bank_partfn(row_after_curr_mon)
           }
@@ -938,26 +1044,30 @@ server <- function(input, output, session) {
           if(input$part_churn == "Custom"){
             part_live$data$`Churn percentage weighted by number of clients`[row_after_curr_mon] <-
               part_live$data$`Custom client churn`[row_after_curr_mon]
-            Composite_costs_multiplier_partfn(row_after_curr_mon, 
-                                              part_live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
+            if(input$part_growslide != "Custom"){
+              const_growslide_numeric = as.numeric(gsub("[\\%,]", "", input$part_growslide))
+              x = -((row_after_curr_mon - 12)^(as.numeric(input$n_num)))
+              growslide_numeric = (((100 * part_live$data$`Churn percentage weighted by number of clients`[row_after_curr_mon] * x) - 
+                                      (as.numeric(input$k_num)*const_growslide_numeric)) / (x - as.numeric(input$k_num))) / 100
+              part_live$data$`Client growth percentage`[row_after_curr_mon] <- growslide_numeric
+            }
             Revenue_partfn(row_after_curr_mon)
             Company_head_count_partfn(row_after_curr_mon)
             Revenue_percent_change_partfn(row_after_curr_mon)
+            Composite_costs_multiplier_partfn(row_after_curr_mon, 
+                                              part_live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
             Total_monthly_ARPA_partfn(row_after_curr_mon)
             Client_growth_after_churn_partfn(row_after_curr_mon)
-            CLTV_partfn(row_after_curr_mon)
             CLTV_to_CAC_ratio_partfn(row_after_curr_mon)
             Company_head_count_partfn(row_after_curr_mon)
             Actual_labor_costs_partfn(row_after_curr_mon)
             Revenue_per_head_partfn(row_after_curr_mon)
-            Gross_profit_partfn(row_after_curr_mon)
             Gross_margins_partfn(row_after_curr_mon)
             Total_partner_pay_partfn(row_after_curr_mon)
-            Sales_and_marketing_costs_partfn(row_after_curr_mon)
+            #Sales_and_marketing_costs_partfn(row_after_curr_mon)
             
             Overhead_partfn(row_after_curr_mon)
             Overhead_to_opex_partfn(row_after_curr_mon)
-            Net_profit_partfn(row_after_curr_mon)
             Net_margins_partfn(row_after_curr_mon)
             Cash_in_bank_partfn(row_after_curr_mon)
           }
@@ -965,25 +1075,30 @@ server <- function(input, output, session) {
             churn_numeric = as.numeric(gsub("[\\%,]", "", input$part_churn))
             churn_numeric = churn_numeric / 100
             part_live$data$`Churn percentage weighted by number of clients`[row_after_curr_mon] <- churn_numeric
-            Composite_costs_multiplier_partfn(row_after_curr_mon, part_live$data$`Overhead to revenue ratio`[row_after_curr_mon])
+            if(input$part_growslide != "Custom"){
+              const_growslide_numeric = as.numeric(gsub("[\\%,]", "", input$part_growslide))
+              x = -((row_after_curr_mon - 12)^(1))
+              growslide_numeric = (((100 * part_live$data$`Churn percentage weighted by number of clients`[row_after_curr_mon] * x) - 
+                                      (7*const_growslide_numeric)) / (x - 7)) / 100
+              part_live$data$`Client growth percentage`[row_after_curr_mon] <- growslide_numeric
+            }
+            
             Revenue_partfn(row_after_curr_mon)
             Company_head_count_partfn(row_after_curr_mon)
             Revenue_percent_change_partfn(row_after_curr_mon)
+            Composite_costs_multiplier_partfn(row_after_curr_mon, part_live$data$`Overhead to revenue ratio`[row_after_curr_mon])
             Total_monthly_ARPA_partfn(row_after_curr_mon)
             Client_growth_after_churn_partfn(row_after_curr_mon)
-            CLTV_partfn(row_after_curr_mon)
             CLTV_to_CAC_ratio_partfn(row_after_curr_mon)
             Company_head_count_partfn(row_after_curr_mon)
             Actual_labor_costs_partfn(row_after_curr_mon)
             Revenue_per_head_partfn(row_after_curr_mon)
-            Gross_profit_partfn(row_after_curr_mon)
             Gross_margins_partfn(row_after_curr_mon)
             Total_partner_pay_partfn(row_after_curr_mon)
-            Sales_and_marketing_costs_partfn(row_after_curr_mon)
+            #Sales_and_marketing_costs_partfn(row_after_curr_mon)
             
             Overhead_partfn(row_after_curr_mon)
             Overhead_to_opex_partfn(row_after_curr_mon)
-            Net_profit_partfn(row_after_curr_mon)
             Net_margins_partfn(row_after_curr_mon)
             Cash_in_bank_partfn(row_after_curr_mon)
           }
@@ -1002,12 +1117,12 @@ server <- function(input, output, session) {
         while(row_after_curr_mon <= nrow(MRT$data)){
           if(input$part_Partners == "Custom"){
             part_live$data$`Number of partners`[row_after_curr_mon] <- part_live$data$`Custom number of partners`[row_after_curr_mon]
-            Composite_costs_multiplier_partfn(row_after_curr_mon, 
-                                              part_live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
+            
             Company_head_count_partfn(row_after_curr_mon)
             Revenue_per_head_partfn(row_after_curr_mon)
+            Composite_costs_multiplier_partfn(row_after_curr_mon, 
+                                              part_live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
             Total_partner_pay_partfn(row_after_curr_mon)
-            Net_profit_partfn(row_after_curr_mon)
             Net_margins_partfn(row_after_curr_mon)
             Cash_in_bank_partfn(row_after_curr_mon)
           }
@@ -1015,11 +1130,11 @@ server <- function(input, output, session) {
             part_numeric = as.numeric(input$part_Partners)
             part_live$data$`Number of partners`[row_after_curr_mon] <- (part_live$data$`Number of partners`[row_after_curr_mon - 1] + 
                                                                           part_numeric)
-            Composite_costs_multiplier_partfn(row_after_curr_mon, part_live$data$`Overhead to revenue ratio`[row_after_curr_mon])
+            
             Company_head_count_partfn(row_after_curr_mon)
             Revenue_per_head_partfn(row_after_curr_mon)
+            Composite_costs_multiplier_partfn(row_after_curr_mon, part_live$data$`Overhead to revenue ratio`[row_after_curr_mon])
             Total_partner_pay_partfn(row_after_curr_mon)
-            Net_profit_partfn(row_after_curr_mon)
             Net_margins_partfn(row_after_curr_mon)
             Cash_in_bank_partfn(row_after_curr_mon)
           }
@@ -1040,13 +1155,15 @@ server <- function(input, output, session) {
             part_live$data$`Automation multiplier`[row_after_curr_mon] <- part_live$data$`Custom automation multiplier`[row_after_curr_mon]
             part_live$data$`Reduction in agent task completion times relative to price benchmark`[row_after_curr_mon] <- 
               part_live$data$`Automation multiplier`[row_after_curr_mon]
-            Composite_costs_multiplier_partfn(row_after_curr_mon, part_live$data$`Overhead to revenue growth ratio`[row_after_curr_mon])
+            
             Company_head_count_partfn(row_after_curr_mon)
             Actual_labor_costs_partfn(row_after_curr_mon)
             Revenue_per_head_partfn(row_after_curr_mon)
+            Composite_costs_multiplier_partfn(row_after_curr_mon, 
+                                              part_live$data$`Custom overhead to revenue growth ratio`[row_after_curr_mon])
+            Overhead_partfn(row_after_curr_mon)
             Overhead_to_opex_partfn(row_after_curr_mon)
             Gross_margins_partfn(row_after_curr_mon)
-            Net_profit_partfn(row_after_curr_mon)
             Net_margins_partfn(row_after_curr_mon)
             Cash_in_bank_partfn(row_after_curr_mon)
           }
@@ -1057,13 +1174,14 @@ server <- function(input, output, session) {
               (1 + auto_numeric)
             part_live$data$`Reduction in agent task completion times relative to price benchmark`[row_after_curr_mon] <- 1 / 
               part_live$data$`Automation multiplier`[row_after_curr_mon]
-            Composite_costs_multiplier_partfn(row_after_curr_mon, part_live$data$`Overhead to revenue ratio`[row_after_curr_mon])
+            
             Company_head_count_partfn(row_after_curr_mon)
             Actual_labor_costs_partfn(row_after_curr_mon)
             Revenue_per_head_partfn(row_after_curr_mon)
+            Composite_costs_multiplier_partfn(row_after_curr_mon, part_live$data$`Overhead to revenue ratio`[row_after_curr_mon])
+            Overhead_partfn(row_after_curr_mon)
             Overhead_to_opex_partfn(row_after_curr_mon)
             Gross_margins_partfn(row_after_curr_mon)
-            Net_profit_partfn(row_after_curr_mon)
             Net_margins_partfn(row_after_curr_mon)
             Cash_in_bank_partfn(row_after_curr_mon)
           }
@@ -1171,15 +1289,174 @@ server <- function(input, output, session) {
                                    hAxis="{title:'Revenue'}", series = "[{color: '8497e5'}]", title = "Economies of Scale"))
   })
   
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  ####################################Partner Pay Calculator###########################
+ 
+
+  output$pp_date <- renderText({pp_live$data$Month[input$pp_moSlider]})
+  
+  
+  observeEvent(input$pp_reload, {
+    MRT$data <- gs_read( gs_key("14AmPkfN5b51fSBsT223khVg_gH9-lzl2WAtyWp9zEkc"), ws = "Shiny sheet")
+    pp_live$data <- MRT$data
+    updateSliderInput(session, inputId = "pp_rev", value = isolate(MRT$data$Number[1]))
+    updateSliderInput(session, inputId = "pp_gmargin", value = isolate(as.numeric(MRT$data$Number[2]) * 100))
+    updateSliderInput(session, inputId = "pp_salcap", value = isolate(MRT$data$Number[5]))
+  }, ignoreNULL = TRUE)
+  output$pp_clics <- renderText(input$pp_reload)
+  
+  observeEvent(input$pp_newTable, {
+    output$pp_main_table <-renderGvis({
+      gvisTable(pp_live$data[,c("Name","Start date","Tier","Tier points","Experience points","New merit","Historical merit",
+                             "Total points before cap","Salary before cap","Salary after cap","Category","Number")],
+                             options = list(frozenColumns = 1))
+    })
+  }, ignoreNULL = TRUE)
+  
+###############################Partner pay sliders##############################################
+  observeEvent(input$pp_rev, {
+    pp_live$data$Number[1] <- input$pp_rev
+    Salary_after_cap_ppfn()
+    Revenue_total_maxing_out_all_partners_caps_ppfn()
+    Partners_hitting_cap_ppfn()
+  }, ignoreInit = TRUE)
+  
+  #################Gross margin slider
+  observeEvent(input$pp_gmargin, {
+      pp_live$data$Number[2] <- (input$pp_gmargin/100)
+      Salary_after_cap_ppfn()
+      Revenue_total_maxing_out_all_partners_caps_ppfn()
+      Partners_hitting_cap_ppfn()
+  }, ignoreInit = TRUE)
+  
+  observeEvent(input$pp_salcap, {
+      pp_live$data$Number[5] <- input$pp_salcap
+      Salary_after_cap_ppfn()
+      Revenue_total_maxing_out_all_partners_caps_ppfn()
+      Partners_hitting_cap_ppfn()
+  }, ignoreInit = TRUE)
+  
+  observe({
+    gross_profit <- (input$pp_gmargin / 100) * input$pp_rev
+    output$pp_gprof <- renderUI({
+      paste("Gross profit is", gross_profit)
+      })
+  })
+  ##########Pie chart###############
+  
+  output$pp_doughchart <- renderGvis({
+    
+    df <- data.frame(Names = pp_live$data$Name,
+                      Salary_after_cap = pp_live$data$`Salary after cap`)
+    gvisPieChart(df, options=list(#sliceVisibilityThreshold = pp_live$data$Name[1],
+                                  width=950,
+                                  height=650,
+                                  slices=if(input$pp_partnernames == pp_live$data$Name[1]){
+                                    "{0: {offset: 0.2, color:'8497e5'}}"
+                                    }
+                                  else if(input$pp_partnernames == pp_live$data$Name[2]){
+                                    "{1: {offset: 0.2, color:'8497e5'}}"
+                                  }
+                                  else if(input$pp_partnernames == pp_live$data$Name[3]){
+                                    "{2: {offset: 0.2, color:'8497e5'}}"
+                                  }
+                                  else if(input$pp_partnernames == pp_live$data$Name[4]){
+                                    "{3: {offset: 0.2, color:'8497e5'}}"
+                                  }
+                                  else if(input$pp_partnernames == pp_live$data$Name[5]){
+                                    "{4: {offset: 0.2, color:'8497e5'}}"
+                                  }
+                                  else if(input$pp_partnernames == pp_live$data$Name[6]){
+                                    "{5: {offset: 0.2, color:'8497e5'}}"
+                                  }
+                                  else if(input$pp_partnernames == pp_live$data$Name[7]){
+                                    "{6: {offset: 0.2, color:'8497e5'}}"
+                                  }
+                                  else if(input$pp_partnernames == pp_live$data$Name[8]){
+                                    "{7: {offset: 0.2, color:'8497e5'}}"
+                                  }
+                                  else if(input$pp_partnernames == pp_live$data$Name[9]){
+                                    "{8: {offset: 0.2, color:'8497e5'}}"
+                                  }
+                                  else if(input$pp_partnernames == pp_live$data$Name[10]){
+                                    "{9: {offset: 0.2, color:'8497e5'}}"
+                                  }
+                                  else if(input$pp_partnernames == pp_live$data$Name[11]){
+                                    "{10: {offset: 0.2, color:'8497e5'}}"
+                                  }
+                                  else if(input$pp_partnernames == pp_live$data$Name[12]){
+                                    "{11: {offset: 0.2, color:'8497e5'}}"
+                                  }
+                                  else if(input$pp_partnernames == pp_live$data$Name[13]){
+                                    "{12: {offset: 0.2, color:'8497e5'}}"
+                                  }
+                                  else if(input$pp_partnernames == pp_live$data$Name[14]){
+                                    "{13: {offset: 0.2, color:'8497e5'}}"
+                                  }
+                                  else if(input$pp_partnernames == pp_live$data$Name[15]){
+                                    "{14: {offset: 0.2, color:'8497e5'}}"
+                                  }
+                                  else if(input$pp_partnernames == pp_live$data$Name[16]){
+                                    "{15: {offset: 0.2, color:'8497e5'}}"
+                                  }
+                                  else if(input$pp_partnernames == pp_live$data$Name[17]){
+                                    "{16: {offset: 0.2, color:'8497e5'}}"
+                                  }
+                                  else if(input$pp_partnernames == pp_live$data$Name[18]){
+                                    "{17: {offset: 0.2, color:'8497e5'}}"
+                                  }
+                                  else if(input$pp_partnernames == pp_live$data$Name[19]){
+                                    "{18: {offset: 0.2, color:'8497e5'}}"
+                                  }
+                                  else if(input$pp_partnernames == pp_live$data$Name[20]){
+                                    "{19: {offset: 0.2, color:'8497e5'}}"
+                                  }
+                                  else if(input$pp_partnernames == pp_live$data$Name[21]){
+                                    "{20: {offset: 0.2, color:'8497e5'}}"
+                                  }
+                                  else if(input$pp_partnernames == pp_live$data$Name[22]){
+                                    "{21: {offset: 0.2, color:'8497e5'}}"
+                                  }
+                                  else if(input$pp_partnernames == pp_live$data$Name[23]){
+                                    "{22: {offset: 0.2, color:'8497e5'}}"
+                                  }
+                                  else if(input$pp_partnernames == pp_live$data$Name[24]){
+                                    "{23: {offset: 0.2, color:'8497e5'}}"
+                                  }
+                                  else if(input$pp_partnernames == pp_live$data$Name[25]){
+                                    "{24: {offset: 0.2, color:'8497e5'}}"
+                                  }
+                                  else if(input$pp_partnernames == pp_live$data$Name[26]){
+                                    "{25: {offset: 0.2, color:'8497e5'}}"
+                                  }
+                                  else{
+                                    "{26: {offset: 0.2, color:'8497e5'}}"
+                                  },
+                                  colors="['b8e986']",
+                                  pieSliceText='none',
+                                  pieHole=0.6),
+                                  chartid="doughnut")
+  })
+  
+  
   #########################################MORE PAGE###############################################
   
   ########################################Functional mapping#######################################################
   output$funcmap <-renderGvis({
-    df=data.frame(From = c('Total monthly ARPA',
-                           'Total monthly ARPA',
-                           'Revenue percent change',
-                           'Revenue percent change',
-                           'Month over month revenue',
+    df=data.frame(From = c('Total Monthly ARPA',
+                           'Total Monthly ARPA',
+                           'Revenue Growth Percentage',
+                           'Revenue Growth Percentage',
+                           'Month-over-Month',
                            'Revenue',
                            'Revenue',
                            'Revenue',
@@ -1195,49 +1472,49 @@ server <- function(input, output, session) {
                            'Personal Revenue',
                            'Personal Revenue',
                            'Personal Revenue',
-                           'Total enterprise monthly operator fees',
-                           'Total enterprise monthly assistant fees',
-                           'Total enterprise monthly specialist fees',
-                           'Total enterprise monthly strategist fees',
-                           'Total small business monthly operator fees', 
-                           'Total small business monthly assistant fees',
-                           'Total small business monthly specialist fees',
-                           'Total small business monthly strategist fees',
-                           'Total personal monthly operator fees', 
-                           'Total personal monthly assistant fees',
-                           'Total personal monthly specialist fees',
-                           'Total personal monthly strategist fees',
+                           'Total Enterprise monthly operator fees',
+                           'Total Enterprise monthly assistant fees',
+                           'Total Enterprise monthly specialist fees',
+                           'Total Enterprise monthly strategist fees',
+                           'Total Small Business monthly operator fees', 
+                           'Total Small Business monthly assistant fees',
+                           'Total Small Business monthly specialist fees',
+                           'Total Small Business monthly strategist fees',
+                           'Total Personal monthly operator fees', 
+                           'Total Personal monthly assistant fees',
+                           'Total Personal monthly specialist fees',
+                           'Total Personal monthly strategist fees',
                            'Enterprise monthly strategist hrs',
-                           'Enterprise clients',
-                           'Enterprise clients',
+                           'Enterprise Clients',
+                           'Enterprise Clients',
                            'Enterprise monthly strategist hrs',
                            'Enterprise monthly specialist hrs',
-                           'Enterprise clients',
-                           'Enterprise clients',
+                           'Enterprise Clients',
+                           'Enterprise Clients',
                            'Enterprise monthly specialist hrs',
                            'Enterprise monthly assistant hrs',
-                           'Enterprise clients',
-                           'Enterprise clients',
+                           'Enterprise Clients',
+                           'Enterprise Clients',
                            'Enterprise monthly assistant hrs',
                            'Enterprise monthly operator hrs',
-                           'Enterprise clients',
-                           'Enterprise clients',
+                           'Enterprise Clients',
+                           'Enterprise Clients',
                            'Enterprise monthly operator hrs',
                            'Small Business monthly strategist hrs',
-                           'Small Business clients',
-                           'Small Business clients',
+                           'Small Business Clients',
+                           'Small Business Clients',
                            'Small Business monthly strategist hrs',
                            'Small Business monthly specialist hrs',
-                           'Small Business clients',
-                           'Small Business clients',
+                           'Small Business Clients',
+                           'Small Business Clients',
                            'Small Business monthly specialist hrs',
                            'Small Business monthly assistant hrs',
-                           'Small Business clients',
-                           'Small Business clients',
+                           'Small Business Clients',
+                           'Small Business Clients',
                            'Small Business monthly assistant hrs',
                            'Small Business monthly operator hrs',
-                           'Small Business clients',
-                           'Small Business clients',
+                           'Small Business Clients',
+                           'Small Business Clients',
                            'Personal monthly operator hrs',
                            'Personal monthly strategist hrs',
                            'Personal clients',
@@ -1361,28 +1638,29 @@ server <- function(input, output, session) {
                            'Burn',
                            'Burn',
                            'Burn',
-                           'Burn'
+                           'Burn',
+                           'Composite costs multiplier'
                            ),
                   To =   c('Revenue',
                            'Total clients',
-                           'Month over month revenue',
+                           'Month-over-Month',
                            'Revenue',
                            'Revenue',
                            'Enterprise Revenue',
                            'Small Business Revenue',
                            'Personal Revenue',
-                             'Total enterprise monthly operator fees',
-                             'Total enterprise monthly assistant fees',
-                             'Total enterprise monthly specialist fees',
-                             'Total enterprise monthly strategist fees',
-                             'Total small business monthly operator fees', 
-                             'Total small business monthly assistant fees',
-                             'Total small business monthly specialist fees',
-                             'Total small business monthly strategist fees',
-                             'Total personal monthly operator fees', 
-                             'Total personal monthly assistant fees',
-                             'Total personal monthly specialist fees',
-                             'Total personal monthly strategist fees',
+                             'Total Enterprise monthly operator fees',
+                             'Total Enterprise monthly assistant fees',
+                             'Total Enterprise monthly specialist fees',
+                             'Total Enterprise monthly strategist fees',
+                             'Total Small Business monthly operator fees', 
+                             'Total Small Business monthly assistant fees',
+                             'Total Small Business monthly specialist fees',
+                             'Total Small Business monthly strategist fees',
+                             'Total Personal monthly operator fees', 
+                             'Total Personal monthly assistant fees',
+                             'Total Personal monthly specialist fees',
+                             'Total Personal monthly strategist fees',
                                 'Enterprise monthly operator hrs',
                                 'Enterprise monthly assistant hrs',
                                 'Enterprise monthly specialist hrs',
@@ -1395,36 +1673,36 @@ server <- function(input, output, session) {
                                 'Personal monthly assistant hrs',
                                 'Personal monthly specialist hrs',
                                 'Personal monthly strategist hrs',
-                                  'Enterprise clients',
-                                    'Percent enterprise clients',
+                                  'Enterprise Clients',
+                                    'Percent Enterprise Clients',
                                     'Total clients',
-                                  'Avg enterprise monthly strategist hrs',
-                                  'Enterprise clients',
-                                     'Percent enterprise clients',
+                                  'Avg Enterprise monthly strategist hrs',
+                                  'Enterprise Clients',
+                                     'Percent Enterprise Clients',
                                      'Total clients',
-                                  'Avg enterprise monthly specialist hrs',
-                                  'Enterprise clients',
-                                    'Percent enterprise clients',
+                                  'Avg Enterprise monthly specialist hrs',
+                                  'Enterprise Clients',
+                                    'Percent Enterprise Clients',
                                     'Total clients',
-                                  'Avg enterprise monthly assistant hrs',
-                                  'Enterprise clients',
-                                    'Percent enterprise clients',
+                                  'Avg Enterprise monthly assistant hrs',
+                                  'Enterprise Clients',
+                                    'Percent Enterprise Clients',
                                     'Total clients',
-                                  'Avg enterprise monthly operator hrs',
-                                  'Small Business clients',
-                                    'Percent Small Business clients',
+                                  'Avg Enterprise monthly operator hrs',
+                                  'Small Business Clients',
+                                    'Percent Small Business Clients',
                                     'Total clients',
                                  'Avg Small Business monthly strategist hrs',
-                                 'Small Business clients',
-                                    'Percent Small Business clients',
+                                 'Small Business Clients',
+                                    'Percent Small Business Clients',
                                     'Total clients',
                                  'Avg Small Business monthly specialist hrs',
-                                 'Small Business clients',
-                                    'Percent Small Business clients',
+                                 'Small Business Clients',
+                                    'Percent Small Business Clients',
                                     'Total clients',
                                  'Avg Small Business monthly assistant hrs',
-                                 'Small Business clients',
-                                    'Percent Small Business clients',
+                                 'Small Business Clients',
+                                    'Percent Small Business Clients',
                                     'Total clients',
                                  'Avg Small Business monthly operator hrs',
                                  'Personal clients',
@@ -1549,24 +1827,34 @@ server <- function(input, output, session) {
                            'Additional subscription costs',
                            'Total R and D costs',
                            'BD costs',
-                           'Discretionary spending'
-                           
+                           'Discretionary spending',
+                           'Revenue Growth Percentage'
                   ),
                   Weight = c(3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,
                              3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,
                              3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,
-                             3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3))
+                             3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3))
     gvisSankey(df, from = "From", to = "To", weight = "Weight", 
                options=list(width = 1800, height = 1000,
                  sankey="{link: {colorMode: 'gradient', color: { fill: '8497e5' } },
-                 node: { color: { fill: 'b8e986' },
-                 label: { color: 'Grey' } }}")
+                 node: { 
+                 label: { color: 'Black',
+                 italic: true,
+                 bold: true} }}")
                )
   })
   #######################################Table##############################################
   
   output$table <-renderGvis({
-    gvisTable(grow_live$data, options = list(frozenColumns = 1))
+    gvisTable(MRT$data, options = list(frozenColumns = 1))
   })
-}
   
+  output$clifunc <- renderUI({
+    withMathJax(
+      helpText('$$f(x) = \\frac{Churn * (-x^n) - Client Growth * k}{(-x^n) - k}$$')
+    )
+  })
+
+}
+
+

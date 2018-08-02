@@ -4,7 +4,6 @@ library(googlesheets)
 library(shinythemes)
 library(shinyWidgets)
 curr_date <-format(Sys.Date(), "%b '%y")
-
 #This is for the color of slide bar.
 mycss <- ".irs-bar,
 .irs-bar-edge,
@@ -14,7 +13,7 @@ background: #36454f;
 border-color: #36454f;
 } "
 
-# Define UI for application
+# Define UI for application Cosmo
 ui <- fluidPage(theme = shinytheme("cosmo"),
                 
     #top bar
@@ -24,7 +23,7 @@ ui <- fluidPage(theme = shinytheme("cosmo"),
      
      #############################################Growth page###########################################################################  
      tabPanel("Growth",  #Growth page
-              titlePanel(paste0("The Model"), windowTitle = "TheMoodel3.0"), # App title
+              titlePanel(paste0("The Model"), windowTitle = "The Model"), # App title
               sidebarLayout(position = "right", # Sidebar is on right side
                             sidebarPanel(
                               #this the code to change color of the slide bars(HTML)
@@ -37,6 +36,27 @@ ui <- fluidPage(theme = shinytheme("cosmo"),
                               ),
                               tags$style(mycss),
                               h3("Current Date: ", curr_date),
+                              # fluidRow(
+                              #   column(4,
+                              #          submitButton("Conservative", width = '100%')
+                              #   ),
+                              #   column(4,
+                              #          submitButton("Moderate", width = '100%')
+                              #   ),
+                              #   column(4,
+                              #          submitButton("Aggressive", width = '100%')
+                              #   )
+                              # ),
+                              # submitButton("Conservative", width = '100%'),
+                              # submitButton("Moderate", width = '100%'),
+                              # submitButton("Aggressive", width = '100%'),
+                              
+                              radioButtons(inputId = "grow_diff_types",
+                                           label = "Preselected Model:",
+                                           choices = c("Conservative","Moderate","Aggressive"),
+                                           inline = TRUE,
+                                           selected = "None"),
+                              
                               fluidRow(
                                 column(6,
                                        fluidRow(
@@ -44,7 +64,7 @@ ui <- fluidPage(theme = shinytheme("cosmo"),
                                                 h6(strong("Start:"))
                                          ),
                                          
-                                         column(4,
+                                         column(6,
                                                 h6(textOutput(outputId = "grow_montext"))
                                          ),
                                          column(4,
@@ -53,13 +73,13 @@ ui <- fluidPage(theme = shinytheme("cosmo"),
                                 ),
                                 column(6,
                                        fluidRow(
-                                         column(4,
+                                         column(3,
                                                 h6(strong("End:"))
                                          ),
-                                         column(4,
+                                         column(6,
                                                 h6(textOutput(outputId = "grow_montext2"))
                                          ),
-                                         column(4,
+                                         column(1,
                                                 h6(""))
                                        )
                                 )
@@ -79,8 +99,10 @@ ui <- fluidPage(theme = shinytheme("cosmo"),
                                 inputId = "grow_growslide",
                                 label = "Client Growth:",
                                 grid = TRUE,
-                                choices = c("Custom","5%", "10%","15%","20%","25%","30%","35%","40%","45%","50%",
-                                            "55%","60%","65%","70%", "75%", "80%", "85%", "90%","95%", "100%"),
+                                choices = c("Custom","1%","2%","3%","4%","5%","6%","7%","8%","9%","10%","11%","12%","13%","14%",
+                                            "15%","16%","17%","18%","19%","20%","21%", "22%", "23%", "24%","25%","26%","27%","28%",
+                                            "29%","30%","31%","32%","33%","34%","35%","36%","37%","38%","39%","40%","41%","42%","43%",
+                                            "44%","45%","46%","47%","48%","49%","50%"),
                                 selected = "Custom" 
                               ),
                               
@@ -89,8 +111,8 @@ ui <- fluidPage(theme = shinytheme("cosmo"),
                                 inputId = "grow_mCost",
                                 label = "Costs Multiplier:",
                                 grid = TRUE,
-                                choices = c("Custom","10%", "20%","25%","30%","40%","50%","60%","70%","80%","90%","100%",
-                                            "110%","125%","150%","200%"),
+                                choices = c("Custom","5%", "10%","15%","20%","25%","30%","35%","40%","45%","50%",
+                                            "55%","60%","65%","70%","75%"),
                                 selected = "Custom" 
                               ),
                               #hr(style="border-color: black;"),
@@ -102,14 +124,14 @@ ui <- fluidPage(theme = shinytheme("cosmo"),
                                 grid = TRUE,
                                 choices = c("Custom","1%","2%","3%","4%","5%","6%","7%","8%","9%","10%","11%","12%","13%","14%",
                                             "15%","16%","17%","18%","19%","20%","21%", "22%", "23%", "24%","25%","26%","27%","28%",
-                                            "29%","30%","31%","32%","33%","34%","35%","36%","37%","38%","39%","40%"),
+                                            "29%","30%"),
                                 selected = "Custom" 
                               ),
                               sliderTextInput(
                                 inputId = "grow_Partners",
                                 label = "Partners added per month:",
                                 grid = TRUE,
-                                choices = c("Custom","1","2","3","4","5","6","7","8","9","10"),
+                                choices = c("Custom","1","2","3","4","5"),
                                 selected = "Custom"
                               ),
                               
@@ -159,7 +181,7 @@ ui <- fluidPage(theme = shinytheme("cosmo"),
      ##################################################Costs page########################################################################
      
      tabPanel("Costs",
-              titlePanel("The Model", windowTitle = "TheMoodel3.0"), # App title
+              titlePanel("The Model", windowTitle = "The Model"), # App title
               sidebarLayout(position = "right", # Sidebar is set to right side
                             sidebarPanel(
                               #this the code to change color of the slide bars
@@ -172,6 +194,13 @@ ui <- fluidPage(theme = shinytheme("cosmo"),
                               ),
                               tags$style(mycss),
                               h3("Current Date: ", curr_date),
+                              
+                              radioButtons(inputId = "part_diff_types",
+                                           label = "Preselected Model:",
+                                           choices = c("Conservative","Moderate","Aggressive"),
+                                           inline = TRUE,
+                                           selected = "None"),
+                              
                               fluidRow(
                                 column(6,
                                        fluidRow(
@@ -179,7 +208,7 @@ ui <- fluidPage(theme = shinytheme("cosmo"),
                                                 h6(strong("Start:"))
                                          ),
                                          
-                                         column(4,
+                                         column(6,
                                                 h6(textOutput(outputId = "part_montext"))
                                          ),
                                          column(4,
@@ -191,7 +220,7 @@ ui <- fluidPage(theme = shinytheme("cosmo"),
                                          column(4,
                                                 h6(strong("End:"))
                                          ),
-                                         column(4,
+                                         column(6,
                                                 h6(textOutput(outputId = "part_montext2"))
                                          ),
                                          column(4,
@@ -213,8 +242,10 @@ ui <- fluidPage(theme = shinytheme("cosmo"),
                                 inputId = "part_growslide",
                                 label = "Client Growth:",
                                 grid = TRUE,
-                                choices = c("Custom","5%", "10%","15%","20%","25%","30%","35%","40%","45%","50%",
-                                            "55%","60%","65%","70%", "75%", "80%", "85%", "90%","95%", "100%"),
+                                choices = c("Custom","1%","2%","3%","4%","5%","6%","7%","8%","9%","10%","11%","12%","13%","14%",
+                                            "15%","16%","17%","18%","19%","20%","21%", "22%", "23%", "24%","25%","26%","27%","28%",
+                                            "29%","30%","31%","32%","33%","34%","35%","36%","37%","38%","39%","40%","41%","42%","43%",
+                                            "44%","45%","46%","47%","48%","49%","50%"),
                                 selected = "Custom" 
                               ),
                               
@@ -223,8 +254,8 @@ ui <- fluidPage(theme = shinytheme("cosmo"),
                                 inputId = "part_mCost",
                                 label = "Costs Multiplier:",
                                 grid = TRUE,
-                                choices = c("Custom","10%", "20%","25%","30%","40%","50%","60%","70%","80%","90%","100%",
-                                            "110%","125%","150%","200%"),
+                                choices = c("Custom","5%", "10%","15%","20%","25%","30%","35%","40%","45%","50%",
+                                            "55%","60%","65%","70%","75%"),
                                 selected = "Custom" 
                               ),
                               #slider for Churn
@@ -234,14 +265,14 @@ ui <- fluidPage(theme = shinytheme("cosmo"),
                                 grid = TRUE,
                                 choices = c("Custom","1%","2%","3%","4%","5%","6%","7%","8%","9%","10%","11%","12%","13%","14%",
                                             "15%","16%","17%","18%","19%","20%","21%", "22%", "23%", "24%","25%","26%","27%","28%",
-                                            "29%","30%","31%","32%","33%","34%","35%","36%","37%","38%","39%","40%"),
+                                            "29%","30%"),
                                 selected = "Custom" 
                               ),
                               sliderTextInput(
                                 inputId = "part_Partners",
                                 label = "Partners added per month:",
                                 grid = TRUE,
-                                choices = c("Custom","1","2","3","4","5","6","7","8","9","10"),
+                                choices = c("Custom","1","2","3","4","5"),
                                 selected = "Custom"
                               ),
                               
@@ -289,7 +320,7 @@ ui <- fluidPage(theme = shinytheme("cosmo"),
      # more page with visualizations and table
      navbarMenu("More",
                 tabPanel("Visualizations",  #general page
-                         titlePanel(paste0("The Model"), windowTitle = "TheMoodel3.0"), # App title
+                         titlePanel(paste0("The Model"), windowTitle = "The Model"), # App title
                          sidebarLayout(position = "right", # Sidebar is on right side
                                        sidebarPanel(
                                          #this the code to change color of the slide bars(HTML)
@@ -303,6 +334,13 @@ ui <- fluidPage(theme = shinytheme("cosmo"),
                                          tags$style(mycss),
                                          
                                          h3("Current Date: ", curr_date),
+                                         
+                                         radioButtons(inputId = "diff_types",
+                                                      label = "Preselected Model:",
+                                                      choices = c("Conservative","Moderate","Aggressive"),
+                                                      inline = TRUE,
+                                                      selected = "None"),
+                                         
                                          fluidRow(
                                            column(6,
                                                   fluidRow(
@@ -310,7 +348,7 @@ ui <- fluidPage(theme = shinytheme("cosmo"),
                                                            h6(strong("Start:"))
                                                     ),
                                                     
-                                                    column(4,
+                                                    column(6,
                                                            h6(textOutput(outputId = "montext"))
                                                     ),
                                                     column(4,
@@ -322,7 +360,7 @@ ui <- fluidPage(theme = shinytheme("cosmo"),
                                                     column(4,
                                                            h6(strong("End:"))
                                                     ),
-                                                    column(4,
+                                                    column(6,
                                                            h6(textOutput(outputId = "montext2"))
                                                     ),
                                                     column(4,
@@ -344,8 +382,10 @@ ui <- fluidPage(theme = shinytheme("cosmo"),
                                            inputId = "growslide",
                                            label = "Client Growth:",
                                            grid = TRUE,
-                                           choices = c("Custom","5%", "10%","15%","20%","25%","30%","35%","40%","45%","50%",
-                                                       "55%","60%","65%","70%", "75%", "80%", "85%", "90%","95%", "100%"),
+                                           choices = c("Custom","1%","2%","3%","4%","5%","6%","7%","8%","9%","10%","11%","12%","13%","14%",
+                                                       "15%","16%","17%","18%","19%","20%","21%", "22%", "23%", "24%","25%","26%","27%",
+                                                       "28%","29%","30%","31%","32%","33%","34%","35%","36%","37%","38%","39%","40%","41%",
+                                                       "42%","43%","44%","45%","46%","47%","48%","49%","50%"),
                                            selected = "Custom" 
                                          ),
                                          
@@ -354,8 +394,8 @@ ui <- fluidPage(theme = shinytheme("cosmo"),
                                            inputId = "mCost",
                                            label = "Costs Multiplier:",
                                            grid = TRUE,
-                                           choices = c("Custom","10%", "20%","25%","30%","40%","50%","60%","70%","80%","90%","100%",
-                                                       "110%","125%","150%","200%"),
+                                           choices = c("Custom","5%", "10%","15%","20%","25%","30%","35%","40%","45%","50%",
+                                                       "55%","60%","65%","70%","75%"),
                                            selected = "Custom" 
                                          ),
                                          #hr(style="border-color: black;"),
@@ -367,14 +407,14 @@ ui <- fluidPage(theme = shinytheme("cosmo"),
                                            grid = TRUE,
                                            choices = c("Custom","1%","2%","3%","4%","5%","6%","7%","8%","9%","10%","11%","12%","13%","14%",
                                                        "15%","16%","17%","18%","19%","20%","21%", "22%", "23%", "24%","25%","26%","27%",
-                                                       "28%","29%","30%","31%","32%","33%","34%","35%","36%","37%","38%","39%","40%"),
+                                                       "28%","29%","30%"),
                                            selected = "Custom" 
                                          ),
                                          sliderTextInput(
                                            inputId = "Partners",
                                            label = "Partners added per month:",
                                            grid = TRUE,
-                                           choices = c("Custom","1","2","3","4","5","6","7","8","9","10"),
+                                           choices = c("Custom","1","2","3","4","5"),
                                            selected = "Custom"
                                          ),
                                          
@@ -421,20 +461,174 @@ ui <- fluidPage(theme = shinytheme("cosmo"),
                 tabPanel("Functional Mapping",
                         htmlOutput('funcmap')
                         ),
+                tabPanel("Client Growth Function",
+                         withMathJax(),
+                         h3("Below is how Client Growth increases or decreases over time in relation to churn:"),
+                         h2(uiOutput("clifunc")),
+                         h4("x = Time in Months"),
+                         h4("y-intercept = Client Growth"),
+                         h4("Horizontal Asymptote: y = Churn"),
+                         h4("n = How rapidly Client Growth approaches Churn."),  
+                         fluidRow(
+                           column(1), 
+                           column(11, h4("n > 1: Client growth will go to churn rapidly"))
+                         ),
+                         fluidRow(
+                           column(1), 
+                           column(11, h4("n < 1: Client growth will go to churn slowly"))
+                         ),
+                         fluidRow(
+                           column(1), 
+                           column(11, 
+                                  textInput(inputId = "n_num",
+                                            label = "Custom n:",
+                                            value = 1))
+                         ),
+                         h4("k = How Linear vs Exponential Client growth changes."),
+                         fluidRow(
+                           column(1), 
+                           column(11, h4("As k aproaches infinity, Client Growth will be more horizontal and f'(x) will 
+                                         approach a constant, g(x) = 0. Assumption: x is within our range"))
+                           ),
+                         fluidRow(
+                           column(1), 
+                           column(11, h4("As k approaches 0, Client Growth will be more vertical. f'(x) will 
+                                         approach a constant, g(x) = infinity. Assumption: x is within our range"))
+                           ),
+                         fluidRow(
+                           column(1), 
+                           column(11, 
+                                  textInput(inputId = "k_num",
+                                            label = "Custom k:",
+                                            value = 7))
+                         )),
                 
                 #Table dropdown in More 
-                tabPanel("Table",
+                tabPanel("Raw Data",
                          htmlOutput('table')
-                         )
                          ),
-     tabPanel("Demo",
-              HTML('<iframe width="1000" height="600" 
+                tabPanel("Demo",
+                         HTML('<iframe width="1000" height="600" 
                               src="https://www.youtube.com/embed/tX1gtG--OGE" 
-                   frameborder="0" allow="autoplay; encrypted-media" 
-                   allowfullscreen></iframe>')
+                              frameborder="0" allow="autoplay; encrypted-media" 
+                              allowfullscreen></iframe>')
+                         )),
+    
+     
+####################################################Partner Pay     
+      tabPanel("Partner Pay Calculator",
+              titlePanel(paste0("Partner Pay Calculator"), windowTitle = "The Model"), # App title
+              sidebarLayout(position = "right", # Sidebar is on right side
+                            sidebarPanel(
+                              #this the code to change color of the slide bars(HTML)
+                              tags$head(tags$style(HTML('.js-irs-0 .irs-single, .js-irs-0 .irs-bar- edge, .js-irs-0 .irs-bar {
+                                                        background: #36454f;
+                                                        border-top: 1px solid #36454f ;
+                                                        border-bottom: 1px solid #36454f ;}
+                                                        .irs-from, .irs-to, .irs-single { background: #36454f }'
+                              ))
+                              ),
+                              tags$style(mycss),
+                              h3("Current Date: ", curr_date),
+                              
+                        
+                              #slider for Revenue
+                              sliderInput(inputId = "pp_rev",
+                                          label = "Revenue:",
+                                          step = 5000,
+                                          min = 5000,
+                                          max = 300000,
+                                          value= 50000,
+                                          animate = TRUE
+                              ),
+                              
+                              #slider for Gross Margins
+                              sliderInput(inputId = "pp_gmargin",
+                                          label = "Gross Margins:(%)",
+                                          step = 1,
+                                          min = 1,
+                                          max = 100,
+                                          value= 50,
+                                          animate = TRUE
+                              ),
+                              
+                              #first slider bar for months
+                              sliderInput(inputId = "pp_salcap",
+                                          label = "Salary Cap:",
+                                          step = 500,
+                                          min = 1000,
+                                          max = 12000,
+                                          value= 1000,
+                                          animate = TRUE
+                              ),
+                              
+                              htmlOutput("pp_gprof"),
+                              h4(" "),
+                              
+                              
+                              #reload data clicker
+                              fluidRow(
+                                column(6,
+                                       actionButton(inputId = "pp_reload", label = "Reload data"),
+                                       textOutput('pp_clics')
+                                ),
+                                column(6,
+                                       actionButton(inputId = "pp_newTable", label = "Show Sheet")
+                                )
+                              )
+                            ),
+                            
+                            
+                            # main panel outputs
+                            mainPanel(
+                              fluidRow(
+                                column(12,
+                                       selectInput(
+                                         inputId = "pp_partnernames",
+                                         label = "Partner",
+                                         choices = c("Francis Pedraza",
+                                                     "Keenahn Jung",
+                                                     "Kamron Palizban",
+                                                     "Gunar Gessner",
+                                                     "Corey Breier",
+                                                     "Leo Kewitz",
+                                                     "Ric Pedraza",
+                                                     "Melissa Smith",
+                                                     "Marshall Sutherland",
+                                                     "Rodrigo de Oliveira",
+                                                     "Shane Mileham",
+                                                     "Erinn Woodside",
+                                                     "Jarvis Martin",
+                                                     "Steven Luibrand",
+                                                     "Tiffany Bellah",
+                                                     "Mark Firth",
+                                                     "Hamza Ouaghad",
+                                                     "Thomas Chen",
+                                                     "Zach O'Brien",
+                                                     "Egor Dzezhyts",
+                                                     "Alex Poole",
+                                                     "Stijn Hendrikse",
+                                                     "Horia Veselin",
+                                                     "Skyler Stevens",
+                                                     "Bilal Qureshi",
+                                                     "Gabriel Altemann",
+                                                     "Jay Kumar"),
+                                         selected = "Francis Pedraza"
+                                         
+                                       )
+                                      )
+                                ),
+                              htmlOutput("pp_doughchart")
+                            )
+              ),
+              #this is the table at the bottom of the General page. 
+              fluidRow(
+                column(12,
+                       htmlOutput("pp_main_table")
+                )
               )
             )
-
-          )
+        )
+    )
 
 

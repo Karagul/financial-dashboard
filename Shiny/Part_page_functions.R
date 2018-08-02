@@ -228,7 +228,8 @@ Avg_customer_lifetime_months_partfn <- function(index){
 #8#####################CLTV#############################
 
 CLTV_partfn <- function(index){
-  part_live$data$`CLTV`[index] <- (Total_monthly_ARPA_partfn(index) * Avg_customer_lifetime_months_partfn(index)) - part_live$data$`CAC`[index]
+  part_live$data$`CLTV`[index] <- (Total_monthly_ARPA_partfn(index) * Avg_customer_lifetime_months_partfn(index)) - 
+    part_live$data$`CAC`[index]
 }
 
 #10###################CLTV/CAC##################
@@ -250,7 +251,8 @@ Number_of_agents_partfn <- function(index){
 }
 
 Total_agents_not_including_set_managers_partfn <- function(index) {
-  part_live$data$`Total agents not including set managers`[index] <- Number_of_operators_invisible_decides_to_employ_this_month_partfn(index) + 
+  part_live$data$`Total agents not including set managers`[index] <- 
+    Number_of_operators_invisible_decides_to_employ_this_month_partfn(index) + 
     Number_of_RRRs_invisible_decides_to_employ_this_month_partfn(index) + 
     Number_of_specialists_invisible_decides_to_employ_this_month_partfn(index) +
     Number_of_strategists_invisible_decides_to_employ_this_month_partfn(index)
@@ -283,7 +285,8 @@ Billable_operator_sentry_and_10_dollar_per_hr_RRR_hrs_partfn <- function(index){
 
 ##############Not needed?
 # Personal_monthly_operator_hrs_partfn <- function(index){
-#   part_live$data$`Personal monthly operator hrs`[index] <- part_live$data$`Avg personal monthly operator hrs`[index] * Personal_clients_partfn(index)
+#   part_live$data$`Personal monthly operator hrs`[index] <- part_live$data$`Avg personal monthly operator hrs`[index] * 
+# Personal_clients_partfn(index)
 # }
 
 
@@ -301,7 +304,8 @@ Actual_client_hrs_RRRs_worked_partfn <- function(index){
 }
 
 Billable_RRR_hrs_partfn <- function(index) {
-  part_live$data$`Billable RRR hrs`[index] <- Enterprise_monthly_assistant_hrs_partfn(index) + Small_business_monthly_assistant_hrs_partfn(index) + 
+  part_live$data$`Billable RRR hrs`[index] <- Enterprise_monthly_assistant_hrs_partfn(index) + 
+    Small_business_monthly_assistant_hrs_partfn(index) + 
     Personal_monthly_assistant_hrs_partfn(index)
 }
 
@@ -395,7 +399,8 @@ Total_partner_pay_partfn <- function(index){
 }
 
 Avg_partner_salary_partfn <- function(index){
-  part_live$data$`Avg partner salary`[index] <-  part_live$data$`Avg salary cap per partner`[index] + Avg_dollars_shy_of_partner_salary_cap_partfn(index)
+  part_live$data$`Avg partner salary`[index] <-  part_live$data$`Avg salary cap per partner`[index] + 
+    Avg_dollars_shy_of_partner_salary_cap_partfn(index)
 }
 
 Avg_dollars_shy_of_partner_salary_cap_partfn <- function(index){
@@ -403,8 +408,8 @@ Avg_dollars_shy_of_partner_salary_cap_partfn <- function(index){
     part_live$data$`Avg dollars shy of partner salary cap`[index] = 0
   }
   else {
-  part_live$data$`Avg dollars shy of partner salary cap`[index] <- Gross_margins_split_pre_partner_pay_partfn(index) -
-    part_live$data$`Avg salary cap per partner`[index]
+    part_live$data$`Avg dollars shy of partner salary cap`[index] <- Gross_margins_split_pre_partner_pay_partfn(index) -
+      part_live$data$`Avg salary cap per partner`[index]
   }
 }
 
@@ -426,7 +431,8 @@ Gross_margins_split_pre_partner_pay_partfn <- function(index){
 
 #20#####################Sales and marketing costs
 Sales_and_marketing_costs_partfn <- function(index){
-  part_live$data$`Sales and marketing costs`[index] <- Commissions_partfn(index) + Growth_software_costs_partfn(index) + Advertising_costs_partfn(index) + 
+  part_live$data$`Sales and marketing costs`[index] <- Commissions_partfn(index) + Growth_software_costs_partfn(index) + 
+    Advertising_costs_partfn(index) + 
     Sales_agents_partfn(index) + Invisible_sales_processes_partfn(index)
 }
 
@@ -435,7 +441,7 @@ Commissions_partfn <- function(index){
 }
 
 Growth_software_costs_partfn <- function(index){
-  part_live$data$`Growth software`[index] <-part_live$data$`Growth software`[index - 1] * 
+  part_live$data$`Growth software`[index] <- part_live$data$`Growth software`[index - 1] * 
     (1 + part_live$data$`Composite costs multiplier`[index])
 }
 
@@ -456,8 +462,27 @@ Invisible_sales_processes_partfn <- function(index){
 
 #21####################Subscrption costs
 Additional_subscription_costs_partfn <- function(index){
-  part_live$data$`Additional subscription costs`[index] <- part_live$data$`Additional subscription costs`[index - 1] * 
+  part_live$data$`Additional subscription costs`[index] <- Engineering_software_partfn(index) + Operations_software_partfn(index) + 
+    Development_software_partfn(index) + Finance_software_partfn(index)
+}
+
+Engineering_software_partfn <- function(index){
+  part_live$data$`Engineering software`[index] <- part_live$data$`Engineering software`[index - 1] * 
     (1 + part_live$data$`Composite costs multiplier`[index])
+}
+
+Operations_software_partfn <- function(index){
+  part_live$data$`Operations software`[index] <- part_live$data$`Operations software`[index - 1] * 
+    (1 + part_live$data$`Composite costs multiplier`[index])
+}
+
+Development_software_partfn <- function(index){
+  part_live$data$`Development software`[index] <- part_live$data$`Development software`[index - 1] * 
+    (1 + part_live$data$`Composite costs multiplier`[index])
+}
+
+Finance_software_partfn <- function(index){
+  part_live$data$`Finance software`[index] <- part_live$data$`Finance software`[index]
 }
 
 
@@ -507,7 +532,7 @@ Net_profit_partfn <- function(index) {
 #28####################Net Margins
 
 Net_margins_partfn <- function(index) {
-  part_live$data$`Net margins`[index] <- part_live$data$`Net profit`[index] / part_live$data$Revenue[index]
+  part_live$data$`Net margins`[index] <- Net_profit_partfn(index) / part_live$data$Revenue[index]
 }
 
 #29#####################
@@ -515,7 +540,8 @@ Net_margins_partfn <- function(index) {
 
 #30#####################
 Cash_in_bank_partfn <- function(index){
-  part_live$data$`Cash in bank`[index] <- part_live$data$`Cash in bank`[index - 1] + part_live$data$`Net profit`[index] + part_live$data$`Funds raised`[index]
+  part_live$data$`Cash in bank`[index] <- part_live$data$`Cash in bank`[index - 1] + part_live$data$`Net profit`[index] + 
+    part_live$data$`Funds raised`[index]
 }
 
 
@@ -523,8 +549,7 @@ Cash_in_bank_partfn <- function(index){
 ###############PArtner Bonuses?????????????????
 
 Burn_partfn <- function(index){
-  part_live$data$Burn[index] <- part_live$data$`Partner bonuses`[index] + Sales_and_marketing_costs_partfn(index) + Additional_subscription_costs_partfn(index) + 
-    Total_R_and_D_costs_partfn(index) + BD_costs_partfn(index) + Discretionary_spending_partfn(index)
+  part_live$data$Burn[index] <- part_live$data$`Partner bonuses`[index] + part_live$data$Overhead[index]
 }
 
 

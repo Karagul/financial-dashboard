@@ -9,6 +9,13 @@ gs_mock_runway_title <- gs_title("Mock Runway Table")
 gs_MRT <- gs_read(gs_mock_runway_title, ws=1)
 
 
+
+x = -((row_after_curr_mon - 11)^(.9))
+            growslide_numeric = (((100 * live$data$`Churn percentage weighted by number of clients`[row_after_curr_mon] * x) - 
+                                    const_growslide_numeric) / (x - 1)) / 100
+
+
+
 operators_numeric = as.numeric(gsub("[\\$,]", "", gs_MRT$Operators))
 RRR_numeric = as.numeric(gsub("[\\$,]", "", gs_MRT$RRRs))
 sentries_numeric = as.numeric(gsub("[\\$,]", "", gs_MRT$Sentries))
