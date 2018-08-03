@@ -465,17 +465,18 @@ ui <- fluidPage(theme = shinytheme("cosmo"),
                          withMathJax(),
                          h3("Below is how Client Growth increases or decreases over time in relation to churn:"),
                          h2(uiOutput("clifunc")),
+                         h2(uiOutput("derivative_clifunc")),
                          h4("x = Time in Months"),
                          h4("y-intercept = Client Growth"),
                          h4("Horizontal Asymptote: y = Churn"),
-                         h4("n = How rapidly Client Growth approaches Churn."),  
+                         h4("n = How rapidly Client Growth approaches Churn without changing exponential shape."),  
                          fluidRow(
                            column(1), 
-                           column(11, h4("n > 1: Client growth will go to churn rapidly"))
+                           column(11, h4("n > 1: Client growth will go to churn rapidly. f'(x) will be larger"))
                          ),
                          fluidRow(
                            column(1), 
-                           column(11, h4("n < 1: Client growth will go to churn slowly"))
+                           column(11, h4("n < 1: Client growth will go to churn slowly. f'(x) will be smaller"))
                          ),
                          fluidRow(
                            column(1), 

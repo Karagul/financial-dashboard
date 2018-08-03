@@ -529,9 +529,9 @@ server <- function(input, output, session) {
             #grow_live$data$`Client growth percentage`[row_after_curr_mon] <- growslide_numeric
             #grow_live$data$`Churn percentage weighted by number of clients`[row_after_curr_mon] <- 
             const_growslide_numeric = as.numeric(gsub("[\\%,]", "", input$grow_growslide))
-            x = -((row_after_curr_mon - 12)^(as.numeric(input$n_num)))
+            x = -((row_after_curr_mon - 12)^(as.numeric(n_num)))
             growslide_numeric = (((100 * grow_live$data$`Churn percentage weighted by number of clients`[row_after_curr_mon] * x) - 
-                                    (as.numeric(input$k_num)*const_growslide_numeric)) / (x - as.numeric(input$k_num))) / 100
+                                    (as.numeric(k_num)*const_growslide_numeric)) / (x - as.numeric(k_num))) / 100
             grow_live$data$`Client growth percentage`[row_after_curr_mon] <- growslide_numeric
             Revenue_growfn(row_after_curr_mon)
             Company_head_count_growfn(row_after_curr_mon)
@@ -1852,6 +1852,11 @@ server <- function(input, output, session) {
   output$clifunc <- renderUI({
     withMathJax(
       helpText('$$f(x) = \\frac{Churn * (-x^n) - Client Growth * k}{(-x^n) - k}$$')
+    )
+  })
+  output$derivative_clifunc <- renderUI({
+    withMathJax(
+      helpText('$$\\frac{\\partial}{\\partial x} = \\frac{kn(x^{n-1})(Churn - Client Growth)}{(-x^n - k)^2}$$')
     )
   })
 
